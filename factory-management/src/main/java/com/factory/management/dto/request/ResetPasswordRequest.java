@@ -1,0 +1,15 @@
+package com.factory.management.dto.request;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import lombok.*;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class ResetPasswordRequest {
+    @NotBlank(message = "NOT_BLANK_PASSWORD")
+    @Size(min = 8, max = 100, message = "SIZE_PASSWORD")
+    private String newPassword;
+}

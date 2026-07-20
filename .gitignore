@@ -1,0 +1,16 @@
+﻿.jdks/
+.vscode/
+.idea/
+*.iml
+
+**/target/
+**/node_modules/
+**/dist/
+**/build/
+
+**/.env
+**/.env.*
+!**/.env.example
+
+~$*
+hs_err_pid*.log
