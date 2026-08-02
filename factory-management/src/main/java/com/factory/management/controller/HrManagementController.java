@@ -14,7 +14,7 @@ import com.factory.management.dto.response.PageResponse;
 import com.factory.management.entity.AttendanceStatus;
 import com.factory.management.entity.LeaveStatus;
 import com.factory.management.entity.OvertimeStatus;
-import com.factory.management.service.ServiceImpl.HrManagementService;
+import com.factory.management.service.impl.HrManagementService;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;

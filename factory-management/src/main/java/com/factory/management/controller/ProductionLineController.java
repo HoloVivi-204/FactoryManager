@@ -4,7 +4,7 @@ import com.factory.management.dto.request.ProductionLineRequest;
 import com.factory.management.dto.request.ProductionLineUpdateRequest;
 import com.factory.management.dto.response.ApiResponse;
 import com.factory.management.dto.response.ProductionLineResponse;
-import com.factory.management.service.Service.ProductionLineService;
+import com.factory.management.service.ProductionLineService;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.AccessLevel;

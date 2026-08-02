@@ -9,7 +9,7 @@ import com.factory.management.dto.request.RegisterRequest;
 import com.factory.management.dto.response.ApiResponse;
 import com.factory.management.dto.response.AuthResponse;
 import com.factory.management.dto.response.IntrospectResponse;
-import com.factory.management.service.ServiceImpl.AuthService;
+import com.factory.management.service.impl.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;

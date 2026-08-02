@@ -5,7 +5,7 @@ import com.factory.management.dto.request.DepartmentUpdateRequest;
 import com.factory.management.dto.response.ApiResponse;
 import com.factory.management.dto.response.DepartmentResponse;
 import com.factory.management.dto.response.DepartmentTypeResponse;
-import com.factory.management.service.Service.DepartmentService;
+import com.factory.management.service.DepartmentService;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.AccessLevel;

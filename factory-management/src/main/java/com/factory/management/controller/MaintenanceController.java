@@ -12,7 +12,7 @@ import com.factory.management.dto.response.PageResponse;
 import com.factory.management.entity.MaintenancePriority;
 import com.factory.management.entity.MaintenanceRequestStatus;
 import com.factory.management.entity.MaintenanceWorkOrderStatus;
-import com.factory.management.service.ServiceImpl.MaintenanceService;
+import com.factory.management.service.impl.MaintenanceService;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.time.LocalDateTime;

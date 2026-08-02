@@ -7,7 +7,7 @@ import com.factory.management.dto.response.InventoryStockResponse;
 import com.factory.management.dto.response.InventoryTransactionResponse;
 import com.factory.management.dto.response.PageResponse;
 import com.factory.management.entity.InventoryTransactionType;
-import com.factory.management.service.ServiceImpl.InventoryService;
+import com.factory.management.service.impl.InventoryService;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;

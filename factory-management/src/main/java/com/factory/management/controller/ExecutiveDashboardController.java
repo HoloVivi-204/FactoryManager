@@ -2,7 +2,7 @@ package com.factory.management.controller;
 
 import com.factory.management.dto.response.ApiResponse;
 import com.factory.management.dto.response.ExecutiveDashboardResponse;
-import com.factory.management.service.ServiceImpl.ExecutiveDashboardService;
+import com.factory.management.service.impl.ExecutiveDashboardService;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;

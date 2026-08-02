@@ -4,7 +4,7 @@ import com.factory.management.dto.request.EmployeeActualStagingRequest;
 import com.factory.management.dto.request.EmployeeActualStagingUpdateRequest;
 import com.factory.management.dto.response.ApiResponse;
 import com.factory.management.dto.response.EmployeeActualStagingResponse;
-import com.factory.management.service.Service.EmployeeActualStagingService;
+import com.factory.management.service.EmployeeActualStagingService;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.AccessLevel;

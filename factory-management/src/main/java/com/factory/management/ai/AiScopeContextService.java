@@ -5,7 +5,7 @@ import com.factory.management.entity.User;
 import com.factory.management.exception.AppException;
 import com.factory.management.exception.ErrorCode;
 import com.factory.management.security.AuthorizationScope;
-import com.factory.management.service.Service.CurrentUserService;
+import com.factory.management.service.CurrentUserService;
 import java.time.LocalDate;
 import java.util.Locale;
 import java.util.Set;

@@ -4,7 +4,7 @@ import com.factory.management.dto.request.MachineDowntimeStagingRequest;
 import com.factory.management.dto.request.MachineDowntimeStagingUpdateRequest;
 import com.factory.management.dto.response.ApiResponse;
 import com.factory.management.dto.response.MachineDowntimeStagingResponse;
-import com.factory.management.service.Service.MachineDowntimeStagingService;
+import com.factory.management.service.MachineDowntimeStagingService;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.AccessLevel;

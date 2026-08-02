@@ -3,7 +3,7 @@ package com.factory.management.controller;
 import com.factory.management.dto.response.ApiResponse;
 import com.factory.management.dto.response.AuditEventResponse;
 import com.factory.management.dto.response.PageResponse;
-import com.factory.management.service.ServiceImpl.AuditService;
+import com.factory.management.service.impl.AuditService;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;

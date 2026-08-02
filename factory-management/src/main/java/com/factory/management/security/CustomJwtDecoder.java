@@ -1,7 +1,7 @@
 package com.factory.management.security;
 
 import com.factory.management.dto.request.IntrospectRequest;
-import com.factory.management.service.ServiceImpl.AuthService;
+import com.factory.management.service.impl.AuthService;
 import javax.crypto.spec.SecretKeySpec;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

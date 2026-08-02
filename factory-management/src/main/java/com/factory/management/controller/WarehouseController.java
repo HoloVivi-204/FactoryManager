@@ -3,7 +3,7 @@ package com.factory.management.controller;
 import com.factory.management.dto.request.WarehouseRequest;
 import com.factory.management.dto.response.ApiResponse;
 import com.factory.management.dto.response.WarehouseResponse;
-import com.factory.management.service.ServiceImpl.WarehouseService;
+import com.factory.management.service.impl.WarehouseService;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

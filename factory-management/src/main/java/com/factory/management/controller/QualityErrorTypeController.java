@@ -5,7 +5,7 @@ import com.factory.management.dto.request.QualityErrorTypeUpdateRequest;
 import com.factory.management.dto.response.ApiResponse;
 import com.factory.management.dto.response.QualityErrorTypeResponse;
 import com.factory.management.entity.QualityErrorSeverity;
-import com.factory.management.service.Service.QualityErrorTypeService;
+import com.factory.management.service.QualityErrorTypeService;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.AccessLevel;

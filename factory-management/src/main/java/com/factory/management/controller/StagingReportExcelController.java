@@ -2,7 +2,7 @@ package com.factory.management.controller;
 
 import com.factory.management.dto.response.ApiResponse;
 import com.factory.management.dto.response.StagingExcelImportResponse;
-import com.factory.management.service.ServiceImpl.StagingReportExcelService;
+import com.factory.management.service.impl.StagingReportExcelService;
 import java.nio.charset.StandardCharsets;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ContentDisposition;

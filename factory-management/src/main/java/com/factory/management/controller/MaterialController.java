@@ -4,7 +4,7 @@ import com.factory.management.dto.request.MaterialRequest;
 import com.factory.management.dto.request.MaterialUpdateRequest;
 import com.factory.management.dto.response.ApiResponse;
 import com.factory.management.dto.response.MaterialResponse;
-import com.factory.management.service.Service.MaterialService;
+import com.factory.management.service.MaterialService;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.AccessLevel;

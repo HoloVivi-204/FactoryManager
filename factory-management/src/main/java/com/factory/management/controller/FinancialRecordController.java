@@ -11,7 +11,7 @@ import com.factory.management.dto.response.FinancialSummaryResponse;
 import com.factory.management.dto.response.PageResponse;
 import com.factory.management.entity.FinancialEntryType;
 import com.factory.management.entity.FinancialRecordStatus;
-import com.factory.management.service.ServiceImpl.FinancialRecordService;
+import com.factory.management.service.impl.FinancialRecordService;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;

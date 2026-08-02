@@ -4,7 +4,7 @@ import com.factory.management.dto.request.ShiftRequest;
 import com.factory.management.dto.request.ShiftUpdateRequest;
 import com.factory.management.dto.response.ApiResponse;
 import com.factory.management.dto.response.ShiftResponse;
-import com.factory.management.service.Service.ShiftService;
+import com.factory.management.service.ShiftService;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.AccessLevel;

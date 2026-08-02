@@ -5,7 +5,7 @@ import com.factory.management.dto.response.ApiResponse;
 import com.factory.management.dto.response.PageResponse;
 import com.factory.management.dto.response.ProductionPlanResponse;
 import com.factory.management.entity.ProductionPlanStatus;
-import com.factory.management.service.ServiceImpl.ProductionPlanService;
+import com.factory.management.service.impl.ProductionPlanService;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;

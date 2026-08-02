@@ -4,7 +4,7 @@ import com.factory.management.dto.request.ProductRequest;
 import com.factory.management.dto.response.ApiResponse;
 import com.factory.management.dto.response.PageResponse;
 import com.factory.management.dto.response.ProductResponse;
-import com.factory.management.service.ServiceImpl.ProductService;
+import com.factory.management.service.impl.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;

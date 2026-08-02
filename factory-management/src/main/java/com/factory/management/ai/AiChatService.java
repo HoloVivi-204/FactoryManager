@@ -2,7 +2,7 @@ package com.factory.management.ai;
 
 import com.factory.management.dto.request.AiChatRequest;
 import com.factory.management.dto.response.AiChatResponse;
-import com.factory.management.service.ServiceImpl.AuditService;
+import com.factory.management.service.impl.AuditService;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;

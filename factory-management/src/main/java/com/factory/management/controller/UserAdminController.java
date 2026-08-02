@@ -4,7 +4,7 @@ import com.factory.management.dto.request.ResetPasswordRequest;
 import com.factory.management.dto.request.UpdateUserRolesRequest;
 import com.factory.management.dto.response.ApiResponse;
 import com.factory.management.dto.response.UserResponse;
-import com.factory.management.service.ServiceImpl.UserManagementService;
+import com.factory.management.service.impl.UserManagementService;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

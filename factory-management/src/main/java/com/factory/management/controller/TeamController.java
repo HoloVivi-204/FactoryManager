@@ -5,7 +5,7 @@ import com.factory.management.dto.request.TeamRequest;
 import com.factory.management.dto.request.TeamUpdateRequest;
 import com.factory.management.dto.response.ApiResponse;
 import com.factory.management.dto.response.TeamResponse;
-import com.factory.management.service.Service.TeamService;
+import com.factory.management.service.TeamService;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.AccessLevel;

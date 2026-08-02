@@ -5,7 +5,7 @@ import com.factory.management.dto.request.MachineUpdateRequest;
 import com.factory.management.dto.response.ApiResponse;
 import com.factory.management.dto.response.MachineResponse;
 import com.factory.management.entity.MachineOperationalStatus;
-import com.factory.management.service.Service.MachineService;
+import com.factory.management.service.MachineService;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.AccessLevel;

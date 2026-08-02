@@ -4,7 +4,7 @@ import com.factory.management.dto.request.EmployeeRequest;
 import com.factory.management.dto.request.EmployeeUpdateRequest;
 import com.factory.management.dto.response.ApiResponse;
 import com.factory.management.dto.response.EmployeeResponse;
-import com.factory.management.service.Service.EmployeeService;
+import com.factory.management.service.EmployeeService;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.AccessLevel;

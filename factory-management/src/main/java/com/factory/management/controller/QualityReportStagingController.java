@@ -4,7 +4,7 @@ import com.factory.management.dto.request.QualityReportStagingRequest;
 import com.factory.management.dto.request.QualityReportStagingUpdateRequest;
 import com.factory.management.dto.response.ApiResponse;
 import com.factory.management.dto.response.QualityReportStagingResponse;
-import com.factory.management.service.Service.QualityReportStagingService;
+import com.factory.management.service.QualityReportStagingService;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.AccessLevel;

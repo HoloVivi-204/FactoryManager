@@ -3,7 +3,7 @@ package com.factory.management.controller;
 import com.factory.management.dto.request.UserDataScopeRequest;
 import com.factory.management.dto.response.ApiResponse;
 import com.factory.management.dto.response.UserDataScopeResponse;
-import com.factory.management.service.ServiceImpl.UserDataScopeService;
+import com.factory.management.service.impl.UserDataScopeService;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

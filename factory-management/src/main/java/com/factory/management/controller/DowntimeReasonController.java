@@ -5,7 +5,7 @@ import com.factory.management.dto.request.DowntimeReasonUpdateRequest;
 import com.factory.management.dto.response.ApiResponse;
 import com.factory.management.dto.response.DowntimeReasonResponse;
 import com.factory.management.entity.DowntimeReasonType;
-import com.factory.management.service.Service.DowntimeReasonService;
+import com.factory.management.service.DowntimeReasonService;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.AccessLevel;

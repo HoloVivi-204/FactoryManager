@@ -3,7 +3,7 @@ package com.factory.management.controller;
 import com.factory.management.dto.request.FinancialCategoryRequest;
 import com.factory.management.dto.response.ApiResponse;
 import com.factory.management.dto.response.FinancialCategoryResponse;
-import com.factory.management.service.ServiceImpl.FinancialCategoryService;
+import com.factory.management.service.impl.FinancialCategoryService;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

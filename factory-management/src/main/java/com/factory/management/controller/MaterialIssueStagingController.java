@@ -5,7 +5,7 @@ import com.factory.management.dto.request.MaterialIssueStagingUpdateRequest;
 import com.factory.management.dto.response.ApiResponse;
 import com.factory.management.dto.response.MaterialIssueStagingResponse;
 import com.factory.management.entity.MaterialIssueType;
-import com.factory.management.service.Service.MaterialIssueStagingService;
+import com.factory.management.service.MaterialIssueStagingService;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.AccessLevel;
