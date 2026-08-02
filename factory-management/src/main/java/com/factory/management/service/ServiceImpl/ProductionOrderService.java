@@ -205,7 +205,7 @@ public class ProductionOrderService {
 
     private Team activeTeam(Long id) {
         return teamRepository
-                .findByIdAndActiveTrueAndProductionLine_ActiveTrueAndProductionLine_Department_ActiveTrueAndProductionLine_Department_Factory_ActiveTrue(id)
+                .findActiveByIdInActiveHierarchy(id)
                 .orElseThrow(() -> new AppException(ErrorCode.TEAM_ID_NOT_FOUND));
     }
 

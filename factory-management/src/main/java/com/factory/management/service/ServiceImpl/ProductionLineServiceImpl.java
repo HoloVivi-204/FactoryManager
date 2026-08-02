@@ -55,7 +55,7 @@ public class ProductionLineServiceImpl implements ProductionLineService {
     @Transactional(readOnly = true)
     public List<ProductionLineResponse> getAll() {
         return productionLineRepository
-                .findAllByActiveTrueAndDepartment_ActiveTrueAndDepartment_Factory_ActiveTrue()
+                .findAllActiveInActiveHierarchy()
                 .stream()
                 .map(productionLineMapper::mapToProductionLineResponse)
                 .toList();
@@ -66,9 +66,7 @@ public class ProductionLineServiceImpl implements ProductionLineService {
     public List<ProductionLineResponse> getAllByDepartmentId(Long departmentId) {
         findActiveDepartment(departmentId);
         return productionLineRepository
-                .findAllByDepartment_IdAndActiveTrueAndDepartment_ActiveTrueAndDepartment_Factory_ActiveTrue(
-                        departmentId
-                )
+                .findAllActiveByDepartmentIdInActiveHierarchy(departmentId)
                 .stream()
                 .map(productionLineMapper::mapToProductionLineResponse)
                 .toList();
@@ -117,13 +115,13 @@ public class ProductionLineServiceImpl implements ProductionLineService {
     }
 
     private Department findActiveDepartment(Long id) {
-        return departmentRepository.findByIdAndActiveTrueAndFactory_ActiveTrue(id)
+        return departmentRepository.findActiveByIdInActiveHierarchy(id)
                 .orElseThrow(() -> new AppException(ErrorCode.DEPARTMENT_ID_NOT_FOUND));
     }
 
     private ProductionLine findActiveProductionLine(Long id) {
         return productionLineRepository
-                .findByIdAndActiveTrueAndDepartment_ActiveTrueAndDepartment_Factory_ActiveTrue(id)
+                .findActiveByIdInActiveHierarchy(id)
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCTION_LINE_ID_NOT_FOUND));
     }
 

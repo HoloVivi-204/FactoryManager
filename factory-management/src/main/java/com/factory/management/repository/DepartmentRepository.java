@@ -3,6 +3,8 @@ package com.factory.management.repository;
 import com.factory.management.entity.Department;
 import com.factory.management.entity.DepartmentType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,11 +22,41 @@ public interface DepartmentRepository extends JpaRepository<Department, Long> {
             Long id
     );
 
-    List<Department> findAllByActiveTrueAndFactory_ActiveTrue();
+    @Query("""
+            select department
+            from Department department
+                join department.factory factory
+            where department.active = true
+                and factory.active = true
+            """)
+    List<Department> findAllActiveInActiveHierarchy();
 
-    List<Department> findAllByFactory_IdAndActiveTrueAndFactory_ActiveTrue(Long factoryId);
+    @Query("""
+            select department
+            from Department department
+                join department.factory factory
+            where factory.id = :factoryId
+                and department.active = true
+                and factory.active = true
+            """)
+    List<Department> findAllActiveByFactoryIdInActiveHierarchy(@Param("factoryId") Long factoryId);
 
-    Optional<Department> findByIdAndActiveTrueAndFactory_ActiveTrue(Long id);
+    @Query("""
+            select department
+            from Department department
+                join department.factory factory
+            where department.id = :id
+                and department.active = true
+                and factory.active = true
+            """)
+    Optional<Department> findActiveByIdInActiveHierarchy(@Param("id") Long id);
 
-    Optional<Department> findByIdAndFactory_ActiveTrue(Long id);
+    @Query("""
+            select department
+            from Department department
+                join department.factory factory
+            where department.id = :id
+                and factory.active = true
+            """)
+    Optional<Department> findByIdInActiveHierarchy(@Param("id") Long id);
 }

@@ -318,11 +318,10 @@ public class FinancialRecordService {
         Factory factory = factories.findByIdAndActiveTrue(request.getFactoryId())
                 .orElseThrow(() -> new AppException(ErrorCode.FACTORY_ID_NOT_FOUND));
         Department department = request.getDepartmentId() == null ? null
-                : departments.findByIdAndActiveTrueAndFactory_ActiveTrue(request.getDepartmentId())
+                : departments.findActiveByIdInActiveHierarchy(request.getDepartmentId())
                 .orElseThrow(() -> new AppException(ErrorCode.DEPARTMENT_ID_NOT_FOUND));
         ProductionLine line = request.getProductionLineId() == null ? null
-                : lines.findByIdAndActiveTrueAndDepartment_ActiveTrueAndDepartment_Factory_ActiveTrue(
-                        request.getProductionLineId())
+                : lines.findActiveByIdInActiveHierarchy(request.getProductionLineId())
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCTION_LINE_ID_NOT_FOUND));
         if ((department != null && !department.getFactory().getId().equals(factory.getId()))
                 || (line != null && (department == null

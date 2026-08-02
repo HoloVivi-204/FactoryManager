@@ -58,7 +58,7 @@ public class TeamServiceImpl implements TeamService {
     @Transactional(readOnly = true)
     public List<TeamResponse> getAll() {
         return teamRepository
-                .findAllByActiveTrueAndProductionLine_ActiveTrueAndProductionLine_Department_ActiveTrueAndProductionLine_Department_Factory_ActiveTrue()
+                .findAllActiveInActiveHierarchy()
                 .stream()
                 .map(teamMapper::mapToTeamResponse)
                 .toList();
@@ -69,9 +69,7 @@ public class TeamServiceImpl implements TeamService {
     public List<TeamResponse> getAllByProductionLineId(Long productionLineId) {
         findActiveProductionLine(productionLineId);
         return teamRepository
-                .findAllByProductionLine_IdAndActiveTrueAndProductionLine_ActiveTrueAndProductionLine_Department_ActiveTrueAndProductionLine_Department_Factory_ActiveTrue(
-                        productionLineId
-                )
+                .findAllActiveByProductionLineIdInActiveHierarchy(productionLineId)
                 .stream()
                 .map(teamMapper::mapToTeamResponse)
                 .toList();
@@ -146,19 +144,19 @@ public class TeamServiceImpl implements TeamService {
 
     private ProductionLine findActiveProductionLine(Long id) {
         return productionLineRepository
-                .findByIdAndActiveTrueAndDepartment_ActiveTrueAndDepartment_Factory_ActiveTrue(id)
+                .findActiveByIdInActiveHierarchy(id)
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCTION_LINE_ID_NOT_FOUND));
     }
 
     private Team findActiveTeam(Long id) {
         return teamRepository
-                .findByIdAndActiveTrueAndProductionLine_ActiveTrueAndProductionLine_Department_ActiveTrueAndProductionLine_Department_Factory_ActiveTrue(id)
+                .findActiveByIdInActiveHierarchy(id)
                 .orElseThrow(() -> new AppException(ErrorCode.TEAM_ID_NOT_FOUND));
     }
 
     private Team findTeamForUpdate(Long id) {
         return teamRepository
-                .findByIdAndProductionLine_ActiveTrueAndProductionLine_Department_ActiveTrueAndProductionLine_Department_Factory_ActiveTrue(id)
+                .findByIdInActiveHierarchy(id)
                 .orElseThrow(() -> new AppException(ErrorCode.TEAM_ID_NOT_FOUND));
     }
 

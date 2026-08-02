@@ -2,6 +2,8 @@ package com.factory.management.repository;
 
 import com.factory.management.entity.ProductionLine;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -11,11 +13,40 @@ public interface ProductionLineRepository extends JpaRepository<ProductionLine, 
 
     boolean existsByDepartment_IdAndCodeIgnoreCaseAndIdNot(Long departmentId, String code, Long id);
 
-    List<ProductionLine> findAllByActiveTrueAndDepartment_ActiveTrueAndDepartment_Factory_ActiveTrue();
+    @Query("""
+            select line
+            from ProductionLine line
+                join line.department department
+                join department.factory factory
+            where line.active = true
+                and department.active = true
+                and factory.active = true
+            """)
+    List<ProductionLine> findAllActiveInActiveHierarchy();
 
-    List<ProductionLine> findAllByDepartment_IdAndActiveTrueAndDepartment_ActiveTrueAndDepartment_Factory_ActiveTrue(
-            Long departmentId
+    @Query("""
+            select line
+            from ProductionLine line
+                join line.department department
+                join department.factory factory
+            where department.id = :departmentId
+                and line.active = true
+                and department.active = true
+                and factory.active = true
+            """)
+    List<ProductionLine> findAllActiveByDepartmentIdInActiveHierarchy(
+            @Param("departmentId") Long departmentId
     );
 
-    Optional<ProductionLine> findByIdAndActiveTrueAndDepartment_ActiveTrueAndDepartment_Factory_ActiveTrue(Long id);
+    @Query("""
+            select line
+            from ProductionLine line
+                join line.department department
+                join department.factory factory
+            where line.id = :id
+                and line.active = true
+                and department.active = true
+                and factory.active = true
+            """)
+    Optional<ProductionLine> findActiveByIdInActiveHierarchy(@Param("id") Long id);
 }

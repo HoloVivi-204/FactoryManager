@@ -714,7 +714,7 @@ public class StagingReportExcelService {
 
     private void createCatalogSheets(XSSFWorkbook workbook, CellStyle style) {
         Set<Long> teamIds = authorizationScope.accessibleTeamIds();
-        List<Team> teams = teamRepository.findAllByActiveTrueAndProductionLine_ActiveTrueAndProductionLine_Department_ActiveTrueAndProductionLine_Department_Factory_ActiveTrue()
+        List<Team> teams = teamRepository.findAllActiveInActiveHierarchy()
                 .stream().filter(team -> teamIds.contains(team.getId())).toList();
         Sheet scope = catalog(workbook, "DM_TO_MAY", style,
                 "factoryCode", "departmentCode", "productionLineCode", "teamCode", "leaderEmployeeCode", "machineCode");

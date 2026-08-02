@@ -228,7 +228,7 @@ public class ProductionPlanService {
 
     private ProductionLine activeLine(Long id) {
         return productionLineRepository
-                .findByIdAndActiveTrueAndDepartment_ActiveTrueAndDepartment_Factory_ActiveTrue(id)
+                .findActiveByIdInActiveHierarchy(id)
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCTION_LINE_ID_NOT_FOUND));
     }
 

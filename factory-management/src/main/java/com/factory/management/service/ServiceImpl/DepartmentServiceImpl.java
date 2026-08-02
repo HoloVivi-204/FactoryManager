@@ -57,7 +57,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     @Transactional(readOnly = true)
     public List<DepartmentResponse> getAll() {
-        return departmentRepository.findAllByActiveTrueAndFactory_ActiveTrue().stream()
+        return departmentRepository.findAllActiveInActiveHierarchy().stream()
                 .map(departmentMapper::mapToDepartmentResponse)
                 .toList();
     }
@@ -66,7 +66,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Transactional(readOnly = true)
     public List<DepartmentResponse> getAllByFactoryId(Long factoryId) {
         findActiveFactory(factoryId);
-        return departmentRepository.findAllByFactory_IdAndActiveTrueAndFactory_ActiveTrue(factoryId).stream()
+        return departmentRepository.findAllActiveByFactoryIdInActiveHierarchy(factoryId).stream()
                 .map(departmentMapper::mapToDepartmentResponse)
                 .toList();
     }
@@ -130,12 +130,12 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     private Department findActiveDepartment(Long id) {
-        return departmentRepository.findByIdAndActiveTrueAndFactory_ActiveTrue(id)
+        return departmentRepository.findActiveByIdInActiveHierarchy(id)
                 .orElseThrow(() -> new AppException(ErrorCode.DEPARTMENT_ID_NOT_FOUND));
     }
 
     private Department findDepartmentInActiveFactory(Long id) {
-        return departmentRepository.findByIdAndFactory_ActiveTrue(id)
+        return departmentRepository.findByIdInActiveHierarchy(id)
                 .orElseThrow(() -> new AppException(ErrorCode.DEPARTMENT_ID_NOT_FOUND));
     }
 

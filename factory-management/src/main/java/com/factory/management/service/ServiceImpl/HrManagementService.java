@@ -411,8 +411,7 @@ public class HrManagementService {
         Employee employee = employee(request.getEmployeeId());
         requireEmployeeAccess(employee.getId());
         Team target = teams
-                .findByIdAndActiveTrueAndProductionLine_ActiveTrueAndProductionLine_Department_ActiveTrueAndProductionLine_Department_Factory_ActiveTrue(
-                        request.getTargetTeamId())
+                .findActiveByIdInActiveHierarchy(request.getTargetTeamId())
                 .orElseThrow(() -> new AppException(ErrorCode.TEAM_ID_NOT_FOUND));
         requireTeamAccess(target.getId());
         LocalDate end = request.getEffectiveTo() == null ? LocalDate.of(9999, 12, 31) : request.getEffectiveTo();

@@ -244,8 +244,7 @@ public class AuthorizationScope {
     }
 
     private Set<Long> accessibleTeamIds(User user, Set<Role> effectiveRoles) {
-        List<Team> activeTeams = teamRepository
-                .findAllByActiveTrueAndProductionLine_ActiveTrueAndProductionLine_Department_ActiveTrueAndProductionLine_Department_Factory_ActiveTrue();
+        List<Team> activeTeams = teamRepository.findAllActiveInActiveHierarchy();
         if (hasAny(effectiveRoles, Role.ADMIN, Role.DIRECTOR)) {
             return activeTeams.stream().map(Team::getId).collect(java.util.stream.Collectors.toUnmodifiableSet());
         }

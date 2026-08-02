@@ -254,14 +254,13 @@ public class ProductionReportStagingServiceImpl implements ProductionReportStagi
                 .orElseThrow(() -> new AppException(ErrorCode.SHIFT_ID_NOT_FOUND));
         Factory factory = factoryRepository.findByIdAndActiveTrue(factoryId)
                 .orElseThrow(() -> new AppException(ErrorCode.FACTORY_ID_NOT_FOUND));
-        Department department = departmentRepository.findByIdAndActiveTrueAndFactory_ActiveTrue(departmentId)
+        Department department = departmentRepository.findActiveByIdInActiveHierarchy(departmentId)
                 .orElseThrow(() -> new AppException(ErrorCode.DEPARTMENT_ID_NOT_FOUND));
         ProductionLine line = productionLineRepository
-                .findByIdAndActiveTrueAndDepartment_ActiveTrueAndDepartment_Factory_ActiveTrue(lineId)
+                .findActiveByIdInActiveHierarchy(lineId)
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCTION_LINE_ID_NOT_FOUND));
         Team team = teamRepository
-                .findByIdAndActiveTrueAndProductionLine_ActiveTrueAndProductionLine_Department_ActiveTrueAndProductionLine_Department_Factory_ActiveTrue(
-                        teamId)
+                .findActiveByIdInActiveHierarchy(teamId)
                 .orElseThrow(() -> new AppException(ErrorCode.TEAM_ID_NOT_FOUND));
         Employee leader = employeeRepository
                 .findActiveByIdInActiveHierarchy(leaderId)
