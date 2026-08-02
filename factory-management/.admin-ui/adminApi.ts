@@ -1,1 +1,0 @@
-import{get,send}from'./client';export const adminApi={list:(path:string)=>get<any[]>(`/${path}/all`),create:(path:string,data:any)=>send(`/${path}`,'POST',data),remove:(path:string,id:number)=>send(`/${path}/${id}`,'DELETE')}

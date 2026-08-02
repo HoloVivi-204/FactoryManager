@@ -1,1 +1,0 @@
-import{get,send}from'./client';import type{TableRow}from'../types';export const shiftReportApi={createDetail:(path:string,data:unknown)=>send<TableRow>(`/${path}`,'POST',data),details:(path:string,id:number)=>get<TableRow[]>(`/${path}/report/${id}`)}
