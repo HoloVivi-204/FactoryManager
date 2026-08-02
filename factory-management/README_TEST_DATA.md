@@ -1,5 +1,12 @@
 # Bộ dữ liệu mẫu kiểm thử Factory Management
 
+> Bộ fixture này phục vụ implementation **Current/legacy**. Các mã `DIRECTOR`, `FACTORY_MANAGER`,
+> `PRODUCTION_MANAGER`, `TEAM_LEADER` và tên workspace trong tài liệu phải giữ nguyên cho đến khi code
+> được migration. Chúng không thay thế mô hình Target
+> `Quản lý điều hành → Quản lý vận hành → Nhân viên vận hành`; trong Target, Ca trưởng/Tổ trưởng là
+> chức danh nhân sự, không phải security role. Không dùng fixture này làm bằng chứng rằng migration role,
+> navigation hoặc phân quyền Target đã hoàn tất.
+
 File Excel mẫu đã điền sẵn dữ liệu ngày `2026-07-12`: [MAU_NHAP_BAO_CAO_CA.xlsx](MAU_NHAP_BAO_CAO_CA.xlsx).
 
 File này sử dụng các mã danh mục trong chính tài liệu này. Sau khi tạo dữ liệu nền và đăng nhập bằng `totruong.a1`, bạn có thể tải file lên màn hình Báo cáo trong ca để kiểm tra luồng import.

@@ -1,6 +1,13 @@
 # Nhập dữ liệu báo cáo ca từ Excel
 
-Chức năng này dành cho Tổ trưởng/Ca trưởng nhập dữ liệu lịch sử vào các bảng staging. Dữ liệu sau khi nhập luôn ở trạng thái `DRAFT`; hệ thống không tự submit, approve hoặc tạo báo cáo chính thức.
+> Phạm vi tài liệu: luồng Excel của implementation **Current/legacy**. `TEAM_LEADER` và đường dẫn
+> “Tổ trưởng” bên dưới vẫn là tên đang chạy, không phải role/tab Target. Target cho Nhân viên vận hành
+> có quyền nhập trong scope; Ca trưởng/Tổ trưởng chỉ là chức danh trong Quản lý nhân sự. Luồng Current
+> cũng chưa có `businessDataCode`, phân lớp thời gian, cảnh báo gần trùng hoặc đối soát Excel–web–OCR.
+
+Trong implementation Current, chức năng này dành cho tài khoản `TEAM_LEADER`/Tổ trưởng nhập dữ liệu
+lịch sử vào các bảng staging. Dữ liệu sau khi nhập luôn ở trạng thái `DRAFT`; hệ thống không tự submit,
+approve hoặc tạo báo cáo chính thức.
 
 ## Quy trình trên web
 

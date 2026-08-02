@@ -1,5 +1,12 @@
 # Phân quyền và phạm vi dữ liệu
 
+> Phạm vi tài liệu: contract của implementation **Current/legacy**. Bảng role bên dưới phản ánh enum
+> đang chạy, không phải mô hình Target đã duyệt. Target dùng
+> `Quản lý điều hành → Quản lý vận hành → Nhân viên vận hành`; quyền quản trị/audit trực giao và
+> Ca trưởng/Tổ trưởng là chức danh nhân sự. Việc ánh xạ/migration chưa được triển khai, xem
+> [`../../PRD_He_thong_hieu_suat_nha_may.md`](../../PRD_He_thong_hieu_suat_nha_may.md) mục 5 và
+> [`../../DECISIONS.md`](../../DECISIONS.md) `ADR-C03`.
+
 ## Vai trò
 
 | Role | Phạm vi mặc định | Chức năng chính |

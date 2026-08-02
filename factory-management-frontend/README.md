@@ -1,54 +1,97 @@
-# React + TypeScript + Vite
+# FactoryManager Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Ứng dụng React cho FactoryManager. Frontend hiện có login, workspace theo role, master data admin, nhập/duyệt
+báo cáo sản xuất, dashboard cơ bản và một số module mở rộng ngoài MVP. Route UI `ReportsPage` có tồn tại
+nhưng chức năng liệt kê báo cáo official theo scope đang bị hỏng do lệch API.
 
-Currently, two official plugins are available:
+Tài liệu sản phẩm và UI:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- [Root README](../README.md)
+- [PRD](../PRD_He_thong_hieu_suat_nha_may.md)
+- [Design System](../DESIGN_SYSTEM.md)
+- [Screen Map](../docs/ui/SCREEN_MAP.md)
+- [Hướng dẫn test](../HUONG_DAN_TEST.md)
 
-## Expanding the ESLint configuration
+## Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- React 19
+- TypeScript 5.8
+- Vite 6
+- React Router 7
+- Recharts
+- ESLint 9
+- pnpm
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## Cài và chạy
+
+```powershell
+pnpm.cmd install
+$env:VITE_API_URL = 'http://localhost:8080/factory-management/api/v1'
+pnpm.cmd dev -- --host localhost --port 5173 --strictPort
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Nếu không đặt `VITE_API_URL`, ứng dụng dùng URL trên làm mặc định.
+Backend hiện chỉ allow CORS từ `http://localhost:5173` và `http://127.0.0.1:5173`. Nếu port `5173` đang bận,
+`--strictPort` phải dừng startup; giải phóng port rồi chạy lại, không chuyển sang port Vite tự chọn.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Kiểm tra
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+```powershell
+pnpm.cmd run lint
+pnpm.cmd run build
 ```
+
+Repository chưa có script test frontend. Production build và lint là hai gate hiện có; xem
+[Final status](../docs/release/FINAL_STATUS.md) để biết kết quả gần nhất.
+
+## Routing hiện tại
+
+Ứng dụng dùng route:
+
+```text
+/workspace/:roleSlug/:pageKey
+```
+
+Khi chưa đăng nhập, mọi route render `LoginPage`. Khi đã đăng nhập:
+
+- Role và page key được kiểm tra trước khi render workspace.
+- Navigation chỉ hiển thị page được khai báo cho role hiện tại.
+- Backend vẫn phải kiểm tra role/data scope; redirect hoặc ẩn menu không phải security control.
+
+Chi tiết current/target route nằm trong [Screen Map](../docs/ui/SCREEN_MAP.md).
+
+## API client
+
+- Base URL lấy từ `VITE_API_URL`.
+- Bearer token được gắn vào request authenticated.
+- Client hiện đọc envelope `{ code, message, result }`.
+- HTTP 401 xóa phiên local và phát sự kiện unauthorized.
+- HTTP 403 hiển thị lỗi quyền.
+- Upload Excel dùng `multipart/form-data`, giới hạn backend hiện tại là 10 MB.
+- `ReportsPage` hiện gọi `GET /production-reports/search/my-scope`, nhưng backend chưa có route này; không dùng
+  trang đó làm bằng chứng demo hoặc acceptance cho tới khi consumer và controller được đồng bộ.
+
+Không thay response envelope chỉ ở frontend. Mọi thay đổi contract phải được ghi trong
+[API Contracts](../API_Contracts.md) và triển khai có compatibility plan.
+
+## Trạng thái UI
+
+Current UI hỗ trợ:
+
+- Loading/authentication state.
+- Empty và error state ở nhiều table/panel.
+- Toast cho kết quả mutation.
+- Responsive grid ở các breakpoint 1000 px và 650 px.
+
+Gap đáng chú ý:
+
+- Mobile đang ẩn sidebar nhưng chưa có navigation thay thế.
+- CSS còn nhiều block lặp và chưa dùng semantic token.
+- Một số page trong navigation là placeholder hoặc nằm ngoài MVP.
+- Chưa có accessibility test, component test hoặc E2E test.
+- Dashboard chưa biểu diễn đầy đủ coverage, freshness, Partial, Adjusted và Stale.
+- `RoleOverviewPage` có thể bỏ qua lỗi summary sau loading, còn formatter hiện đổi dữ liệu thiếu thành `0`/
+  `0.00%`; phải xác nhận request API thành công trước khi diễn giải số zero là dữ liệu thật.
+
+Component mới phải tuân thủ [Design System](../DESIGN_SYSTEM.md), đặc biệt quy tắc “missing khác zero” và
+state contract loading/empty/error/partial/stale.
