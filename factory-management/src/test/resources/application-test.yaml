@@ -1,0 +1,25 @@
+spring:
+  sql:
+    init:
+      mode: never
+
+  datasource:
+    url: jdbc:h2:mem:factorymanagement;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+
+app:
+  bootstrap-admin:
+    enabled: false
+
+ai:
+  enabled: false

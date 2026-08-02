@@ -55,7 +55,7 @@ public class ReportImportBatch {
 
     @Lob
     @Basic(fetch = FetchType.LAZY)
-    @Column(name = "uploaded_content", nullable = false)
+    @Column(name = "uploaded_content", nullable = false, columnDefinition = "bytea")
     private byte[] uploadedContent;
 
     @Column(name = "total_rows", nullable = false)

@@ -44,7 +44,7 @@ public class GeneratedReportFile {
 
     @Lob
     @Basic(fetch = FetchType.LAZY)
-    @Column(name = "file_content", nullable = false)
+    @Column(name = "file_content", nullable = false, columnDefinition = "bytea")
     private byte[] content;
 
     @Column(name = "data_row_count", nullable = false)
