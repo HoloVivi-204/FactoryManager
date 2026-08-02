@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { employeeApi } from '../api/employeeApi'
 import { DataTable, LoadingState, Panel, StatusBadge } from '../components/ui'
 import { useApi } from '../utils/useApi'
-import type { PageKey } from '../types'
+import type { HrSchedule, PageKey } from '../types'
 
 export default function EmployeePortalPage({ view }: { view: PageKey }) {
   const portal = useApi(employeeApi.dashboard, [])
@@ -21,7 +21,7 @@ export default function EmployeePortalPage({ view }: { view: PageKey }) {
 
   const filteredNotifications = useMemo(() => {
     const term = notificationFilters.keyword.trim().toLocaleLowerCase('vi')
-    return (data?.notifications ?? []).filter((notification: any) => {
+    return (data?.notifications ?? []).filter((notification) => {
       const createdDate = String(notification.createdAt ?? '').slice(0, 10)
       if (notificationFilters.fromDate && createdDate < notificationFilters.fromDate) return false
       if (notificationFilters.toDate && createdDate > notificationFilters.toDate) return false
@@ -116,7 +116,7 @@ export default function EmployeePortalPage({ view }: { view: PageKey }) {
             { key: 'checkOut', label: 'Ra ca' },
             { key: 'workingMinutes', label: 'Phút làm' },
             { key: 'overtimeMinutes', label: 'Tăng ca' },
-            { key: 'status', label: 'Trạng thái', render: (row) => <StatusBadge value={row.status} /> },
+            { key: 'attendanceStatus', label: 'Trạng thái', render: (row) => <StatusBadge value={row.attendanceStatus} /> },
           ]} />
         </Panel>
       )}
@@ -196,7 +196,7 @@ export default function EmployeePortalPage({ view }: { view: PageKey }) {
           </Panel>
           <Panel title={`Thông báo (${filteredNotifications.length}/${data?.notifications?.length ?? 0})`}>
           <div className="notice-list">
-            {filteredNotifications.map((notification: any) => (
+            {filteredNotifications.map((notification) => (
               <button
                 className={notification.read ? 'read' : ''}
                 key={notification.id}
@@ -218,7 +218,7 @@ export default function EmployeePortalPage({ view }: { view: PageKey }) {
   )
 }
 
-function Schedule({ rows }: { rows: any[] }) {
+function Schedule({ rows }: { rows: HrSchedule[] }) {
   return <DataTable rows={rows} columns={[
     { key: 'workDate', label: 'Ngày' },
     { key: 'shiftCode', label: 'Mã ca' },

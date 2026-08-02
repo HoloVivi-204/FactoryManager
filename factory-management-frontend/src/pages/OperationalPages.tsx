@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { dashboardApi } from '../api/dashboardApi'
 import { DataTable, LoadingState, Panel, StatusBadge } from '../components/ui'
 import { useApi } from '../utils/useApi'
+import type { TableRow } from '../types'
 
 type Kind = 'machines' | 'downtime' | 'quality' | 'people' | 'materials'
 
@@ -10,7 +11,7 @@ const configs: Record<
   {
     title: string
     sub: string
-    load: () => Promise<any[]>
+    load: () => Promise<TableRow[]>
     cols: readonly (readonly [string, string])[]
     filterKey?: string
     filterLabel?: string
@@ -143,7 +144,7 @@ export default function OperationalPage({ kind }: { kind: Kind }) {
   const columns = config.cols.map(([key, label]) => ({
     key,
     label,
-    render: (row: any) =>
+    render: (row: TableRow) =>
       badgeKeys.has(key) ? <StatusBadge value={row[key]} /> : String(row[key] ?? '—'),
   }))
 

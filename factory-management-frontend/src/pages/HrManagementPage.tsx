@@ -201,7 +201,7 @@ export default function HrManagementPage({ view }: { view: HrView }) {
   const config = configs[view]
   const [filters, setFilters] = useState(emptyFilters)
   const [applied, setApplied] = useState(filters)
-  const [result, setResult] = useState<PageResponse<any>>()
+  const [result, setResult] = useState<PageResponse<TableRow>>()
   const [sentNotifications, setSentNotifications] = useState<HrNotification[]>([])
   const [page, setPage] = useState(0)
   const [loading, setLoading] = useState(false)

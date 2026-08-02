@@ -156,12 +156,12 @@ export default function TeamLeaderDashboard({ reports }: { reports: StagingRepor
   }, [details.employees])
 
   const downtimeReasons = useMemo(
-    () => group(details.downtime, (row) => row.downtimeReasonName ?? row.downtimeReasonCode ?? 'Chưa xác định',
+    () => group(details.downtime, (row) => String(row.downtimeReasonName ?? row.downtimeReasonCode ?? 'Chưa xác định'),
       (row) => Number(row.durationMinutes ?? 0), ' phút'),
     [details.downtime],
   )
   const qualityTypes = useMemo(
-    () => group(details.quality, (row) => row.qualityErrorTypeName ?? row.qualityErrorTypeCode ?? 'Chưa xác định',
+    () => group(details.quality, (row) => String(row.qualityErrorTypeName ?? row.qualityErrorTypeCode ?? 'Chưa xác định'),
       (row) => Number(row.quantity ?? 0), ' lỗi'),
     [details.quality],
   )

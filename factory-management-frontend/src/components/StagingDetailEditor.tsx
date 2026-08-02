@@ -3,7 +3,7 @@ import { shiftReportApi } from '../api/shiftReportApi'
 import type { StagingDetailPath, TableRow } from '../types'
 import { DataTable, Panel } from './ui'
 
-type Option = Record<string, any>
+type Option = TableRow
 export type DetailSelect = { key: string; label: string; rows: Option[] }
 export type DetailField = {
   key: string
@@ -124,9 +124,9 @@ export default function StagingDetailEditor({
               >
                 <option value="">-- Chọn --</option>
                 {item.rows.map((option) => (
-                  <option key={option.id} value={option.id}>
-                    {option.code ? `${option.code} - ` : ''}
-                    {option.name ?? option.fullName ?? option.id}
+                  <option key={String(option.id)} value={String(option.id ?? '')}>
+                    {option.code ? `${String(option.code)} - ` : ''}
+                    {String(option.name ?? option.fullName ?? option.id ?? '')}
                   </option>
                 ))}
               </select>

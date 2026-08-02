@@ -1,4 +1,5 @@
 import { get, send } from './client'
+import type { TableRow } from '../types'
 
 export type DepartmentTypeOption = {
   type: string
@@ -19,9 +20,9 @@ export type UserDataScope = {
 }
 
 export const adminApi = {
-  list: (path: string) => get<any[]>(`/${path}/all`),
+  list: (path: string) => get<TableRow[]>(`/${path}/all`),
   departmentTypes: () => get<DepartmentTypeOption[]>('/departments/types'),
-  employeesByTeam: (teamId: number) => get<any[]>(`/employees/team/${teamId}`),
+  employeesByTeam: (teamId: number) => get<TableRow[]>(`/employees/team/${teamId}`),
   create: (path: string, data: unknown) => send(`/${path}`, 'POST', data),
   update: (path: string, id: number, data: unknown) => send(`/${path}/${id}`, 'PUT', data),
   updateRoles: (id: number, roles: string[]) => send(`/users/${id}/roles`, 'PUT', { roles }),

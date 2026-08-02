@@ -1,2 +1,28 @@
-import{get,send}from'./client';
-export const financeApi={summary:(q='')=>get<any>(`/financial-records/dashboard${q}`),records:(q='')=>get<any[]>(`/financial-records/search${q}`),categories:()=>get<any[]>('/financial-categories/all'),factories:()=>get<any[]>('/factories/all'),departments:()=>get<any[]>('/departments/all'),lines:()=>get<any[]>('/production-lines/all'),materials:()=>get<any[]>('/materials/all'),warehouses:()=>get<any[]>('/warehouses/all'),createRecord:(d:any)=>send('/financial-records','POST',d),createWarehouse:(d:any)=>send('/warehouses','POST',d),transactions:(q='')=>get<any[]>(`/inventory/transactions${q}`),stocks:(q='')=>get<any[]>(`/inventory/stocks${q}`),createTransaction:(d:any)=>send('/inventory/transactions','POST',d)}
+import { get, send } from './client'
+import type { TableRow } from '../types'
+
+export type FinanceSummary = {
+  totalRevenue?: number
+  totalExpense?: number
+  profit?: number
+  accountsReceivable?: number
+  accountsPayable?: number
+}
+
+export type FinanceFormPayload = Record<string, unknown>
+
+export const financeApi = {
+  summary: (query = '') => get<FinanceSummary>(`/financial-records/dashboard${query}`),
+  records: (query = '') => get<TableRow[]>(`/financial-records/search${query}`),
+  categories: () => get<TableRow[]>('/financial-categories/all'),
+  factories: () => get<TableRow[]>('/factories/all'),
+  departments: () => get<TableRow[]>('/departments/all'),
+  lines: () => get<TableRow[]>('/production-lines/all'),
+  materials: () => get<TableRow[]>('/materials/all'),
+  warehouses: () => get<TableRow[]>('/warehouses/all'),
+  createRecord: (data: FinanceFormPayload) => send('/financial-records', 'POST', data),
+  createWarehouse: (data: FinanceFormPayload) => send('/warehouses', 'POST', data),
+  transactions: (query = '') => get<TableRow[]>(`/inventory/transactions${query}`),
+  stocks: (query = '') => get<TableRow[]>(`/inventory/stocks${query}`),
+  createTransaction: (data: FinanceFormPayload) => send('/inventory/transactions', 'POST', data),
+}

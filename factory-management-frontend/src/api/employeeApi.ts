@@ -1,5 +1,5 @@
 import { get, send } from './client'
-import type { HrOvertime } from '../types'
+import type { HrAttendance, HrKpi, HrLeave, HrNotification, HrOvertime, HrSchedule } from '../types'
 
 export type EmployeePortal = {
   employeeId: number
@@ -10,12 +10,12 @@ export type EmployeePortal = {
   workingMinutes: number
   overtimeMinutes: number
   unreadNotifications: number
-  schedules: any[]
-  attendance: any[]
-  kpis: any[]
-  leaves: any[]
+  schedules: HrSchedule[]
+  attendance: HrAttendance[]
+  kpis: HrKpi[]
+  leaves: HrLeave[]
   overtimeRequests: HrOvertime[]
-  notifications: any[]
+  notifications: HrNotification[]
 }
 
 export const employeeApi = {

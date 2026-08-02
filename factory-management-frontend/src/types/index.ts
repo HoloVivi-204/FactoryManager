@@ -261,7 +261,10 @@ export type Machine = {
   active?: boolean
 }
 
-export type TableRow = Record<string, any>
+export type TableRow = {
+  id?: string | number
+  [key: string]: unknown
+}
 
 export type StagingDetailPath =
   | 'machine-downtime-staging'

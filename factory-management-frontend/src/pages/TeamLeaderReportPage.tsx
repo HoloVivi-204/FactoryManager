@@ -646,8 +646,8 @@ function Select({
       <select value={value} onChange={(event) => onChange(event.target.value)}>
         <option value="">-- Chọn --</option>
         {rows.map((row) => (
-          <option key={row.id} value={row.id}>
-            {row.code ? `${row.code} - ` : ''}{row[name] ?? row.id}
+          <option key={String(row.id)} value={String(row.id ?? '')}>
+            {row.code ? `${String(row.code)} - ` : ''}{String(row[name] ?? row.id ?? '')}
           </option>
         ))}
       </select>
