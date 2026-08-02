@@ -1,1 +1,7 @@
-package com.factory.management.service.Service; import com.factory.management.dto.response.ProductionReportDetailResponse; public interface ProductionReportDetailService {ProductionReportDetailResponse getByReportId(Long reportId);}
+package com.factory.management.service.Service;
+
+import com.factory.management.dto.response.ProductionReportDetailResponse;
+
+public interface ProductionReportDetailService {
+    ProductionReportDetailResponse getByReportId(Long reportId);
+}
