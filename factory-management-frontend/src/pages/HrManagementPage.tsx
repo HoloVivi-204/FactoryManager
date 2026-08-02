@@ -59,12 +59,22 @@ const configs: Record<HrView, ViewConfig> = {
       { key: 'checkIn', label: 'Vào ca', type: 'datetime-local' },
       { key: 'checkOut', label: 'Ra ca', type: 'datetime-local' },
       {
-        key: 'attendanceStatus', label: 'Trạng thái', type: 'select',
-        options: ['PRESENT', 'ABSENT', 'LATE', 'LEAVE_EARLY', 'ON_LEAVE'].map((value) => ({ value, label: value })),
+        key: 'attendanceStatus',
+        label: 'Trạng thái',
+        type: 'select',
+        options: ['PRESENT', 'ABSENT', 'LATE', 'LEAVE_EARLY', 'ON_LEAVE'].map((value) => ({
+          value,
+          label: value,
+        })),
       },
       {
-        key: 'source', label: 'Nguồn', type: 'select',
-        options: ['TIME_CLOCK', 'HR_IMPORT', 'MANUAL', 'ADJUSTMENT'].map((value) => ({ value, label: value })),
+        key: 'source',
+        label: 'Nguồn',
+        type: 'select',
+        options: ['TIME_CLOCK', 'HR_IMPORT', 'MANUAL', 'ADJUSTMENT'].map((value) => ({
+          value,
+          label: value,
+        })),
       },
       { key: 'note', label: 'Ghi chú', type: 'textarea' },
     ],
@@ -148,7 +158,9 @@ const configs: Record<HrView, ViewConfig> = {
       { key: 'employeeId', label: 'ID nhân viên', type: 'number' },
       { key: 'targetTeamId', label: 'ID tổ nhận', type: 'number' },
       {
-        key: 'assignmentType', label: 'Kiểu phân công', type: 'select',
+        key: 'assignmentType',
+        label: 'Kiểu phân công',
+        type: 'select',
         options: ['TRANSFERRED', 'SUPPORT'].map((value) => ({ value, label: value })),
       },
       { key: 'effectiveFrom', label: 'Từ ngày', type: 'date' },
@@ -175,8 +187,13 @@ const configs: Record<HrView, ViewConfig> = {
       { key: 'title', label: 'Tiêu đề' },
       { key: 'message', label: 'Nội dung', type: 'textarea' },
       {
-        key: 'severity', label: 'Mức độ', type: 'select',
-        options: ['INFO', 'SUCCESS', 'WARNING', 'CRITICAL'].map((value) => ({ value, label: value })),
+        key: 'severity',
+        label: 'Mức độ',
+        type: 'select',
+        options: ['INFO', 'SUCCESS', 'WARNING', 'CRITICAL'].map((value) => ({
+          value,
+          label: value,
+        })),
       },
       { key: 'actionUrl', label: 'Đường dẫn thao tác' },
     ],
@@ -191,11 +208,24 @@ const configs: Record<HrView, ViewConfig> = {
 }
 
 const numericKeys = new Set([
-  'employeeId', 'shiftId', 'targetTeamId', 'requestedMinutes',
-  'score', 'productivityScore', 'qualityScore', 'attendanceScore',
+  'employeeId',
+  'shiftId',
+  'targetTeamId',
+  'requestedMinutes',
+  'score',
+  'productivityScore',
+  'qualityScore',
+  'attendanceScore',
 ])
 
-const badgeKeys = new Set(['status', 'attendanceStatus', 'source', 'assignmentType', 'active', 'severity'])
+const badgeKeys = new Set([
+  'status',
+  'attendanceStatus',
+  'source',
+  'assignmentType',
+  'active',
+  'severity',
+])
 const emptyFilters = () => ({ fromDate: '', toDate: '', employeeId: '', teamId: '', status: '' })
 
 export default function HrManagementPage({ view }: { view: HrView }) {
@@ -237,12 +267,19 @@ export default function HrManagementPage({ view }: { view: HrView }) {
     async function load() {
       try {
         const data =
-          view === 'schedule' ? await hrApi.schedules(request) :
-          view === 'attendance' ? await hrApi.attendance(request) :
-          view === 'kpi' ? await hrApi.kpis(request) :
-          view === 'leave' ? await hrApi.leaveRequests(request) :
-          view === 'overtime' ? await hrApi.overtime(request) :
-          view === 'assignments' ? await hrApi.assignments(request) : undefined
+          view === 'schedule'
+            ? await hrApi.schedules(request)
+            : view === 'attendance'
+              ? await hrApi.attendance(request)
+              : view === 'kpi'
+                ? await hrApi.kpis(request)
+                : view === 'leave'
+                  ? await hrApi.leaveRequests(request)
+                  : view === 'overtime'
+                    ? await hrApi.overtime(request)
+                    : view === 'assignments'
+                      ? await hrApi.assignments(request)
+                      : undefined
         if (!cancelled) setResult(data)
       } catch (loadError) {
         if (!cancelled) setError((loadError as Error).message)
@@ -252,7 +289,9 @@ export default function HrManagementPage({ view }: { view: HrView }) {
     }
 
     void load()
-    return () => { cancelled = true }
+    return () => {
+      cancelled = true
+    }
   }, [view, page, applied, reloadKey])
 
   function openCreate() {
@@ -269,7 +308,12 @@ export default function HrManagementPage({ view }: { view: HrView }) {
     const next: Record<string, string> = {}
     config.fields.forEach((field) => {
       const value = row[field.key]
-      next[field.key] = value == null ? '' : field.type === 'datetime-local' ? String(value).slice(0, 16) : String(value)
+      next[field.key] =
+        value == null
+          ? ''
+          : field.type === 'datetime-local'
+            ? String(value).slice(0, 16)
+            : String(value)
     })
     setForm(next)
     setEditingId(Number(row.id))
@@ -333,7 +377,9 @@ export default function HrManagementPage({ view }: { view: HrView }) {
   }
 
   async function decide(kind: 'leave' | 'overtime', id: number, decision: 'APPROVED' | 'REJECTED') {
-    const comment = prompt(decision === 'APPROVED' ? 'Nhận xét phê duyệt (có thể để trống):' : 'Lý do từ chối:')
+    const comment = prompt(
+      decision === 'APPROVED' ? 'Nhận xét phê duyệt (có thể để trống):' : 'Lý do từ chối:',
+    )
     if (comment === null || (decision === 'REJECTED' && !comment.trim())) return
     setBusy(true)
     try {
@@ -348,7 +394,10 @@ export default function HrManagementPage({ view }: { view: HrView }) {
   }
 
   async function endAssignment(id: number) {
-    const endDate = prompt('Ngày kết thúc điều chuyển (YYYY-MM-DD):', new Date().toISOString().slice(0, 10))
+    const endDate = prompt(
+      'Ngày kết thúc điều chuyển (YYYY-MM-DD):',
+      new Date().toISOString().slice(0, 10),
+    )
     if (!endDate) return
     setBusy(true)
     try {
@@ -362,65 +411,204 @@ export default function HrManagementPage({ view }: { view: HrView }) {
   }
 
   function action(row: TableRow) {
-    if (view === 'schedule') return <div className="admin-actions"><button onClick={() => openEdit(row)}>Sửa</button><button className="danger-link" onClick={() => void deleteSchedule(Number(row.id))}>Xóa</button></div>
-    if (view === 'attendance' || view === 'kpi') return <button onClick={() => openEdit(row)}>Sửa</button>
-    if (view === 'leave' && row.status === 'PENDING') return <DecisionButtons onApprove={() => void decide('leave', Number(row.id), 'APPROVED')} onReject={() => void decide('leave', Number(row.id), 'REJECTED')} />
-    if (view === 'overtime' && row.status === 'PENDING') return <DecisionButtons onApprove={() => void decide('overtime', Number(row.id), 'APPROVED')} onReject={() => void decide('overtime', Number(row.id), 'REJECTED')} />
-    if (view === 'assignments' && row.active) return <button className="danger-link" onClick={() => void endAssignment(Number(row.id))}>Kết thúc</button>
+    if (view === 'schedule')
+      return (
+        <div className="admin-actions">
+          <button onClick={() => openEdit(row)}>Sửa</button>
+          <button className="danger-link" onClick={() => void deleteSchedule(Number(row.id))}>
+            Xóa
+          </button>
+        </div>
+      )
+    if (view === 'attendance' || view === 'kpi')
+      return <button onClick={() => openEdit(row)}>Sửa</button>
+    if (view === 'leave' && row.status === 'PENDING')
+      return (
+        <DecisionButtons
+          onApprove={() => void decide('leave', Number(row.id), 'APPROVED')}
+          onReject={() => void decide('leave', Number(row.id), 'REJECTED')}
+        />
+      )
+    if (view === 'overtime' && row.status === 'PENDING')
+      return (
+        <DecisionButtons
+          onApprove={() => void decide('overtime', Number(row.id), 'APPROVED')}
+          onReject={() => void decide('overtime', Number(row.id), 'REJECTED')}
+        />
+      )
+    if (view === 'assignments' && row.active)
+      return (
+        <button className="danger-link" onClick={() => void endAssignment(Number(row.id))}>
+          Kết thúc
+        </button>
+      )
     return '—'
   }
 
-  const rows = view === 'notifications' ? sentNotifications : result?.content ?? []
+  const rows = view === 'notifications' ? sentNotifications : (result?.content ?? [])
   const columns = [
     ...config.columns.map((column) => ({
       ...column,
-      render: (row: TableRow) => badgeKeys.has(column.key) ? <StatusBadge value={row[column.key]} /> : String(row[column.key] ?? '—'),
+      render: (row: TableRow) =>
+        badgeKeys.has(column.key) ? (
+          <StatusBadge value={row[column.key]} />
+        ) : (
+          String(row[column.key] ?? '—')
+        ),
     })),
     ...(view === 'notifications' ? [] : [{ key: 'action', label: 'Thao tác', render: action }]),
   ]
   const statusOptions =
-    view === 'attendance' ? ['PRESENT', 'ABSENT', 'LATE', 'LEAVE_EARLY', 'ON_LEAVE'] :
-    view === 'leave' || view === 'overtime' ? ['PENDING', 'APPROVED', 'REJECTED', 'CANCELLED'] : []
+    view === 'attendance'
+      ? ['PRESENT', 'ABSENT', 'LATE', 'LEAVE_EARLY', 'ON_LEAVE']
+      : view === 'leave' || view === 'overtime'
+        ? ['PENDING', 'APPROVED', 'REJECTED', 'CANCELLED']
+        : []
 
   return (
     <>
       <div className="page-title">
-        <div><h2>{config.title}</h2><p>{config.description}</p></div>
-        {config.addLabel && <button className="admin-add-button" onClick={openCreate}>+ {config.addLabel}</button>}
+        <div>
+          <h2>{config.title}</h2>
+          <p>{config.description}</p>
+        </div>
+        {config.addLabel && (
+          <button className="admin-add-button" onClick={openCreate}>
+            + {config.addLabel}
+          </button>
+        )}
       </div>
 
       {view !== 'notifications' && (
         <Panel title="Bộ lọc theo phạm vi">
           <div className="filters hr-filters">
-            <label>Từ ngày<input type="date" value={filters.fromDate} onChange={(event) => setFilters({ ...filters, fromDate: event.target.value })} /></label>
-            <label>Đến ngày<input type="date" value={filters.toDate} onChange={(event) => setFilters({ ...filters, toDate: event.target.value })} /></label>
-            <label>ID nhân viên<input type="number" min="1" value={filters.employeeId} onChange={(event) => setFilters({ ...filters, employeeId: event.target.value })} /></label>
-            <label>ID tổ<input type="number" min="1" value={filters.teamId} onChange={(event) => setFilters({ ...filters, teamId: event.target.value })} /></label>
-            {statusOptions.length > 0 && <label>Trạng thái<select value={filters.status} onChange={(event) => setFilters({ ...filters, status: event.target.value })}><option value="">Tất cả</option>{statusOptions.map((status) => <option key={status}>{status}</option>)}</select></label>}
-            <button onClick={() => { setPage(0); setApplied({ ...filters }) }}>Áp dụng</button>
+            <label>
+              Từ ngày
+              <input
+                type="date"
+                value={filters.fromDate}
+                onChange={(event) => setFilters({ ...filters, fromDate: event.target.value })}
+              />
+            </label>
+            <label>
+              Đến ngày
+              <input
+                type="date"
+                value={filters.toDate}
+                onChange={(event) => setFilters({ ...filters, toDate: event.target.value })}
+              />
+            </label>
+            <label>
+              ID nhân viên
+              <input
+                type="number"
+                min="1"
+                value={filters.employeeId}
+                onChange={(event) => setFilters({ ...filters, employeeId: event.target.value })}
+              />
+            </label>
+            <label>
+              ID tổ
+              <input
+                type="number"
+                min="1"
+                value={filters.teamId}
+                onChange={(event) => setFilters({ ...filters, teamId: event.target.value })}
+              />
+            </label>
+            {statusOptions.length > 0 && (
+              <label>
+                Trạng thái
+                <select
+                  value={filters.status}
+                  onChange={(event) => setFilters({ ...filters, status: event.target.value })}
+                >
+                  <option value="">Tất cả</option>
+                  {statusOptions.map((status) => (
+                    <option key={status}>{status}</option>
+                  ))}
+                </select>
+              </label>
+            )}
+            <button
+              onClick={() => {
+                setPage(0)
+                setApplied({ ...filters })
+              }}
+            >
+              Áp dụng
+            </button>
           </div>
         </Panel>
       )}
 
       {message && <p className="form-message">{message}</p>}
-      <Panel title={view === 'notifications' ? 'Thông báo vừa gửi trong phiên' : `${number(result?.totalElements)} bản ghi`}>
+      <Panel
+        title={
+          view === 'notifications'
+            ? 'Thông báo vừa gửi trong phiên'
+            : `${number(result?.totalElements)} bản ghi`
+        }
+      >
         <LoadingState loading={loading} error={error} />
         <DataTable rows={rows} columns={columns} />
         {view !== 'notifications' && result && result.totalPages > 1 && (
-          <div className="pagination"><button disabled={result.first} onClick={() => setPage((value) => value - 1)}>Trang trước</button><span>Trang {result.page + 1}/{result.totalPages}</span><button disabled={result.last} onClick={() => setPage((value) => value + 1)}>Trang sau</button></div>
+          <div className="pagination">
+            <button disabled={result.first} onClick={() => setPage((value) => value - 1)}>
+              Trang trước
+            </button>
+            <span>
+              Trang {result.page + 1}/{result.totalPages}
+            </span>
+            <button disabled={result.last} onClick={() => setPage((value) => value + 1)}>
+              Trang sau
+            </button>
+          </div>
         )}
       </Panel>
-      {view === 'notifications' && <p className="hint">Backend hiện có API gửi thông báo nhưng chưa có GET `/hr/notifications`; bảng chỉ giữ các phản hồi tạo thành công trong phiên hiện tại.</p>}
+      {view === 'notifications' && (
+        <p className="hint">
+          Backend hiện có API gửi thông báo nhưng chưa có GET `/hr/notifications`; bảng chỉ giữ các
+          phản hồi tạo thành công trong phiên hiện tại.
+        </p>
+      )}
 
       {modalOpen && (
-        <div className="modal-backdrop" onMouseDown={(event) => event.target === event.currentTarget && !busy && setModalOpen(false)}>
+        <div
+          className="modal-backdrop"
+          onMouseDown={(event) =>
+            event.target === event.currentTarget && !busy && setModalOpen(false)
+          }
+        >
           <div className="modal admin-modal">
-            <div className="admin-modal-header"><div><h2>{editingId ? 'Cập nhật' : config.addLabel}</h2><p>{config.title}</p></div><button className="modal-close" disabled={busy} onClick={() => setModalOpen(false)}>×</button></div>
+            <div className="admin-modal-header">
+              <div>
+                <h2>{editingId ? 'Cập nhật' : config.addLabel}</h2>
+                <p>{config.title}</p>
+              </div>
+              <button className="modal-close" disabled={busy} onClick={() => setModalOpen(false)}>
+                ×
+              </button>
+            </div>
             <div className="form-grid">
-              {config.fields.map((field) => <HrField key={field.key} field={field} value={form[field.key] ?? ''} onChange={(value) => setForm({ ...form, [field.key]: value })} />)}
+              {config.fields.map((field) => (
+                <HrField
+                  key={field.key}
+                  field={field}
+                  value={form[field.key] ?? ''}
+                  onChange={(value) => setForm({ ...form, [field.key]: value })}
+                />
+              ))}
             </div>
             {message && <p className="form-message error">{message}</p>}
-            <div className="form-actions"><button disabled={busy} onClick={() => setModalOpen(false)}>Hủy</button><button className="primary" disabled={busy} onClick={() => void save()}>{busy ? 'Đang xử lý…' : 'Lưu'}</button></div>
+            <div className="form-actions">
+              <button disabled={busy} onClick={() => setModalOpen(false)}>
+                Hủy
+              </button>
+              <button className="primary" disabled={busy} onClick={() => void save()}>
+                {busy ? 'Đang xử lý…' : 'Lưu'}
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -428,10 +616,48 @@ export default function HrManagementPage({ view }: { view: HrView }) {
   )
 }
 
-function HrField({ field, value, onChange }: { field: FieldSpec; value: string; onChange: (value: string) => void }) {
-  return <label className="field"><span>{field.label}</span>{field.type === 'select' ? <select value={value} onChange={(event) => onChange(event.target.value)}><option value="">-- Chọn --</option>{field.options?.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select> : field.type === 'textarea' ? <textarea value={value} onChange={(event) => onChange(event.target.value)} /> : <input min={field.type === 'number' ? 0 : undefined} type={field.type ?? 'text'} value={value} onChange={(event) => onChange(event.target.value)} />}</label>
+function HrField({
+  field,
+  value,
+  onChange,
+}: {
+  field: FieldSpec
+  value: string
+  onChange: (value: string) => void
+}) {
+  return (
+    <label className="field">
+      <span>{field.label}</span>
+      {field.type === 'select' ? (
+        <select value={value} onChange={(event) => onChange(event.target.value)}>
+          <option value="">-- Chọn --</option>
+          {field.options?.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      ) : field.type === 'textarea' ? (
+        <textarea value={value} onChange={(event) => onChange(event.target.value)} />
+      ) : (
+        <input
+          min={field.type === 'number' ? 0 : undefined}
+          type={field.type ?? 'text'}
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+        />
+      )}
+    </label>
+  )
 }
 
 function DecisionButtons({ onApprove, onReject }: { onApprove: () => void; onReject: () => void }) {
-  return <div className="admin-actions"><button onClick={onApprove}>Duyệt</button><button className="danger-link" onClick={onReject}>Từ chối</button></div>
+  return (
+    <div className="admin-actions">
+      <button onClick={onApprove}>Duyệt</button>
+      <button className="danger-link" onClick={onReject}>
+        Từ chối
+      </button>
+    </div>
+  )
 }

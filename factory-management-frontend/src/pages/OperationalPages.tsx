@@ -123,8 +123,11 @@ export default function OperationalPage({ kind }: { kind: Kind }) {
 
   const categoryOptions = useMemo(() => {
     if (!config.filterKey) return []
-    return [...new Set((api.data ?? []).map((row) => String(row[config.filterKey!] ?? '')).filter(Boolean))]
-      .sort((a, b) => a.localeCompare(b, 'vi'))
+    return [
+      ...new Set(
+        (api.data ?? []).map((row) => String(row[config.filterKey!] ?? '')).filter(Boolean),
+      ),
+    ].sort((a, b) => a.localeCompare(b, 'vi'))
   }, [api.data, config.filterKey])
 
   const filteredRows = useMemo(() => {
@@ -134,10 +137,13 @@ export default function OperationalPage({ kind }: { kind: Kind }) {
       if (filters.fromDate && rowDate && rowDate < filters.fromDate) return false
       if (filters.toDate && rowDate && rowDate > filters.toDate) return false
       if (filters.category && String(row[config.filterKey ?? '']) !== filters.category) return false
-      if (filters.reportStatus && String(row.reportStatus ?? '') !== filters.reportStatus) return false
+      if (filters.reportStatus && String(row.reportStatus ?? '') !== filters.reportStatus)
+        return false
       if (!term) return true
       return Object.values(row).some((value) =>
-        String(value ?? '').toLocaleLowerCase('vi').includes(term),
+        String(value ?? '')
+          .toLocaleLowerCase('vi')
+          .includes(term),
       )
     })
   }, [api.data, config.filterKey, filters])
@@ -159,15 +165,80 @@ export default function OperationalPage({ kind }: { kind: Kind }) {
       </div>
       <Panel title="Tìm kiếm dữ liệu">
         <div className="filters hr-filters">
-          {kind !== 'machines' && <label>Từ ngày<input type="date" value={filters.fromDate} onChange={(event) => setFilters({ ...filters, fromDate: event.target.value })} /></label>}
-          {kind !== 'machines' && <label>Đến ngày<input type="date" value={filters.toDate} onChange={(event) => setFilters({ ...filters, toDate: event.target.value })} /></label>}
-          {config.filterKey && <label>{config.filterLabel}<select value={filters.category} onChange={(event) => setFilters({ ...filters, category: event.target.value })}><option value="">Tất cả</option>{categoryOptions.map((value) => <option key={value} value={value}>{value}</option>)}</select></label>}
-          {kind !== 'machines' && <label>Trạng thái báo cáo<select value={filters.reportStatus} onChange={(event) => setFilters({ ...filters, reportStatus: event.target.value })}><option value="">Tất cả</option><option value="DRAFT">Đang nhập</option><option value="SUBMITTED">Chờ duyệt</option><option value="CHANGE_REQUESTED">Cần sửa</option><option value="APPROVED">Đã duyệt</option><option value="LOCKED">Đã chốt</option></select></label>}
-          <label>Từ khóa<input type="search" placeholder={kind === 'machines' ? 'Mã máy, tên máy, tổ…' : 'Nội dung cần tìm…'} value={filters.keyword} onChange={(event) => setFilters({ ...filters, keyword: event.target.value })} /></label>
-          <button type="button" onClick={() => setFilters({ fromDate: '', toDate: '', category: '', reportStatus: '', keyword: '' })}>Xóa bộ lọc</button>
+          {kind !== 'machines' && (
+            <label>
+              Từ ngày
+              <input
+                type="date"
+                value={filters.fromDate}
+                onChange={(event) => setFilters({ ...filters, fromDate: event.target.value })}
+              />
+            </label>
+          )}
+          {kind !== 'machines' && (
+            <label>
+              Đến ngày
+              <input
+                type="date"
+                value={filters.toDate}
+                onChange={(event) => setFilters({ ...filters, toDate: event.target.value })}
+              />
+            </label>
+          )}
+          {config.filterKey && (
+            <label>
+              {config.filterLabel}
+              <select
+                value={filters.category}
+                onChange={(event) => setFilters({ ...filters, category: event.target.value })}
+              >
+                <option value="">Tất cả</option>
+                {categoryOptions.map((value) => (
+                  <option key={value} value={value}>
+                    {value}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
+          {kind !== 'machines' && (
+            <label>
+              Trạng thái báo cáo
+              <select
+                value={filters.reportStatus}
+                onChange={(event) => setFilters({ ...filters, reportStatus: event.target.value })}
+              >
+                <option value="">Tất cả</option>
+                <option value="DRAFT">Đang nhập</option>
+                <option value="SUBMITTED">Chờ duyệt</option>
+                <option value="CHANGE_REQUESTED">Cần sửa</option>
+                <option value="APPROVED">Đã duyệt</option>
+                <option value="LOCKED">Đã chốt</option>
+              </select>
+            </label>
+          )}
+          <label>
+            Từ khóa
+            <input
+              type="search"
+              placeholder={kind === 'machines' ? 'Mã máy, tên máy, tổ…' : 'Nội dung cần tìm…'}
+              value={filters.keyword}
+              onChange={(event) => setFilters({ ...filters, keyword: event.target.value })}
+            />
+          </label>
+          <button
+            type="button"
+            onClick={() =>
+              setFilters({ fromDate: '', toDate: '', category: '', reportStatus: '', keyword: '' })
+            }
+          >
+            Xóa bộ lọc
+          </button>
         </div>
       </Panel>
-      <Panel title={`Dữ liệu theo phạm vi JWT (${filteredRows.length}/${number(api.data?.length)})`}>
+      <Panel
+        title={`Dữ liệu theo phạm vi JWT (${filteredRows.length}/${number(api.data?.length)})`}
+      >
         <LoadingState loading={api.loading} error={api.error} />
         <DataTable rows={filteredRows} columns={columns} />
       </Panel>
