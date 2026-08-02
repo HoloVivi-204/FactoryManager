@@ -12,11 +12,10 @@ import com.factory.management.repository.ProductionLineRepository;
 import com.factory.management.repository.TeamRepository;
 import com.factory.management.repository.UserDataScopeRepository;
 import com.factory.management.repository.UserRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor

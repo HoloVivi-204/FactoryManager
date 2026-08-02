@@ -5,12 +5,11 @@ import com.factory.management.ai.AiToolArguments;
 import com.factory.management.ai.AiToolContext;
 import com.factory.management.ai.AiToolResult;
 import com.factory.management.entity.Role;
-import org.springframework.stereotype.Component;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.springframework.stereotype.Component;
 
 @Component
 public class ChatbotCapabilitiesTool implements AiDataTool {

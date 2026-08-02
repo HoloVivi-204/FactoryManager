@@ -5,18 +5,17 @@ import com.factory.management.entity.Role;
 import com.factory.management.entity.User;
 import com.factory.management.repository.EmployeeRepository;
 import com.factory.management.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
+import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
 
 @Component
 @RequiredArgsConstructor

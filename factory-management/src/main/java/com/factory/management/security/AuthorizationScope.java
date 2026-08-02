@@ -25,15 +25,14 @@ import com.factory.management.repository.QualityReportStagingRepository;
 import com.factory.management.repository.TeamRepository;
 import com.factory.management.repository.UserDataScopeRepository;
 import com.factory.management.repository.UserRepository;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Component("authorizationScope")
 @RequiredArgsConstructor

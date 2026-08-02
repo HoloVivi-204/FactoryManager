@@ -1,10 +1,9 @@
 package com.factory.management.repository;
 
 import com.factory.management.entity.MachineDowntime;
-import org.springframework.data.jpa.repository.JpaRepository;
-
 import java.util.Collection;
 import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MachineDowntimeRepository extends JpaRepository<MachineDowntime, Long> {
     List<MachineDowntime> findAllByProductionReport_Id(Long id);

@@ -1,9 +1,10 @@
 package com.factory.management.repository;
 
 import com.factory.management.entity.EmployeeActualStaging;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
-
-import java.util.*;
 
 public interface EmployeeActualStagingRepository extends JpaRepository<EmployeeActualStaging, Long> {
     boolean existsByProductionReportStaging_IdAndEmployee_Id(Long reportId, Long employeeId);

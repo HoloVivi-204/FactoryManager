@@ -4,7 +4,6 @@ import com.factory.management.dto.request.QualityErrorTypeRequest;
 import com.factory.management.dto.request.QualityErrorTypeUpdateRequest;
 import com.factory.management.dto.response.QualityErrorTypeResponse;
 import com.factory.management.entity.QualityErrorSeverity;
-
 import java.util.List;
 
 public interface QualityErrorTypeService {

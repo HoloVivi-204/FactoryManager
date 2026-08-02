@@ -5,13 +5,12 @@ import com.factory.management.entity.MaintenancePriority;
 import com.factory.management.entity.MaintenanceRequestStatus;
 import com.factory.management.entity.MaintenanceType;
 import com.factory.management.entity.MaintenanceWorkOrderStatus;
-import lombok.Builder;
-import lombok.Getter;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import lombok.Builder;
+import lombok.Getter;
 
 public final class MaintenanceResponse {
     private MaintenanceResponse() {

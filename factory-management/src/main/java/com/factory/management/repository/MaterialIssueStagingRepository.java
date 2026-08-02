@@ -1,9 +1,11 @@
 package com.factory.management.repository;
 
-import com.factory.management.entity.*;
+import com.factory.management.entity.MaterialIssueStaging;
+import com.factory.management.entity.MaterialIssueType;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
-
-import java.util.*;
 
 public interface MaterialIssueStagingRepository extends JpaRepository<MaterialIssueStaging, Long> {
     List<MaterialIssueStaging> findAllByActiveTrue();

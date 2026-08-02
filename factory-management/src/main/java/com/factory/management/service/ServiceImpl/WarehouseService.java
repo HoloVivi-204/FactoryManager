@@ -9,11 +9,10 @@ import com.factory.management.exception.ErrorCode;
 import com.factory.management.repository.FactoryRepository;
 import com.factory.management.repository.WarehouseRepository;
 import com.factory.management.security.AuthorizationScope;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor

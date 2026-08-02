@@ -4,7 +4,6 @@ import com.factory.management.dto.request.DowntimeReasonRequest;
 import com.factory.management.dto.request.DowntimeReasonUpdateRequest;
 import com.factory.management.dto.response.DowntimeReasonResponse;
 import com.factory.management.entity.DowntimeReasonType;
-
 import java.util.List;
 
 public interface DowntimeReasonService {

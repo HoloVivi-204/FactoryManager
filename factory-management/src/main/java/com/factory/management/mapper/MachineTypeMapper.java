@@ -4,7 +4,11 @@ import com.factory.management.dto.request.MachineTypeRequest;
 import com.factory.management.dto.request.MachineTypeUpdateRequest;
 import com.factory.management.dto.response.MachineTypeResponse;
 import com.factory.management.entity.MachineType;
-import org.mapstruct.*;
+import org.mapstruct.BeanMapping;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 
 @Mapper(componentModel = "spring")
 public interface MachineTypeMapper {

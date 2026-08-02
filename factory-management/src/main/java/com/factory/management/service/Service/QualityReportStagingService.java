@@ -1,8 +1,8 @@
 package com.factory.management.service.Service;
 
-import com.factory.management.dto.request.*;
+import com.factory.management.dto.request.QualityReportStagingRequest;
+import com.factory.management.dto.request.QualityReportStagingUpdateRequest;
 import com.factory.management.dto.response.QualityReportStagingResponse;
-
 import java.util.List;
 
 public interface QualityReportStagingService {

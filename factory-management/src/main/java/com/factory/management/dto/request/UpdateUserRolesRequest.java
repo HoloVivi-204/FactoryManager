@@ -2,12 +2,11 @@ package com.factory.management.dto.request;
 
 import com.factory.management.entity.Role;
 import jakarta.validation.constraints.NotEmpty;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.Set;
 
 @Getter
 @Setter

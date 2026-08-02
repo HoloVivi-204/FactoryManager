@@ -3,7 +3,6 @@ package com.factory.management.service.Service;
 import com.factory.management.dto.request.MaterialRequest;
 import com.factory.management.dto.request.MaterialUpdateRequest;
 import com.factory.management.dto.response.MaterialResponse;
-
 import java.util.List;
 
 public interface MaterialService {

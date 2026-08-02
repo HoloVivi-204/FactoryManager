@@ -3,7 +3,10 @@ package com.factory.management.service.ServiceImpl;
 import com.factory.management.dto.request.MachineRequest;
 import com.factory.management.dto.request.MachineUpdateRequest;
 import com.factory.management.dto.response.MachineResponse;
-import com.factory.management.entity.*;
+import com.factory.management.entity.Machine;
+import com.factory.management.entity.MachineOperationalStatus;
+import com.factory.management.entity.MachineType;
+import com.factory.management.entity.Team;
 import com.factory.management.exception.AppException;
 import com.factory.management.exception.ErrorCode;
 import com.factory.management.mapper.MachineMapper;
@@ -11,15 +14,14 @@ import com.factory.management.repository.MachineRepository;
 import com.factory.management.repository.MachineTypeRepository;
 import com.factory.management.repository.TeamRepository;
 import com.factory.management.service.Service.MachineService;
+import java.util.List;
+import java.util.Locale;
 import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor

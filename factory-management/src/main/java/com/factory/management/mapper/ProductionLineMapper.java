@@ -4,7 +4,11 @@ import com.factory.management.dto.request.ProductionLineRequest;
 import com.factory.management.dto.request.ProductionLineUpdateRequest;
 import com.factory.management.dto.response.ProductionLineResponse;
 import com.factory.management.entity.ProductionLine;
-import org.mapstruct.*;
+import org.mapstruct.BeanMapping;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 
 @Mapper(componentModel = "spring")
 public interface ProductionLineMapper {

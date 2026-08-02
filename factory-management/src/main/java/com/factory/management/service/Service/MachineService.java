@@ -4,7 +4,6 @@ import com.factory.management.dto.request.MachineRequest;
 import com.factory.management.dto.request.MachineUpdateRequest;
 import com.factory.management.dto.response.MachineResponse;
 import com.factory.management.entity.MachineOperationalStatus;
-
 import java.util.List;
 
 public interface MachineService {

@@ -4,7 +4,6 @@ import com.factory.management.dto.request.DepartmentRequest;
 import com.factory.management.dto.request.DepartmentUpdateRequest;
 import com.factory.management.dto.response.DepartmentResponse;
 import com.factory.management.dto.response.DepartmentTypeResponse;
-
 import java.util.List;
 
 public interface DepartmentService {

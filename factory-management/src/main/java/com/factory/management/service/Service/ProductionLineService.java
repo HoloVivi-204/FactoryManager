@@ -3,7 +3,6 @@ package com.factory.management.service.Service;
 import com.factory.management.dto.request.ProductionLineRequest;
 import com.factory.management.dto.request.ProductionLineUpdateRequest;
 import com.factory.management.dto.response.ProductionLineResponse;
-
 import java.util.List;
 
 public interface ProductionLineService {

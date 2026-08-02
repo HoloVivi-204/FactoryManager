@@ -1,8 +1,8 @@
 package com.factory.management.service.Service;
 
-import com.factory.management.dto.request.*;
+import com.factory.management.dto.request.MachineDowntimeStagingRequest;
+import com.factory.management.dto.request.MachineDowntimeStagingUpdateRequest;
 import com.factory.management.dto.response.MachineDowntimeStagingResponse;
-
 import java.util.List;
 
 public interface MachineDowntimeStagingService {

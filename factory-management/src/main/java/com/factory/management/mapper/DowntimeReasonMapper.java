@@ -4,7 +4,11 @@ import com.factory.management.dto.request.DowntimeReasonRequest;
 import com.factory.management.dto.request.DowntimeReasonUpdateRequest;
 import com.factory.management.dto.response.DowntimeReasonResponse;
 import com.factory.management.entity.DowntimeReason;
-import org.mapstruct.*;
+import org.mapstruct.BeanMapping;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 
 @Mapper(componentModel = "spring")
 public interface DowntimeReasonMapper {

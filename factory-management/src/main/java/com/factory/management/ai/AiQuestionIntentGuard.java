@@ -1,7 +1,5 @@
 package com.factory.management.ai;
 
-import org.springframework.stereotype.Component;
-
 import java.text.Normalizer;
 import java.time.DateTimeException;
 import java.time.LocalDate;
@@ -9,8 +7,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.Set;
+import org.springframework.stereotype.Component;
 
 @Component
 public class AiQuestionIntentGuard {

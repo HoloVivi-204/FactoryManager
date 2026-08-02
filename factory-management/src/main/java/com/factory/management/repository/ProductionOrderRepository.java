@@ -2,13 +2,12 @@ package com.factory.management.repository;
 
 import com.factory.management.entity.ProductionOrder;
 import com.factory.management.entity.ProductionOrderStatus;
+import java.math.BigDecimal;
+import java.util.Collection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-
-import java.math.BigDecimal;
-import java.util.Collection;
 
 public interface ProductionOrderRepository
         extends JpaRepository<ProductionOrder, Long>, JpaSpecificationExecutor<ProductionOrder> {

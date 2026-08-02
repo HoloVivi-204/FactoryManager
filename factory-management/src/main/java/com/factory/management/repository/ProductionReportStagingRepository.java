@@ -2,12 +2,11 @@ package com.factory.management.repository;
 
 import com.factory.management.entity.ProductionReportStaging;
 import com.factory.management.entity.ProductionReportStatus;
-import org.springframework.data.jpa.repository.JpaRepository;
-
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.Collection;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ProductionReportStagingRepository extends JpaRepository<ProductionReportStaging, Long> {
     boolean existsByReportDateAndShift_IdAndTeam_IdAndMachine_Id(

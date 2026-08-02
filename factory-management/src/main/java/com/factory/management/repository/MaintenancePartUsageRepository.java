@@ -1,10 +1,9 @@
 package com.factory.management.repository;
 
 import com.factory.management.entity.MaintenancePartUsage;
-import org.springframework.data.jpa.repository.JpaRepository;
-
-import java.util.List;
 import java.util.Collection;
+import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MaintenancePartUsageRepository extends JpaRepository<MaintenancePartUsage, Long> {
     List<MaintenancePartUsage> findAllByWorkOrder_IdAndActiveTrue(Long workOrderId);

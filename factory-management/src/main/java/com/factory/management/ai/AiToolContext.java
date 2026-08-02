@@ -1,7 +1,6 @@
 package com.factory.management.ai;
 
 import com.factory.management.entity.Role;
-
 import java.time.LocalDate;
 import java.util.Set;
 

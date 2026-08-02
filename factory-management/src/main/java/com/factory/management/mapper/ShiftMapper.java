@@ -4,7 +4,11 @@ import com.factory.management.dto.request.ShiftRequest;
 import com.factory.management.dto.request.ShiftUpdateRequest;
 import com.factory.management.dto.response.ShiftResponse;
 import com.factory.management.entity.Shift;
-import org.mapstruct.*;
+import org.mapstruct.BeanMapping;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 
 @Mapper(componentModel = "spring")
 public interface ShiftMapper {

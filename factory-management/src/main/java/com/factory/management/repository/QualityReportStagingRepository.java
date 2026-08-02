@@ -1,13 +1,12 @@
 package com.factory.management.repository;
 
 import com.factory.management.entity.QualityReportStaging;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface QualityReportStagingRepository extends JpaRepository<QualityReportStaging, Long> {
     boolean existsByProductionReportStaging_IdAndQualityErrorType_Id(Long reportId, Long errorTypeId);

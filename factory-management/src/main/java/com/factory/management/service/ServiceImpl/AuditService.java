@@ -1,14 +1,16 @@
 package com.factory.management.service.ServiceImpl;
 
+import com.factory.management.config.RequestCorrelationFilter;
 import com.factory.management.dto.response.AuditEventResponse;
 import com.factory.management.dto.response.PageResponse;
-import com.factory.management.config.RequestCorrelationFilter;
 import com.factory.management.entity.AuditEvent;
 import com.factory.management.entity.User;
 import com.factory.management.repository.AuditEventRepository;
 import com.factory.management.repository.UserRepository;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.MDC;
 import org.springframework.data.domain.PageRequest;
@@ -19,9 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 
 @Service
 @RequiredArgsConstructor

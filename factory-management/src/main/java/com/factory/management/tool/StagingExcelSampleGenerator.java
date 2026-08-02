@@ -1,5 +1,8 @@
 package com.factory.management.tool;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Path;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.FillPatternType;
@@ -9,10 +12,6 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.file.Path;
 
 /**
  * Generates a ready-to-upload sample workbook for the staging report Excel API.

@@ -1,7 +1,9 @@
 package com.factory.management.service.Service;
 
-import com.factory.management.dto.response.*;
-import com.factory.management.entity.*;
+import com.factory.management.dto.response.ProductionDashboardResponse;
+import com.factory.management.dto.response.ProductionReportResponse;
+import com.factory.management.entity.Employee;
+import com.factory.management.entity.ProductionReportStaging;
 import java.time.LocalDate;
 import java.util.List;
 

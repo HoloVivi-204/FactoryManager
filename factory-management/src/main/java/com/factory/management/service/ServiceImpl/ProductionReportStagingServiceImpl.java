@@ -1,17 +1,9 @@
 package com.factory.management.service.ServiceImpl;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
-
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.factory.management.dto.request.ProductionReportApprovalRequest;
+import com.factory.management.dto.request.ProductionReportReviewRequest;
 import com.factory.management.dto.request.ProductionReportStagingRequest;
 import com.factory.management.dto.request.ProductionReportStagingUpdateRequest;
-import com.factory.management.dto.request.ProductionReportReviewRequest;
 import com.factory.management.dto.response.ProductionReportResponse;
 import com.factory.management.dto.response.ProductionReportStagingResponse;
 import com.factory.management.entity.Department;
@@ -27,25 +19,30 @@ import com.factory.management.exception.AppException;
 import com.factory.management.exception.ErrorCode;
 import com.factory.management.mapper.ProductionReportStagingMapper;
 import com.factory.management.repository.DepartmentRepository;
+import com.factory.management.repository.EmployeeActualStagingRepository;
 import com.factory.management.repository.EmployeeRepository;
 import com.factory.management.repository.FactoryRepository;
-import com.factory.management.repository.MachineRepository;
 import com.factory.management.repository.MachineDowntimeStagingRepository;
+import com.factory.management.repository.MachineRepository;
 import com.factory.management.repository.MaterialIssueStagingRepository;
-import com.factory.management.repository.EmployeeActualStagingRepository;
 import com.factory.management.repository.ProductionLineRepository;
 import com.factory.management.repository.ProductionReportStagingRepository;
 import com.factory.management.repository.QualityReportStagingRepository;
 import com.factory.management.repository.ShiftRepository;
 import com.factory.management.repository.TeamRepository;
 import com.factory.management.security.AuthorizationScope;
+import com.factory.management.service.Service.CurrentUserService;
 import com.factory.management.service.Service.ProductionReportService;
 import com.factory.management.service.Service.ProductionReportStagingService;
-import com.factory.management.service.Service.CurrentUserService;
-
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor

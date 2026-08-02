@@ -3,15 +3,14 @@ package com.factory.management.ai;
 import com.factory.management.dto.request.AiChatRequest;
 import com.factory.management.dto.response.AiChatResponse;
 import com.factory.management.service.ServiceImpl.AuditService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor

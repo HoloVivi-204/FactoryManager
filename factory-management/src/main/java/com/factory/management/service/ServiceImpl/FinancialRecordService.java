@@ -1,7 +1,7 @@
 package com.factory.management.service.ServiceImpl;
 
-import com.factory.management.dto.request.FinancialRecordRequest;
 import com.factory.management.dto.request.FinancialPaymentRequest;
+import com.factory.management.dto.request.FinancialRecordRequest;
 import com.factory.management.dto.response.FinancialPaymentResponse;
 import com.factory.management.dto.response.FinancialRecordResponse;
 import com.factory.management.dto.response.FinancialSummaryResponse;
@@ -11,9 +11,9 @@ import com.factory.management.entity.ExpenseGroup;
 import com.factory.management.entity.Factory;
 import com.factory.management.entity.FinancialCategory;
 import com.factory.management.entity.FinancialEntryType;
+import com.factory.management.entity.FinancialPayment;
 import com.factory.management.entity.FinancialRecord;
 import com.factory.management.entity.FinancialRecordStatus;
-import com.factory.management.entity.FinancialPayment;
 import com.factory.management.entity.PaymentStatus;
 import com.factory.management.entity.ProductionLine;
 import com.factory.management.exception.AppException;
@@ -21,27 +21,26 @@ import com.factory.management.exception.ErrorCode;
 import com.factory.management.repository.DepartmentRepository;
 import com.factory.management.repository.FactoryRepository;
 import com.factory.management.repository.FinancialCategoryRepository;
-import com.factory.management.repository.FinancialRecordRepository;
 import com.factory.management.repository.FinancialPaymentRepository;
+import com.factory.management.repository.FinancialRecordRepository;
 import com.factory.management.repository.ProductionLineRepository;
 import com.factory.management.security.AuthorizationScope;
 import com.factory.management.service.Service.CurrentUserService;
 import jakarta.persistence.criteria.Predicate;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.math.BigDecimal;
+import java.time.format.DateTimeFormatter;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor

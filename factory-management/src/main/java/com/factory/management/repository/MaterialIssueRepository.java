@@ -2,10 +2,9 @@ package com.factory.management.repository;
 
 import com.factory.management.entity.MaterialIssue;
 import com.factory.management.entity.MaterialIssueType;
-import org.springframework.data.jpa.repository.JpaRepository;
-
 import java.util.Collection;
 import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MaterialIssueRepository extends JpaRepository<MaterialIssue, Long> {
     List<MaterialIssue> findAllByProductionReport_Id(Long id);

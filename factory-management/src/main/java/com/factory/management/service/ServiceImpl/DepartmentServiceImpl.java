@@ -13,16 +13,15 @@ import com.factory.management.mapper.DepartmentMapper;
 import com.factory.management.repository.DepartmentRepository;
 import com.factory.management.repository.FactoryRepository;
 import com.factory.management.service.Service.DepartmentService;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
+import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor

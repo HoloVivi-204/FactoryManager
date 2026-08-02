@@ -1,11 +1,15 @@
 package com.factory.management.dto.response;
 
-import com.factory.management.entity.*;
-import lombok.*;
-
+import com.factory.management.entity.DailyCloseBatchStatus;
+import com.factory.management.entity.DataScopeType;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter

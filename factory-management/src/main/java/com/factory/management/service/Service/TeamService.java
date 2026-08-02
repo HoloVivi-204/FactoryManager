@@ -3,7 +3,6 @@ package com.factory.management.service.Service;
 import com.factory.management.dto.request.TeamRequest;
 import com.factory.management.dto.request.TeamUpdateRequest;
 import com.factory.management.dto.response.TeamResponse;
-
 import java.util.List;
 
 public interface TeamService {

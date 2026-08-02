@@ -1,7 +1,5 @@
 package com.factory.management.ai;
 
-import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
@@ -9,8 +7,9 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.Set;
+import org.springframework.stereotype.Service;
 
 @Service
 public class AiVisualizationService {

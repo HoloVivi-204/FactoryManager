@@ -13,10 +13,10 @@ import com.factory.management.entity.LeaveRequest;
 import com.factory.management.entity.LeaveStatus;
 import com.factory.management.entity.MachineDowntime;
 import com.factory.management.entity.MachineDowntimeStaging;
-import com.factory.management.entity.MaterialIssue;
-import com.factory.management.entity.MaterialIssueStaging;
 import com.factory.management.entity.MaintenanceRequest;
 import com.factory.management.entity.MaintenanceRequestStatus;
+import com.factory.management.entity.MaterialIssue;
+import com.factory.management.entity.MaterialIssueStaging;
 import com.factory.management.entity.ProductionReport;
 import com.factory.management.entity.ProductionReportStaging;
 import com.factory.management.entity.ProductionReportStatus;
@@ -30,9 +30,9 @@ import com.factory.management.repository.EmployeeActualStagingRepository;
 import com.factory.management.repository.LeaveRequestRepository;
 import com.factory.management.repository.MachineDowntimeRepository;
 import com.factory.management.repository.MachineDowntimeStagingRepository;
+import com.factory.management.repository.MaintenanceRequestRepository;
 import com.factory.management.repository.MaterialIssueRepository;
 import com.factory.management.repository.MaterialIssueStagingRepository;
-import com.factory.management.repository.MaintenanceRequestRepository;
 import com.factory.management.repository.ProductionReportRepository;
 import com.factory.management.repository.ProductionReportStagingRepository;
 import com.factory.management.repository.QualityReportRepository;
@@ -41,10 +41,6 @@ import com.factory.management.repository.WorkScheduleRepository;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -58,6 +54,9 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor

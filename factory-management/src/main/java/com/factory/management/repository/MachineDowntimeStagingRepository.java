@@ -1,12 +1,11 @@
 package com.factory.management.repository;
 
 import com.factory.management.entity.MachineDowntimeStaging;
-import org.springframework.data.jpa.repository.JpaRepository;
-
+import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.Collection;
-import java.time.LocalDateTime;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MachineDowntimeStagingRepository extends JpaRepository<MachineDowntimeStaging, Long> {
     List<MachineDowntimeStaging> findAllByActiveTrue();

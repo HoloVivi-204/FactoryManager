@@ -3,7 +3,6 @@ package com.factory.management.service.Service;
 import com.factory.management.dto.request.MachineTypeRequest;
 import com.factory.management.dto.request.MachineTypeUpdateRequest;
 import com.factory.management.dto.response.MachineTypeResponse;
-
 import java.util.List;
 
 public interface MachineTypeService {

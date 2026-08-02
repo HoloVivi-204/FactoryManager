@@ -1,10 +1,10 @@
 package com.factory.management.service.ServiceImpl;
 
-import com.factory.management.dto.response.ProductionReportDetailResponse;
 import com.factory.management.dto.response.ProductionReportDetailResponse.DowntimeItem;
 import com.factory.management.dto.response.ProductionReportDetailResponse.EmployeeItem;
 import com.factory.management.dto.response.ProductionReportDetailResponse.MaterialItem;
 import com.factory.management.dto.response.ProductionReportDetailResponse.QualityItem;
+import com.factory.management.dto.response.ProductionReportDetailResponse;
 import com.factory.management.entity.EmployeeActual;
 import com.factory.management.entity.MachineDowntime;
 import com.factory.management.entity.MaterialIssue;

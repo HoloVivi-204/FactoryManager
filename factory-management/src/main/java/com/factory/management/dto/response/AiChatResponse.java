@@ -2,11 +2,10 @@ package com.factory.management.dto.response;
 
 import com.factory.management.ai.AiDashboard;
 import com.factory.management.ai.AiRecommendation;
-import lombok.Builder;
-import lombok.Getter;
-
 import java.time.LocalDateTime;
 import java.util.List;
+import lombok.Builder;
+import lombok.Getter;
 
 @Getter
 @Builder

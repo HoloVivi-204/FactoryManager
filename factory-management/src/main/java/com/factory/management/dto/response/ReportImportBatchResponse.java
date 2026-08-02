@@ -1,9 +1,12 @@
 package com.factory.management.dto.response;
 
 import com.factory.management.entity.ReportImportStatus;
-import lombok.*;
-
 import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter

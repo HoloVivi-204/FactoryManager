@@ -4,7 +4,11 @@ import com.factory.management.dto.request.TeamRequest;
 import com.factory.management.dto.request.TeamUpdateRequest;
 import com.factory.management.dto.response.TeamResponse;
 import com.factory.management.entity.Team;
-import org.mapstruct.*;
+import org.mapstruct.BeanMapping;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 
 @Mapper(componentModel = "spring")
 public interface TeamMapper {

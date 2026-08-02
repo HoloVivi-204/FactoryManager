@@ -4,11 +4,10 @@ import com.factory.management.entity.AttendanceSource;
 import com.factory.management.entity.AttendanceStatus;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter

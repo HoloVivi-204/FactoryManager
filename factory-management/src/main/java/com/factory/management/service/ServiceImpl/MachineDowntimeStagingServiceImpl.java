@@ -16,15 +16,14 @@ import com.factory.management.repository.MachineDowntimeStagingRepository;
 import com.factory.management.repository.MachineRepository;
 import com.factory.management.repository.ProductionReportStagingRepository;
 import com.factory.management.service.Service.MachineDowntimeStagingService;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor

@@ -2,7 +2,8 @@ package com.factory.management.mapper;
 
 import com.factory.management.dto.response.MachineDowntimeStagingResponse;
 import com.factory.management.entity.MachineDowntimeStaging;
-import org.mapstruct.*;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface MachineDowntimeStagingMapper {

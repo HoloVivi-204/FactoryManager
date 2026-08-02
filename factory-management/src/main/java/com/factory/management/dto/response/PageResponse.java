@@ -1,11 +1,10 @@
 package com.factory.management.dto.response;
 
+import java.util.function.Function;
+import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.domain.Page;
-
-import java.util.List;
-import java.util.function.Function;
 
 @Getter
 @Builder

@@ -14,14 +14,13 @@ import com.factory.management.repository.ProductionReportStagingRepository;
 import com.factory.management.repository.QualityErrorTypeRepository;
 import com.factory.management.repository.QualityReportStagingRepository;
 import com.factory.management.service.Service.QualityReportStagingService;
+import java.util.List;
 import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
