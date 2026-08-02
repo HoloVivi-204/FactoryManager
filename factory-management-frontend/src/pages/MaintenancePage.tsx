@@ -22,6 +22,7 @@ import type {
   PageResponse,
   Role,
 } from '../types'
+import { number } from '../utils/format'
 
 export type MaintenanceView =
   | 'maintenance-dashboard'
@@ -85,11 +86,15 @@ const optionLabel = (options: Option[], value: unknown) =>
   options.find((option) => option.value === value)?.label ?? String(value ?? '—')
 
 const numberValue = (value: string) => value === '' ? undefined : Number(value)
-const currency = (value: unknown) => new Intl.NumberFormat('vi-VN', {
+const hasFiniteNumber = (value: unknown): value is number =>
+  typeof value === 'number' && Number.isFinite(value)
+const currencyFormatter = new Intl.NumberFormat('vi-VN', {
   style: 'currency',
   currency: 'VND',
   maximumFractionDigits: 0,
-}).format(Number(value ?? 0))
+})
+const currency = (value: unknown) =>
+  hasFiniteNumber(value) ? currencyFormatter.format(value) : '—'
 const dateTime = (value: unknown) => value
   ? new Date(String(value)).toLocaleString('vi-VN')
   : '—'
@@ -190,13 +195,13 @@ function MaintenanceDashboardView() {
       </Panel>
       <LoadingState loading={loading} error={error} />
       <div className="kpi-grid maintenance-kpis">
-        <KpiCard label="Yêu cầu đang mở" value={String(dashboard?.openRequests ?? 0)} hint="Chưa kết thúc" tone="blue" />
-        <KpiCard label="Yêu cầu khẩn cấp" value={String(dashboard?.criticalRequests ?? 0)} hint="Cần ưu tiên" tone="orange" />
-        <KpiCard label="Lịch đã quá hạn" value={String(dashboard?.overdueSchedules ?? 0)} hint="Đang hoạt động" tone="purple" />
-        <KpiCard label="Phiếu đang thực hiện" value={String(dashboard?.activeWorkOrders ?? 0)} hint="Đã giao hoặc đang làm" tone="green" />
+        <KpiCard label="Yêu cầu đang mở" value={number(dashboard?.openRequests)} hint="Chưa kết thúc" tone="blue" />
+        <KpiCard label="Yêu cầu khẩn cấp" value={number(dashboard?.criticalRequests)} hint="Cần ưu tiên" tone="orange" />
+        <KpiCard label="Lịch đã quá hạn" value={number(dashboard?.overdueSchedules)} hint="Đang hoạt động" tone="purple" />
+        <KpiCard label="Phiếu đang thực hiện" value={number(dashboard?.activeWorkOrders)} hint="Đã giao hoặc đang làm" tone="green" />
         <KpiCard label="Chi phí đã hoàn tất" value={currency(dashboard?.completedCost)} hint="Theo khoảng ngày đã chọn" tone="orange" />
       </div>
-      <Panel title={`Chi tiết chi phí phiếu đã hoàn tất (${orders?.totalElements ?? 0})`}>
+      <Panel title={`Chi tiết chi phí phiếu đã hoàn tất (${number(orders?.totalElements)})`}>
         <DataTable rows={orders?.content ?? []} columns={columns} />
         <Pager result={orders} page={page} onPage={setPage} />
       </Panel>
@@ -447,7 +452,7 @@ function MaintenanceRequestsView({ canManage, canCreate }: { canManage: boolean;
           <button type="button" onClick={() => { setFilters(defaults); setApplied(defaults); setPage(0) }}>Xóa bộ lọc</button>
         </div>
       </Panel>
-      <Panel title={`${result?.totalElements ?? 0} yêu cầu`}>
+      <Panel title={`${number(result?.totalElements)} yêu cầu`}>
         <LoadingState loading={loading} error={error} />
         <DataTable rows={result?.content ?? []} columns={columns} />
         <Pager result={result} page={page} onPage={setPage} />
@@ -638,7 +643,7 @@ function MaintenanceSchedulesView({ canManage }: { canManage: boolean }) {
           <button onClick={() => { setPage(0); setApplied({ ...filters }) }}>Áp dụng</button>
         </div>
       </Panel>
-      <Panel title={`${result?.totalElements ?? 0} lịch bảo trì`}>
+      <Panel title={`${number(result?.totalElements)} lịch bảo trì`}>
         <LoadingState loading={loading} error={error} />
         <DataTable rows={result?.content ?? []} columns={columns} />
         <Pager result={result} page={page} onPage={setPage} />
@@ -870,7 +875,7 @@ function MaintenanceWorkOrdersView({ canManage }: { canManage: boolean }) {
           <button onClick={() => { setPage(0); setApplied({ ...filters }) }}>Áp dụng</button>
         </div>
       </Panel>
-      <Panel title={`${result?.totalElements ?? 0} phiếu công việc`}>
+      <Panel title={`${number(result?.totalElements)} phiếu công việc`}>
         <LoadingState loading={loading} error={error} />
         <DataTable rows={result?.content ?? []} columns={columns} />
         <Pager result={result} page={page} onPage={setPage} />
@@ -986,7 +991,7 @@ function MaintenanceHistoryView() {
           <button type="submit">Xem lịch sử</button>
         </form>
       </Panel>
-      <Panel title={appliedMachineId ? `${result?.totalElements ?? 0} lần thay đổi của máy #${appliedMachineId}` : 'Lịch sử trạng thái'}>
+      <Panel title={appliedMachineId ? `${number(result?.totalElements)} lần thay đổi của máy #${appliedMachineId}` : 'Lịch sử trạng thái'}>
         {!appliedMachineId && <div className="module-empty"><b>Chưa chọn máy</b><p>Nhập ID máy thuộc phạm vi được cấp để xem lịch sử.</p></div>}
         <LoadingState loading={loading} error={error} />
         {appliedMachineId && <DataTable rows={result?.content ?? []} columns={columns} />}
