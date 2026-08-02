@@ -5,7 +5,10 @@ import com.factory.management.service.ServiceImpl.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
-import org.springframework.security.oauth2.jwt.*;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtException;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.spec.SecretKeySpec;
@@ -24,7 +27,9 @@ public class CustomJwtDecoder implements JwtDecoder {
     public Jwt decode(String token) throws JwtException {
         boolean valid = authenticationService.introspect(
                 IntrospectRequest.builder().token(token).build()).isValid();
-        if (!valid) throw new JwtException("Invalid token");
+        if (!valid) {
+            throw new JwtException("Invalid token");
+        }
 
         if (delegate == null) {
             SecretKeySpec key = new SecretKeySpec(signerKey.getBytes(), "HS512");

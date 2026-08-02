@@ -1,7 +1,30 @@
 package com.factory.management.security;
 
-import com.factory.management.entity.*;
-import com.factory.management.repository.*;
+import com.factory.management.entity.DataScopeType;
+import com.factory.management.entity.Department;
+import com.factory.management.entity.Employee;
+import com.factory.management.entity.Machine;
+import com.factory.management.entity.ProductionLine;
+import com.factory.management.entity.ProductionReport;
+import com.factory.management.entity.ProductionReportStaging;
+import com.factory.management.entity.Role;
+import com.factory.management.entity.Team;
+import com.factory.management.entity.User;
+import com.factory.management.entity.UserDataScope;
+import com.factory.management.repository.DepartmentRepository;
+import com.factory.management.repository.EmployeeActualStagingRepository;
+import com.factory.management.repository.EmployeeRepository;
+import com.factory.management.repository.FactoryRepository;
+import com.factory.management.repository.MachineDowntimeStagingRepository;
+import com.factory.management.repository.MachineRepository;
+import com.factory.management.repository.MaterialIssueStagingRepository;
+import com.factory.management.repository.ProductionLineRepository;
+import com.factory.management.repository.ProductionReportRepository;
+import com.factory.management.repository.ProductionReportStagingRepository;
+import com.factory.management.repository.QualityReportStagingRepository;
+import com.factory.management.repository.TeamRepository;
+import com.factory.management.repository.UserDataScopeRepository;
+import com.factory.management.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -10,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component("authorizationScope")
 @RequiredArgsConstructor
@@ -48,7 +72,9 @@ public class AuthorizationScope {
             Long productionLineId
     ) {
         User user = currentUser();
-        if (role == null || !has(user, role)) return false;
+        if (role == null || !has(user, role)) {
+            return false;
+        }
         return canAccessFinancialScope(user, Set.of(role), factoryId, departmentId, productionLineId);
     }
 
@@ -59,38 +85,55 @@ public class AuthorizationScope {
             Long departmentId,
             Long productionLineId
     ) {
-        if (hasAny(effectiveRoles, Role.ADMIN, Role.DIRECTOR)) return true;
-        if (!hasAny(effectiveRoles, Role.FINANCE, Role.FACTORY_MANAGER)) return false;
+        if (hasAny(effectiveRoles, Role.ADMIN, Role.DIRECTOR)) {
+            return true;
+        }
+        if (!hasAny(effectiveRoles, Role.FINANCE, Role.FACTORY_MANAGER)) {
+            return false;
+        }
         Long resolvedFactory = factoryId;
         Long resolvedDepartment = departmentId;
         if (productionLineId != null) {
             ProductionLine line = productionLineRepository.findById(productionLineId).orElse(null);
-            if (line == null) return false;
+            if (line == null) {
+                return false;
+            }
             resolvedDepartment = line.getDepartment().getId();
             resolvedFactory = line.getDepartment().getFactory().getId();
         } else if (departmentId != null) {
             Department department = departmentRepository.findById(departmentId).orElse(null);
-            if (department == null) return false;
+            if (department == null) {
+                return false;
+            }
             resolvedFactory = department.getFactory().getId();
-        } else if (factoryId == null || !factoryRepository.existsById(factoryId)) return false;
-        final Long f = resolvedFactory, d = resolvedDepartment;
-        var scopes = userDataScopeRepository.findAllByUser_Id(user.getId());
-        if (!scopes.isEmpty()) return scopes.stream().anyMatch(scope -> {
-            if (scope.getScopeType() == null || scope.getScopeId() == null) return false;
-            if (scope.getScopeType() == DataScopeType.FACTORY) {
-                return scope.getScopeId().equals(f);
-            }
-            if (scope.getScopeType() == DataScopeType.DEPARTMENT) {
-                return d != null && scope.getScopeId().equals(d);
-            }
-            if (scope.getScopeType() == DataScopeType.PRODUCTION_LINE) {
-                return productionLineId != null && scope.getScopeId().equals(productionLineId);
-            }
+        } else if (factoryId == null || !factoryRepository.existsById(factoryId)) {
             return false;
-        });
-        if (effectiveRoles.contains(Role.FINANCE) && !effectiveRoles.contains(Role.FACTORY_MANAGER)) return false;
+        }
+        final Long scopedFactoryId = resolvedFactory;
+        final Long scopedDepartmentId = resolvedDepartment;
+        List<UserDataScope> scopes = userDataScopeRepository.findAllByUser_Id(user.getId());
+        if (!scopes.isEmpty()) {
+            return scopes.stream().anyMatch(scope -> {
+                if (scope.getScopeType() == null || scope.getScopeId() == null) {
+                    return false;
+                }
+                if (scope.getScopeType() == DataScopeType.FACTORY) {
+                    return scope.getScopeId().equals(scopedFactoryId);
+                }
+                if (scope.getScopeType() == DataScopeType.DEPARTMENT) {
+                    return scopedDepartmentId != null && scope.getScopeId().equals(scopedDepartmentId);
+                }
+                if (scope.getScopeType() == DataScopeType.PRODUCTION_LINE) {
+                    return productionLineId != null && scope.getScopeId().equals(productionLineId);
+                }
+                return false;
+            });
+        }
+        if (effectiveRoles.contains(Role.FINANCE) && !effectiveRoles.contains(Role.FACTORY_MANAGER)) {
+            return false;
+        }
         Team own = user.getEmployee().getTeam();
-        return own != null && factoryId(own).equals(f);
+        return own != null && factoryId(own).equals(scopedFactoryId);
     }
 
     /**
@@ -111,7 +154,9 @@ public class AuthorizationScope {
     @Transactional(readOnly = true)
     public Set<Long> accessibleTeamIdsAsRole(Role role) {
         User user = currentUser();
-        if (role == null || !has(user, role)) return Set.of();
+        if (role == null || !has(user, role)) {
+            return Set.of();
+        }
         return accessibleTeamIds(user, Set.of(role));
     }
 
@@ -122,11 +167,17 @@ public class AuthorizationScope {
 
     @Transactional(readOnly = true)
     public boolean canAccessEmployee(Long employeeId) {
-        if (employeeId == null) return false;
+        if (employeeId == null) {
+            return false;
+        }
         User user = currentUser();
         Employee target = employeeRepository.findById(employeeId).orElse(null);
-        if (target == null) return false;
-        if (hasAny(user, Role.ADMIN, Role.DIRECTOR)) return true;
+        if (target == null) {
+            return false;
+        }
+        if (hasAny(user, Role.ADMIN, Role.DIRECTOR)) {
+            return true;
+        }
         if (!hasAny(user, Role.FACTORY_MANAGER, Role.DEPARTMENT_MANAGER,
                 Role.PRODUCTION_MANAGER, Role.TEAM_LEADER)) {
             return user.getEmployee().getId().equals(employeeId);
@@ -144,9 +195,13 @@ public class AuthorizationScope {
     @Transactional(readOnly = true)
     public boolean canManageTeam(Long teamId) {
         User user = currentUser();
-        if (has(user, Role.ADMIN)) return true;
+        if (has(user, Role.ADMIN)) {
+            return true;
+        }
         if (!hasAny(user, Role.FACTORY_MANAGER, Role.DEPARTMENT_MANAGER,
-                Role.PRODUCTION_MANAGER, Role.TEAM_LEADER)) return false;
+                Role.PRODUCTION_MANAGER, Role.TEAM_LEADER)) {
+            return false;
+        }
         Team target = teamRepository.findById(teamId).orElse(null);
         return target != null && canAccessTeam(user, target);
     }
@@ -167,7 +222,9 @@ public class AuthorizationScope {
     public boolean canManageStaging(Long reportId) {
         User user = currentUser();
         if (!hasAny(user, Role.ADMIN, Role.FACTORY_MANAGER, Role.DEPARTMENT_MANAGER,
-                Role.PRODUCTION_MANAGER, Role.TEAM_LEADER)) return false;
+                Role.PRODUCTION_MANAGER, Role.TEAM_LEADER)) {
+            return false;
+        }
         ProductionReportStaging report = stagingRepository.findById(reportId).orElse(null);
         return report != null && canAccessTeam(user, report.getTeam());
     }
@@ -177,9 +234,13 @@ public class AuthorizationScope {
         User user = currentUser();
         // DIRECTOR is an executive read-only role. Approval belongs to the
         // operational management chain; ADMIN remains the emergency override.
-        if (has(user, Role.ADMIN)) return true;
+        if (has(user, Role.ADMIN)) {
+            return true;
+        }
         if (!hasAny(user, Role.FACTORY_MANAGER, Role.DEPARTMENT_MANAGER,
-                Role.PRODUCTION_MANAGER)) return false;
+                Role.PRODUCTION_MANAGER)) {
+            return false;
+        }
         ProductionReportStaging report = stagingRepository.findById(reportId).orElse(null);
         return report != null && canAccessTeam(user, report.getTeam());
     }
@@ -221,21 +282,34 @@ public class AuthorizationScope {
 
     private boolean canAccessTeam(User user, Team target) {
         Set<Role> roles = user.getRoles();
-        if (roles.contains(Role.ADMIN) || roles.contains(Role.DIRECTOR)) return true;
+        if (roles.contains(Role.ADMIN) || roles.contains(Role.DIRECTOR)) {
+            return true;
+        }
         if (!hasAny(user, Role.FACTORY_MANAGER, Role.DEPARTMENT_MANAGER,
-                Role.PRODUCTION_MANAGER, Role.TEAM_LEADER, Role.FINANCE)) return false;
-        var scopes = userDataScopeRepository.findAllByUser_Id(user.getId());
-        if (!scopes.isEmpty()) return scopes.stream().anyMatch(scope -> matchesScope(scope, target));
+                Role.PRODUCTION_MANAGER, Role.TEAM_LEADER, Role.FINANCE)) {
+            return false;
+        }
+        List<UserDataScope> scopes = userDataScopeRepository.findAllByUser_Id(user.getId());
+        if (!scopes.isEmpty()) {
+            return scopes.stream().anyMatch(scope -> matchesScope(scope, target));
+        }
         if (roles.contains(Role.FINANCE) && !hasAny(user, Role.FACTORY_MANAGER,
-                Role.DEPARTMENT_MANAGER, Role.PRODUCTION_MANAGER, Role.TEAM_LEADER)) return false;
+                Role.DEPARTMENT_MANAGER, Role.PRODUCTION_MANAGER, Role.TEAM_LEADER)) {
+            return false;
+        }
         Team own = user.getEmployee().getTeam();
-        if (own == null) return false;
-        if (roles.contains(Role.FACTORY_MANAGER))
+        if (own == null) {
+            return false;
+        }
+        if (roles.contains(Role.FACTORY_MANAGER)) {
             return factoryId(own).equals(factoryId(target));
-        if (roles.contains(Role.DEPARTMENT_MANAGER))
+        }
+        if (roles.contains(Role.DEPARTMENT_MANAGER)) {
             return departmentId(own).equals(departmentId(target));
-        if (roles.contains(Role.PRODUCTION_MANAGER))
+        }
+        if (roles.contains(Role.PRODUCTION_MANAGER)) {
             return own.getProductionLine().getId().equals(target.getProductionLine().getId());
+        }
         return own.getId().equals(target.getId());
     }
 
@@ -246,36 +320,49 @@ public class AuthorizationScope {
     private Set<Long> accessibleTeamIds(User user, Set<Role> effectiveRoles) {
         List<Team> activeTeams = teamRepository.findAllActiveInActiveHierarchy();
         if (hasAny(effectiveRoles, Role.ADMIN, Role.DIRECTOR)) {
-            return activeTeams.stream().map(Team::getId).collect(java.util.stream.Collectors.toUnmodifiableSet());
+            return activeTeams.stream().map(Team::getId).collect(Collectors.toUnmodifiableSet());
         }
         if (!hasAny(effectiveRoles, Role.FACTORY_MANAGER, Role.DEPARTMENT_MANAGER,
-                Role.PRODUCTION_MANAGER, Role.TEAM_LEADER, Role.FINANCE)) return Set.of();
+                Role.PRODUCTION_MANAGER, Role.TEAM_LEADER, Role.FINANCE)) {
+            return Set.of();
+        }
 
-        var scopes = userDataScopeRepository.findAllByUser_Id(user.getId());
+        List<UserDataScope> scopes = userDataScopeRepository.findAllByUser_Id(user.getId());
         if (!scopes.isEmpty()) {
             return activeTeams.stream()
                     .filter(team -> scopes.stream().anyMatch(scope -> matchesScope(scope, team)))
                     .map(Team::getId)
-                    .collect(java.util.stream.Collectors.toUnmodifiableSet());
+                    .collect(Collectors.toUnmodifiableSet());
         }
         if (effectiveRoles.contains(Role.FINANCE) && !hasAny(effectiveRoles, Role.FACTORY_MANAGER,
-                Role.DEPARTMENT_MANAGER, Role.PRODUCTION_MANAGER, Role.TEAM_LEADER)) return Set.of();
+                Role.DEPARTMENT_MANAGER, Role.PRODUCTION_MANAGER, Role.TEAM_LEADER)) {
+            return Set.of();
+        }
 
         Team own = user.getEmployee().getTeam();
-        if (own == null) return Set.of();
+        if (own == null) {
+            return Set.of();
+        }
         return activeTeams.stream().filter(team -> {
-            if (effectiveRoles.contains(Role.FACTORY_MANAGER)) return factoryId(own).equals(factoryId(team));
-            if (effectiveRoles.contains(Role.DEPARTMENT_MANAGER)) return departmentId(own).equals(departmentId(team));
-            if (effectiveRoles.contains(Role.PRODUCTION_MANAGER))
+            if (effectiveRoles.contains(Role.FACTORY_MANAGER)) {
+                return factoryId(own).equals(factoryId(team));
+            }
+            if (effectiveRoles.contains(Role.DEPARTMENT_MANAGER)) {
+                return departmentId(own).equals(departmentId(team));
+            }
+            if (effectiveRoles.contains(Role.PRODUCTION_MANAGER)) {
                 return own.getProductionLine().getId().equals(team.getProductionLine().getId());
+            }
             return own.getId().equals(team.getId());
-        }).map(Team::getId).collect(java.util.stream.Collectors.toUnmodifiableSet());
+        }).map(Team::getId).collect(Collectors.toUnmodifiableSet());
     }
 
     // Keep this as explicit comparisons: enum switches create a synthetic
     // AuthorizationScope$1 class that can become stale during IDE hot reload.
     private boolean matchesScope(UserDataScope scope, Team target) {
-        if (scope.getScopeType() == null || scope.getScopeId() == null) return false;
+        if (scope.getScopeType() == null || scope.getScopeId() == null) {
+            return false;
+        }
         if (scope.getScopeType() == DataScopeType.FACTORY) {
             return scope.getScopeId().equals(factoryId(target));
         }
@@ -293,7 +380,9 @@ public class AuthorizationScope {
 
     private User currentUser() {
         Object authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (!(authentication instanceof JwtAuthenticationToken jwt)) return nullUser();
+        if (!(authentication instanceof JwtAuthenticationToken jwt)) {
+            return nullUser();
+        }
         return userRepository.findByUsernameIgnoreCase(jwt.getToken().getSubject()).orElseGet(this::nullUser);
     }
 
@@ -301,15 +390,33 @@ public class AuthorizationScope {
         return User.builder().roles(Set.of()).build();
     }
 
-    private boolean has(User user, Role role) { return user.getRoles().contains(role); }
+    private boolean has(User user, Role role) {
+        return user.getRoles().contains(role);
+    }
+
     private boolean hasAny(User user, Role... roles) {
-        for (Role role : roles) if (has(user, role)) return true;
+        for (Role role : roles) {
+            if (has(user, role)) {
+                return true;
+            }
+        }
         return false;
     }
+
     private boolean hasAny(Set<Role> assignedRoles, Role... roles) {
-        for (Role role : roles) if (assignedRoles.contains(role)) return true;
+        for (Role role : roles) {
+            if (assignedRoles.contains(role)) {
+                return true;
+            }
+        }
         return false;
     }
-    private Long departmentId(Team team) { return team.getProductionLine().getDepartment().getId(); }
-    private Long factoryId(Team team) { return team.getProductionLine().getDepartment().getFactory().getId(); }
+
+    private Long departmentId(Team team) {
+        return team.getProductionLine().getDepartment().getId();
+    }
+
+    private Long factoryId(Team team) {
+        return team.getProductionLine().getDepartment().getFactory().getId();
+    }
 }
