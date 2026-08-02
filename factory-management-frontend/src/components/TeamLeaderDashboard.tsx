@@ -34,6 +34,7 @@ export default function TeamLeaderDashboard({ reports }: { reports: StagingRepor
   const [keyword, setKeyword] = useState('')
   const [details, setDetails] = useState(emptyDetails)
   const [detailsLoading, setDetailsLoading] = useState(false)
+  const [detailsError, setDetailsError] = useState('')
   const today = localIsoDate()
 
   const filtered = useMemo(() => {
@@ -73,6 +74,7 @@ export default function TeamLeaderDashboard({ reports }: { reports: StagingRepor
     let alive = true
     async function loadDetails() {
       setDetailsLoading(true)
+      setDetailsError('')
       try {
         const bundles = await Promise.all(filtered.map((report) => shiftReportApi.bundle(report.id)))
         if (!alive) return
@@ -82,8 +84,11 @@ export default function TeamLeaderDashboard({ reports }: { reports: StagingRepor
           materials: bundles.flatMap((bundle) => bundle['material-issue-staging']),
           employees: bundles.flatMap((bundle) => bundle['employee-actual-staging']),
         })
-      } catch {
-        if (alive) setDetails(emptyDetails())
+      } catch (loadError) {
+        if (alive) {
+          setDetails(emptyDetails())
+          setDetailsError((loadError as Error).message)
+        }
       } finally {
         if (alive) setDetailsLoading(false)
       }
@@ -172,11 +177,35 @@ export default function TeamLeaderDashboard({ reports }: { reports: StagingRepor
 
   const alerts = useMemo(() => {
     const values: { tone: string; title: string; text: string }[] = []
-    if (!reports.some((row) => row.reportDate === today)) values.push({ tone: 'orange', title: 'Chưa có báo cáo hôm nay', text: 'Hãy tạo báo cáo ca hoặc nhập dữ liệu Excel cho ngày hiện tại.' })
-    if (workflow.change > 0) values.push({ tone: 'red', title: `${workflow.change} báo cáo bị yêu cầu sửa`, text: 'Ưu tiên mở lại báo cáo CHANGE_REQUESTED và bổ sung nội dung quản lý yêu cầu.' })
-    if (metrics.attainment > 0 && metrics.attainment < 90) values.push({ tone: 'orange', title: 'Sản lượng dưới 90% kế hoạch', text: `Còn thiếu ${nf.format(Math.abs(metrics.gap))} sản phẩm; mức hoàn thành ${percentage(metrics.attainment)}.` })
+    if (!reports.some((row) => row.reportDate === today)) {
+      values.push({
+        tone: 'orange',
+        title: 'Chưa có báo cáo hôm nay',
+        text: 'Hãy tạo báo cáo ca hoặc nhập dữ liệu Excel cho ngày hiện tại.',
+      })
+    }
+    if (workflow.change > 0) {
+      values.push({
+        tone: 'red',
+        title: `${workflow.change} báo cáo bị yêu cầu sửa`,
+        text: 'Ưu tiên mở lại báo cáo CHANGE_REQUESTED và bổ sung nội dung quản lý yêu cầu.',
+      })
+    }
+    if (metrics.attainment > 0 && metrics.attainment < 90) {
+      values.push({
+        tone: 'orange',
+        title: 'Sản lượng dưới 90% kế hoạch',
+        text: `Còn thiếu ${nf.format(Math.abs(metrics.gap))} sản phẩm; mức hoàn thành ${percentage(metrics.attainment)}.`,
+      })
+    }
     if (metrics.defectRate > 3) values.push({ tone: 'red', title: 'Tỷ lệ lỗi cao', text: `Hàng lỗi chiếm ${percentage(metrics.defectRate)} sản lượng thực tế.` })
-    if (metrics.downtimeRate > 10) values.push({ tone: 'orange', title: 'Downtime cần chú ý', text: `Thời gian dừng chiếm ${percentage(metrics.downtimeRate)} thời gian làm việc.` })
+    if (metrics.downtimeRate > 10) {
+      values.push({
+        tone: 'orange',
+        title: 'Downtime cần chú ý',
+        text: `Thời gian dừng chiếm ${percentage(metrics.downtimeRate)} thời gian làm việc.`,
+      })
+    }
     if (values.length === 0) values.push({ tone: 'green', title: 'Tình hình trong ngưỡng', text: 'Chưa phát hiện cảnh báo lớn trong khoảng thời gian đang xem.' })
     return values
   }, [metrics, reports, today, workflow.change])
@@ -185,11 +214,34 @@ export default function TeamLeaderDashboard({ reports }: { reports: StagingRepor
     () => [...filtered].sort((a, b) => b.reportDate.localeCompare(a.reportDate) || b.id - a.id),
     [filtered],
   )
+  const detailValue = (value: number) => {
+    if (detailsLoading) return '…'
+    if (detailsError) return '—'
+    return nf.format(value)
+  }
+  const downtimeAverage = detailsLoading
+    ? '…'
+    : detailsError || details.downtime.length === 0
+    ? '—'
+    : `${nf.format(metrics.downtime / details.downtime.length)} phút`
+  const peopleCountLabel = (reportId: number) => {
+    if (detailsLoading) return '…'
+    if (detailsError) return '—'
+
+    const peopleCount = peopleByReport.get(reportId)
+    return peopleCount === undefined ? '—' : `${peopleCount} người`
+  }
 
   return (
     <section className="team-dashboard">
       <div className="team-dashboard-heading">
-        <div><h3>Dashboard vận hành của tổ</h3><p>Từ {fromDate ? dateLabel(fromDate) : 'đầu kỳ'} đến {toDate ? dateLabel(toDate) : 'hiện tại'} · {filtered.length} báo cáo</p></div>
+        <div>
+          <h3>Dashboard vận hành của tổ</h3>
+          <p>
+            Từ {fromDate ? dateLabel(fromDate) : 'đầu kỳ'} đến{' '}
+            {toDate ? dateLabel(toDate) : 'hiện tại'} · {filtered.length} báo cáo
+          </p>
+        </div>
         <div className="period-switch">
           {[{ value: 1, label: 'Hôm nay' }, { value: 7, label: '7 ngày' }, { value: 30, label: '30 ngày' }].map((item) => (
             <button key={item.value} className={days === item.value ? 'active' : ''} onClick={() => selectPeriod(item.value)}>{item.label}</button>
@@ -198,25 +250,92 @@ export default function TeamLeaderDashboard({ reports }: { reports: StagingRepor
       </div>
 
       <div className="filters hr-filters">
-        <label>Từ ngày<input type="date" value={fromDate} onChange={(event) => { setDays(0); setFromDate(event.target.value) }} /></label>
-        <label>Đến ngày<input type="date" value={toDate} onChange={(event) => { setDays(0); setToDate(event.target.value) }} /></label>
-        <label>Tìm báo cáo<input type="search" placeholder="Máy, ca, trạng thái, ghi chú…" value={keyword} onChange={(event) => setKeyword(event.target.value)} /></label>
+        <label>
+          Từ ngày
+          <input
+            type="date"
+            value={fromDate}
+            onChange={(event) => { setDays(0); setFromDate(event.target.value) }}
+          />
+        </label>
+        <label>
+          Đến ngày
+          <input
+            type="date"
+            value={toDate}
+            onChange={(event) => { setDays(0); setToDate(event.target.value) }}
+          />
+        </label>
+        <label>
+          Tìm báo cáo
+          <input
+            type="search"
+            placeholder="Máy, ca, trạng thái, ghi chú…"
+            value={keyword}
+            onChange={(event) => setKeyword(event.target.value)}
+          />
+        </label>
         <button type="button" onClick={clearFilters}>Xóa bộ lọc</button>
       </div>
+      {detailsError && <p className="form-message error">{detailsError}</p>}
 
       <div className="team-insight-grid">
-        <InsightCard tone="blue" label="Tiến độ sản xuất" main={percentage(metrics.attainment)}
-          interpretation={metrics.attainment >= 100 ? 'Đã đạt hoặc vượt kế hoạch.' : `Còn thiếu ${nf.format(Math.max(-metrics.gap, 0))} sản phẩm.`}
-          rows={[['Kế hoạch', nf.format(metrics.planned)], ['Thực tế', nf.format(metrics.actual)], ['Chênh lệch', signed(metrics.gap)]]} />
-        <InsightCard tone="green" label="Chất lượng đầu ra" main={`${nf.format(metrics.good)} tốt`}
-          interpretation={metrics.defectRate <= 3 ? 'Tỷ lệ lỗi đang trong ngưỡng theo dõi.' : 'Tỷ lệ lỗi cao, cần xem nhóm lỗi bên dưới.'}
-          rows={[['Sản phẩm lỗi', nf.format(metrics.defect)], ['Tỷ lệ lỗi', percentage(metrics.defectRate)], ['Loại lỗi ghi nhận', nf.format(details.quality.length)]]} />
-        <InsightCard tone="orange" label="Dừng máy" main={`${nf.format(metrics.downtime)} phút`}
+        <InsightCard
+          tone="blue"
+          label="Tiến độ sản xuất"
+          main={percentage(metrics.attainment)}
+          interpretation={
+            metrics.attainment >= 100
+              ? 'Đã đạt hoặc vượt kế hoạch.'
+              : `Còn thiếu ${nf.format(Math.max(-metrics.gap, 0))} sản phẩm.`
+          }
+          rows={[
+            ['Kế hoạch', nf.format(metrics.planned)],
+            ['Thực tế', nf.format(metrics.actual)],
+            ['Chênh lệch', signed(metrics.gap)],
+          ]}
+        />
+        <InsightCard
+          tone="green"
+          label="Chất lượng đầu ra"
+          main={`${nf.format(metrics.good)} tốt`}
+          interpretation={
+            metrics.defectRate <= 3
+              ? 'Tỷ lệ lỗi đang trong ngưỡng theo dõi.'
+              : 'Tỷ lệ lỗi cao, cần xem nhóm lỗi bên dưới.'
+          }
+          rows={[
+            ['Sản phẩm lỗi', nf.format(metrics.defect)],
+            ['Tỷ lệ lỗi', percentage(metrics.defectRate)],
+            ['Loại lỗi ghi nhận', detailValue(details.quality.length)],
+          ]}
+        />
+        <InsightCard
+          tone="orange"
+          label="Dừng máy"
+          main={`${nf.format(metrics.downtime)} phút`}
           interpretation={downtimeReasons[0] ? `Nguyên nhân lớn nhất: ${downtimeReasons[0].label}.` : 'Chưa có lần dừng máy chi tiết.'}
-          rows={[['Tỷ lệ thời gian dừng', percentage(metrics.downtimeRate)], ['Số lần dừng', nf.format(details.downtime.length)], ['Bình quân/lần', `${nf.format(details.downtime.length ? metrics.downtime / details.downtime.length : 0)} phút`]]} />
-        <InsightCard tone="purple" label="Nhân sự thực tế" main={detailsLoading ? 'Đang tải…' : `${nf.format(people.turns)} lượt`}
-          interpretation={`${people.unique} nhân viên khác nhau đã tham gia trong kỳ.`}
-          rows={[['Vắng/nghỉ', nf.format(people.absent)], ['Đi muộn', nf.format(people.late)], ['Tăng ca', `${nf.format(people.overtime)} phút`]]} />
+          rows={[
+            ['Tỷ lệ thời gian dừng', percentage(metrics.downtimeRate)],
+            ['Số lần dừng', detailValue(details.downtime.length)],
+            ['Bình quân/lần', downtimeAverage],
+          ]}
+        />
+        <InsightCard
+          tone="purple"
+          label="Nhân sự thực tế"
+          main={detailsLoading ? 'Đang tải…' : detailsError ? '—' : `${nf.format(people.turns)} lượt`}
+          interpretation={
+            detailsError
+              ? 'Không tải được dữ liệu nhân sự chi tiết.'
+              : `${people.unique} nhân viên khác nhau đã tham gia trong kỳ.`
+          }
+          rows={[
+            ['Vắng/nghỉ', detailValue(people.absent)],
+            ['Đi muộn', detailValue(people.late)],
+            ['Tăng ca', detailsError ? '—' : `${nf.format(people.overtime)} phút`],
+          ]}
+        />
       </div>
 
       <div className="team-dashboard-grid">
@@ -246,16 +365,45 @@ export default function TeamLeaderDashboard({ reports }: { reports: StagingRepor
 
       <Panel title="Phân tích nguyên nhân trong kỳ">
         <div className="team-breakdowns">
-          <Breakdown title="Lý do dừng máy" rows={downtimeReasons} empty="Chưa ghi nhận dừng máy" />
-          <Breakdown title="Loại lỗi chất lượng" rows={qualityTypes} empty="Chưa ghi nhận lỗi chi tiết" />
-          <Breakdown title="Sự cố vật tư" rows={materialTypes} empty="Chưa ghi nhận sự cố vật tư" />
+          <Breakdown
+            title="Lý do dừng máy"
+            rows={downtimeReasons}
+            empty={detailsError ? 'Không tải được chi tiết dừng máy' : 'Chưa ghi nhận dừng máy'}
+          />
+          <Breakdown
+            title="Loại lỗi chất lượng"
+            rows={qualityTypes}
+            empty={detailsError ? 'Không tải được chi tiết lỗi' : 'Chưa ghi nhận lỗi chi tiết'}
+          />
+          <Breakdown
+            title="Sự cố vật tư"
+            rows={materialTypes}
+            empty={detailsError ? 'Không tải được chi tiết vật tư' : 'Chưa ghi nhận sự cố vật tư'}
+          />
         </div>
       </Panel>
 
       <Panel title="Chi tiết từng báo cáo trong kỳ">
         <div className="table-wrap team-report-table">
           <table>
-            <thead><tr><th>Ngày</th><th>Ca</th><th>Máy</th><th>Kế hoạch</th><th>Thực tế</th><th>Chênh lệch</th><th>Hoàn thành</th><th>Hàng tốt</th><th>Hàng lỗi</th><th>Tỷ lệ lỗi</th><th>Downtime</th><th>Nhân sự</th><th>Trạng thái</th><th>Ghi chú</th></tr></thead>
+            <thead>
+              <tr>
+                <th>Ngày</th>
+                <th>Ca</th>
+                <th>Máy</th>
+                <th>Kế hoạch</th>
+                <th>Thực tế</th>
+                <th>Chênh lệch</th>
+                <th>Hoàn thành</th>
+                <th>Hàng tốt</th>
+                <th>Hàng lỗi</th>
+                <th>Tỷ lệ lỗi</th>
+                <th>Downtime</th>
+                <th>Nhân sự</th>
+                <th>Trạng thái</th>
+                <th>Ghi chú</th>
+              </tr>
+            </thead>
             <tbody>
               {detailReports.map((row) => {
                 const attainment = row.plannedQuantity > 0 ? row.actualQuantity * 100 / row.plannedQuantity : 0
@@ -266,7 +414,7 @@ export default function TeamLeaderDashboard({ reports }: { reports: StagingRepor
                   <td className={row.actualQuantity - row.plannedQuantity < 0 ? 'negative' : 'positive'}>{signed(row.actualQuantity - row.plannedQuantity)}</td>
                   <td>{percentage(attainment)}</td><td>{nf.format(row.goodQuantity)}</td><td>{nf.format(row.defectQuantity)}</td>
                   <td>{percentage(defectRate)}</td><td>{nf.format(row.downtimeMinutes)} phút</td>
-                  <td>{detailsLoading ? '…' : `${peopleByReport.get(row.id) ?? 0} người`}</td>
+                  <td>{peopleCountLabel(row.id)}</td>
                   <td><StatusBadge value={row.status} /></td><td className="report-note-cell">{row.note || '—'}</td>
                 </tr>
               })}
@@ -302,10 +450,24 @@ function InsightCard({ tone, label, main, rows, interpretation }: {
   </article>
 }
 
-function group(rows: TableRow[], label: (row: TableRow) => string, amount: (row: TableRow) => number, suffix: string) {
+function group(
+  rows: TableRow[],
+  label: (row: TableRow) => string,
+  amount: (row: TableRow) => number,
+  suffix: string,
+) {
   const values = new Map<string, number>()
-  rows.forEach((row) => { const key = label(row); values.set(key, (values.get(key) ?? 0) + amount(row)) })
-  return [...values.entries()].sort((a, b) => b[1] - a[1]).map(([name, value]) => ({ label: name, value: `${nf.format(value)}${suffix}`, raw: value }))
+  rows.forEach((row) => {
+    const key = label(row)
+    values.set(key, (values.get(key) ?? 0) + amount(row))
+  })
+  return [...values.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .map(([name, value]) => ({
+      label: name,
+      value: `${nf.format(value)}${suffix}`,
+      raw: value,
+    }))
 }
 
 function Breakdown({ title, rows, empty }: { title: string; rows: { label: string; value: string; raw: number }[]; empty: string }) {
@@ -317,6 +479,13 @@ function Breakdown({ title, rows, empty }: { title: string; rows: { label: strin
 
 function signed(value: number) { return `${value > 0 ? '+' : ''}${nf.format(value)}` }
 
-function issueLabel(value: string) {
-  return ({ SHORTAGE: 'Thiếu vật tư', LATE_DELIVERY: 'Giao chậm', WRONG_SPECIFICATION: 'Sai quy cách', DAMAGED: 'Hư hỏng', QUALITY_FAILED: 'Không đạt chất lượng', OTHER: 'Khác' } as Record<string, string>)[value] ?? value
+const issueLabels: Record<string, string> = {
+  SHORTAGE: 'Thiếu vật tư',
+  LATE_DELIVERY: 'Giao chậm',
+  WRONG_SPECIFICATION: 'Sai quy cách',
+  DAMAGED: 'Hư hỏng',
+  QUALITY_FAILED: 'Không đạt chất lượng',
+  OTHER: 'Khác',
 }
+
+const issueLabel = (value: string) => issueLabels[value] ?? value
