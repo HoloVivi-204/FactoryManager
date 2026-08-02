@@ -5,10 +5,8 @@ import com.factory.management.dto.response.AiChatResponse;
 import com.factory.management.service.ServiceImpl.AuditService;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -74,7 +72,9 @@ public class AiChatService {
     }
 
     private String resolveDataStatus(List<AiToolResult> results) {
-        if (results.isEmpty()) return "NO_BUSINESS_DATA";
+        if (results.isEmpty()) {
+            return "NO_BUSINESS_DATA";
+        }
         if (results.stream().allMatch(result -> "NO_BUSINESS_DATA".equals(result.dataStatus()))) {
             return "NO_BUSINESS_DATA";
         }
@@ -82,8 +82,12 @@ public class AiChatService {
                 result.dataStatus().contains("TEMPORARY"));
         boolean official = results.stream().anyMatch(result ->
                 result.dataStatus().contains("OFFICIAL"));
-        if (temporary && official) return "OFFICIAL_WITH_TEMPORARY";
-        if (temporary) return "TEMPORARY_UNCONFIRMED";
+        if (temporary && official) {
+            return "OFFICIAL_WITH_TEMPORARY";
+        }
+        if (temporary) {
+            return "TEMPORARY_UNCONFIRMED";
+        }
         return "OFFICIAL";
     }
 
@@ -93,26 +97,32 @@ public class AiChatService {
             String dataStatus,
             int recordCount
     ) {
-        Map<String, Object> details = new LinkedHashMap<>();
-        details.put("workspaceRole", context.workspaceRole() == null ? null : context.workspaceRole().name());
-        details.put("tools", tools);
-        details.put("dataStatus", dataStatus);
-        details.put("recordCount", recordCount);
-        details.put("accessibleTeamCount", context.accessibleTeamIds().size());
-        return toSafeJson(details);
+        return toSafeJson(
+                context.workspaceRole() == null ? null : context.workspaceRole().name(),
+                tools,
+                dataStatus,
+                recordCount,
+                context.accessibleTeamIds().size());
     }
 
-    private String toSafeJson(Map<String, Object> details) {
-        String role = details.get("workspaceRole") == null ? "null"
-                : "\"" + details.get("workspaceRole") + "\"";
-        @SuppressWarnings("unchecked")
-        List<String> tools = (List<String>) details.get("tools");
-        String toolJson = tools.stream().map(value -> "\"" + value + "\"")
+    private String toSafeJson(
+            String workspaceRole,
+            List<String> tools,
+            String dataStatus,
+            int recordCount,
+            int accessibleTeamCount
+    ) {
+        String role = workspaceRole == null ? "null" : quote(workspaceRole);
+        String toolJson = tools.stream().map(this::quote)
                 .collect(java.util.stream.Collectors.joining(",", "[", "]"));
         return "{\"workspaceRole\":" + role
                 + ",\"tools\":" + toolJson
-                + ",\"dataStatus\":\"" + details.get("dataStatus") + "\""
-                + ",\"recordCount\":" + details.get("recordCount")
-                + ",\"accessibleTeamCount\":" + details.get("accessibleTeamCount") + "}";
+                + ",\"dataStatus\":" + quote(dataStatus)
+                + ",\"recordCount\":" + recordCount
+                + ",\"accessibleTeamCount\":" + accessibleTeamCount + "}";
+    }
+
+    private String quote(String value) {
+        return "\"" + value.replace("\\", "\\\\").replace("\"", "\\\"") + "\"";
     }
 }

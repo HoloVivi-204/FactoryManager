@@ -704,28 +704,12 @@ public class OllamaChatClient {
                 .format(value);
     }
 
-    @SuppressWarnings("unchecked")
     private Map<String, Object> map(Object value) {
-        return value instanceof Map<?, ?> map
-                ? new LinkedHashMap<>((Map<String, Object>) map)
-                : Map.of();
+        return AiPayloads.objectMap(value);
     }
 
-    @SuppressWarnings("unchecked")
     private List<Map<String, Object>> maps(Object value, int limit) {
-        if (!(value instanceof List<?> values)) {
-            return List.of();
-        }
-        List<Map<String, Object>> result = new ArrayList<>();
-        for (Object item : values) {
-            if (result.size() >= limit) {
-                break;
-            }
-            if (item instanceof Map<?, ?> map) {
-                result.add(new LinkedHashMap<>((Map<String, Object>) map));
-            }
-        }
-        return result;
+        return AiPayloads.objectMaps(value, limit);
     }
 
     private Map<String, Object> baseRequest() {
@@ -782,43 +766,44 @@ public class OllamaChatClient {
                 "/no_think").formatted(context.today(), context.effectiveRoles());
     }
 
-    @SuppressWarnings("unchecked")
     private Map<String, Object> responseMessage(Map<String, Object> response) {
         Object raw = response.get("message");
         if (!(raw instanceof Map<?, ?> map)) {
             throw new AppException(ErrorCode.AI_PROVIDER_INVALID_RESPONSE);
         }
-        return new LinkedHashMap<>((Map<String, Object>) map);
+        return AiPayloads.copyObjectMap(map);
     }
 
-    @SuppressWarnings("unchecked")
     private Map<String, Object> arguments(Object value) {
         if (value == null) {
             return Map.of();
         }
         if (value instanceof Map<?, ?> map) {
-            return new LinkedHashMap<>((Map<String, Object>) map);
+            return AiPayloads.copyObjectMap(map);
         }
         try {
-            return objectMapper.readValue(String.valueOf(value), Map.class);
+            Object parsed = objectMapper.readValue(String.valueOf(value), Object.class);
+            if (!(parsed instanceof Map<?, ?> map)) {
+                throw new AppException(ErrorCode.AI_TOOL_ARGUMENT_INVALID);
+            }
+            return AiPayloads.copyObjectMap(map);
         } catch (JacksonException exception) {
             throw new AppException(ErrorCode.AI_TOOL_ARGUMENT_INVALID);
         }
     }
 
-    @SuppressWarnings("unchecked")
     private Map<String, Object> post(Map<String, Object> request) {
         try {
-            Map<String, Object> response = restClient().post()
+            Object response = restClient().post()
                     .uri(properties.getChatUrl())
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(request)
                     .retrieve()
-                    .body(Map.class);
-            if (response == null) {
+                    .body(Object.class);
+            if (!(response instanceof Map<?, ?> map)) {
                 throw new AppException(ErrorCode.AI_PROVIDER_INVALID_RESPONSE);
             }
-            return response;
+            return AiPayloads.copyObjectMap(map);
         } catch (RestClientResponseException exception) {
             log.warn("Ollama returned HTTP {}", exception.getStatusCode().value());
             throw new AppException(ErrorCode.AI_PROVIDER_UNAVAILABLE);

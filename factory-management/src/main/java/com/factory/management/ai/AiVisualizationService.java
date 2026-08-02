@@ -383,21 +383,12 @@ public class AiVisualizationService {
         return List.copyOf(selected);
     }
 
-    @SuppressWarnings("unchecked")
     private List<Map<String, Object>> mapRows(Object value, int limit) {
-        if (!(value instanceof List<?> values)) return List.of();
-        List<Map<String, Object>> rows = new ArrayList<>();
-        for (Object item : values) {
-            if (rows.size() >= limit) break;
-            if (item instanceof Map<?, ?> map) rows.add(new LinkedHashMap<>((Map<String, Object>) map));
-        }
-        return rows;
+        return AiPayloads.objectMaps(value, limit);
     }
 
-    @SuppressWarnings("unchecked")
     private Map<String, Object> map(Object value) {
-        return value instanceof Map<?, ?> map
-                ? new LinkedHashMap<>((Map<String, Object>) map) : Map.of();
+        return AiPayloads.objectMap(value);
     }
 
     private Object resolve(Map<String, Object> root, String rawPath) {

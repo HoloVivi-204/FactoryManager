@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.stereotype.Service;
@@ -250,20 +249,11 @@ public class AiRecommendationService {
         return String.valueOf(value);
     }
 
-    @SuppressWarnings("unchecked")
     private Map<String, Object> map(Object value) {
-        return value instanceof Map<?, ?> map
-                ? new LinkedHashMap<>((Map<String, Object>) map)
-                : Map.of();
+        return AiPayloads.objectMap(value);
     }
 
-    @SuppressWarnings("unchecked")
     private List<Map<String, Object>> rows(Object value) {
-        if (!(value instanceof List<?> values)) {
-            return List.of();
-        }
-        return values.stream().filter(Map.class::isInstance)
-                .<Map<String, Object>>map(item -> new LinkedHashMap<>((Map<String, Object>) item))
-                .toList();
+        return AiPayloads.objectMaps(value);
     }
 }
