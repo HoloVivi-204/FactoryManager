@@ -1,2 +1,15 @@
-package com.factory.management.repository; import com.factory.management.entity.EmployeeActual; import org.springframework.data.jpa.repository.JpaRepository; import java.util.Collection; import java.util.List;
-public interface EmployeeActualRepository extends JpaRepository<EmployeeActual,Long>{List<EmployeeActual> findAllByProductionReport_Id(Long id);List<EmployeeActual> findAllByProductionReport_IdIn(Collection<Long> ids);List<EmployeeActual> findAllByEmployee_Id(Long id);}
+package com.factory.management.repository;
+
+import com.factory.management.entity.EmployeeActual;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Collection;
+import java.util.List;
+
+public interface EmployeeActualRepository extends JpaRepository<EmployeeActual, Long> {
+    List<EmployeeActual> findAllByProductionReport_Id(Long id);
+
+    List<EmployeeActual> findAllByProductionReport_IdIn(Collection<Long> ids);
+
+    List<EmployeeActual> findAllByEmployee_Id(Long id);
+}
