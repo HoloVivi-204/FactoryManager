@@ -1,8 +1,14 @@
 import { useMemo, useState } from 'react'
 import { employeeApi } from '../api/employeeApi'
 import { DataTable, LoadingState, Panel, StatusBadge } from '../components/ui'
+import { number } from '../utils/format'
 import { useApi } from '../utils/useApi'
 import type { HrSchedule, PageKey } from '../types'
+
+const formatHours = (minutes?: number | null) =>
+  typeof minutes === 'number' && Number.isFinite(minutes)
+    ? (minutes / 60).toFixed(1)
+    : '—'
 
 export default function EmployeePortalPage({ view }: { view: PageKey }) {
   const portal = useApi(employeeApi.dashboard)
@@ -97,10 +103,26 @@ export default function EmployeePortalPage({ view }: { view: PageKey }) {
       {view === 'overview' && (
         <>
           <div className="kpi-grid">
-            <article className="kpi blue"><span>GIỜ LÀM</span><strong>{((data?.workingMinutes ?? 0) / 60).toFixed(1)}</strong><small>giờ trong kỳ</small></article>
-            <article className="kpi orange"><span>TĂNG CA</span><strong>{((data?.overtimeMinutes ?? 0) / 60).toFixed(1)}</strong><small>giờ tăng ca</small></article>
-            <article className="kpi green"><span>KPI GẦN NHẤT</span><strong>{data?.kpis?.[0]?.score ?? '—'}</strong><small>điểm đánh giá</small></article>
-            <article className="kpi purple"><span>THÔNG BÁO MỚI</span><strong>{data?.unreadNotifications ?? 0}</strong><small>chưa đọc</small></article>
+            <article className="kpi blue">
+              <span>GIỜ LÀM</span>
+              <strong>{formatHours(data?.workingMinutes)}</strong>
+              <small>giờ trong kỳ</small>
+            </article>
+            <article className="kpi orange">
+              <span>TĂNG CA</span>
+              <strong>{formatHours(data?.overtimeMinutes)}</strong>
+              <small>giờ tăng ca</small>
+            </article>
+            <article className="kpi green">
+              <span>KPI GẦN NHẤT</span>
+              <strong>{number(data?.kpis?.[0]?.score)}</strong>
+              <small>điểm đánh giá</small>
+            </article>
+            <article className="kpi purple">
+              <span>THÔNG BÁO MỚI</span>
+              <strong>{number(data?.unreadNotifications)}</strong>
+              <small>chưa đọc</small>
+            </article>
           </div>
           <Panel title="Lịch sắp tới"><Schedule rows={data?.schedules ?? []} /></Panel>
         </>
@@ -139,10 +161,41 @@ export default function EmployeePortalPage({ view }: { view: PageKey }) {
         <>
           <Panel title="Tạo đơn nghỉ phép">
             <div className="form-grid">
-              <label className="field"><span>Từ ngày</span><input type="date" value={leaveForm.fromDate} onChange={(event) => setLeaveForm({ ...leaveForm, fromDate: event.target.value })} /></label>
-              <label className="field"><span>Đến ngày</span><input type="date" value={leaveForm.toDate} onChange={(event) => setLeaveForm({ ...leaveForm, toDate: event.target.value })} /></label>
-              <label className="field"><span>Loại nghỉ</span><select value={leaveForm.leaveType} onChange={(event) => setLeaveForm({ ...leaveForm, leaveType: event.target.value })}><option value="ANNUAL">Nghỉ phép năm</option><option value="SICK">Nghỉ bệnh</option><option value="UNPAID">Nghỉ không lương</option><option value="OTHER">Khác</option></select></label>
-              <label className="field"><span>Lý do</span><textarea value={leaveForm.reason} onChange={(event) => setLeaveForm({ ...leaveForm, reason: event.target.value })} /></label>
+              <label className="field">
+                <span>Từ ngày</span>
+                <input
+                  type="date"
+                  value={leaveForm.fromDate}
+                  onChange={(event) => setLeaveForm({ ...leaveForm, fromDate: event.target.value })}
+                />
+              </label>
+              <label className="field">
+                <span>Đến ngày</span>
+                <input
+                  type="date"
+                  value={leaveForm.toDate}
+                  onChange={(event) => setLeaveForm({ ...leaveForm, toDate: event.target.value })}
+                />
+              </label>
+              <label className="field">
+                <span>Loại nghỉ</span>
+                <select
+                  value={leaveForm.leaveType}
+                  onChange={(event) => setLeaveForm({ ...leaveForm, leaveType: event.target.value })}
+                >
+                  <option value="ANNUAL">Nghỉ phép năm</option>
+                  <option value="SICK">Nghỉ bệnh</option>
+                  <option value="UNPAID">Nghỉ không lương</option>
+                  <option value="OTHER">Khác</option>
+                </select>
+              </label>
+              <label className="field">
+                <span>Lý do</span>
+                <textarea
+                  value={leaveForm.reason}
+                  onChange={(event) => setLeaveForm({ ...leaveForm, reason: event.target.value })}
+                />
+              </label>
             </div>
             <div className="form-actions"><button className="primary" disabled={busy} onClick={() => void submitLeave()}>Gửi đơn</button></div>
           </Panel>
@@ -163,9 +216,31 @@ export default function EmployeePortalPage({ view }: { view: PageKey }) {
         <>
           <Panel title="Đăng ký tăng ca">
             <div className="form-grid">
-              <label className="field"><span>Ngày tăng ca</span><input type="date" value={overtimeForm.workDate} onChange={(event) => setOvertimeForm({ ...overtimeForm, workDate: event.target.value })} /></label>
-              <label className="field"><span>Số phút (1-720)</span><input type="number" min="1" max="720" value={overtimeForm.requestedMinutes} onChange={(event) => setOvertimeForm({ ...overtimeForm, requestedMinutes: event.target.value })} /></label>
-              <label className="field"><span>Lý do</span><textarea value={overtimeForm.reason} onChange={(event) => setOvertimeForm({ ...overtimeForm, reason: event.target.value })} /></label>
+              <label className="field">
+                <span>Ngày tăng ca</span>
+                <input
+                  type="date"
+                  value={overtimeForm.workDate}
+                  onChange={(event) => setOvertimeForm({ ...overtimeForm, workDate: event.target.value })}
+                />
+              </label>
+              <label className="field">
+                <span>Số phút (1-720)</span>
+                <input
+                  type="number"
+                  min="1"
+                  max="720"
+                  value={overtimeForm.requestedMinutes}
+                  onChange={(event) => setOvertimeForm({ ...overtimeForm, requestedMinutes: event.target.value })}
+                />
+              </label>
+              <label className="field">
+                <span>Lý do</span>
+                <textarea
+                  value={overtimeForm.reason}
+                  onChange={(event) => setOvertimeForm({ ...overtimeForm, reason: event.target.value })}
+                />
+              </label>
             </div>
             <div className="form-actions"><button className="primary" disabled={busy} onClick={() => void submitOvertime()}>Gửi đăng ký</button></div>
           </Panel>
@@ -187,28 +262,87 @@ export default function EmployeePortalPage({ view }: { view: PageKey }) {
         <>
           <Panel title="Tìm thông báo">
             <div className="filters hr-filters">
-              <label>Từ ngày<input type="date" value={notificationFilters.fromDate} onChange={(event) => setNotificationFilters({ ...notificationFilters, fromDate: event.target.value })} /></label>
-              <label>Đến ngày<input type="date" value={notificationFilters.toDate} onChange={(event) => setNotificationFilters({ ...notificationFilters, toDate: event.target.value })} /></label>
-              <label>Trạng thái<select value={notificationFilters.readStatus} onChange={(event) => setNotificationFilters({ ...notificationFilters, readStatus: event.target.value })}><option value="">Tất cả</option><option value="UNREAD">Chưa đọc</option><option value="READ">Đã đọc</option></select></label>
-              <label>Từ khóa<input type="search" placeholder="Tiêu đề hoặc nội dung…" value={notificationFilters.keyword} onChange={(event) => setNotificationFilters({ ...notificationFilters, keyword: event.target.value })} /></label>
-              <button type="button" onClick={() => setNotificationFilters({ fromDate: '', toDate: '', readStatus: '', keyword: '' })}>Xóa bộ lọc</button>
+              <label>
+                Từ ngày
+                <input
+                  type="date"
+                  value={notificationFilters.fromDate}
+                  onChange={(event) => setNotificationFilters({
+                    ...notificationFilters,
+                    fromDate: event.target.value,
+                  })}
+                />
+              </label>
+              <label>
+                Đến ngày
+                <input
+                  type="date"
+                  value={notificationFilters.toDate}
+                  onChange={(event) => setNotificationFilters({
+                    ...notificationFilters,
+                    toDate: event.target.value,
+                  })}
+                />
+              </label>
+              <label>
+                Trạng thái
+                <select
+                  value={notificationFilters.readStatus}
+                  onChange={(event) => setNotificationFilters({
+                    ...notificationFilters,
+                    readStatus: event.target.value,
+                  })}
+                >
+                  <option value="">Tất cả</option>
+                  <option value="UNREAD">Chưa đọc</option>
+                  <option value="READ">Đã đọc</option>
+                </select>
+              </label>
+              <label>
+                Từ khóa
+                <input
+                  type="search"
+                  placeholder="Tiêu đề hoặc nội dung…"
+                  value={notificationFilters.keyword}
+                  onChange={(event) => setNotificationFilters({
+                    ...notificationFilters,
+                    keyword: event.target.value,
+                  })}
+                />
+              </label>
+              <button
+                type="button"
+                onClick={() => setNotificationFilters({
+                  fromDate: '',
+                  toDate: '',
+                  readStatus: '',
+                  keyword: '',
+                })}
+              >
+                Xóa bộ lọc
+              </button>
             </div>
           </Panel>
-          <Panel title={`Thông báo (${filteredNotifications.length}/${data?.notifications?.length ?? 0})`}>
-          <div className="notice-list">
-            {filteredNotifications.map((notification) => (
-              <button
-                className={notification.read ? 'read' : ''}
-                key={notification.id}
-                onClick={async () => { if (!notification.read) await employeeApi.read(notification.id); portal.reload() }}
-              >
-                <b>{notification.title}</b>
-                <span>{notification.message}</span>
-                <small>{notification.createdAt}</small>
-              </button>
-            ))}
-            {filteredNotifications.length === 0 && <p className="module-empty">Không có thông báo phù hợp bộ lọc.</p>}
-          </div>
+          <Panel title={`Thông báo (${filteredNotifications.length}/${number(data?.notifications?.length)})`}>
+            <div className="notice-list">
+              {filteredNotifications.map((notification) => (
+                <button
+                  className={notification.read ? 'read' : ''}
+                  key={notification.id}
+                  onClick={async () => {
+                    if (!notification.read) await employeeApi.read(notification.id)
+                    portal.reload()
+                  }}
+                >
+                  <b>{notification.title}</b>
+                  <span>{notification.message}</span>
+                  <small>{notification.createdAt}</small>
+                </button>
+              ))}
+              {filteredNotifications.length === 0 && (
+                <p className="module-empty">Không có thông báo phù hợp bộ lọc.</p>
+              )}
+            </div>
           </Panel>
         </>
       )}
@@ -219,12 +353,17 @@ export default function EmployeePortalPage({ view }: { view: PageKey }) {
 }
 
 function Schedule({ rows }: { rows: HrSchedule[] }) {
-  return <DataTable rows={rows} columns={[
-    { key: 'workDate', label: 'Ngày' },
-    { key: 'shiftCode', label: 'Mã ca' },
-    { key: 'shiftName', label: 'Ca làm' },
-    { key: 'startTime', label: 'Bắt đầu' },
-    { key: 'endTime', label: 'Kết thúc' },
-    { key: 'note', label: 'Ghi chú' },
-  ]} />
+  return (
+    <DataTable
+      rows={rows}
+      columns={[
+        { key: 'workDate', label: 'Ngày' },
+        { key: 'shiftCode', label: 'Mã ca' },
+        { key: 'shiftName', label: 'Ca làm' },
+        { key: 'startTime', label: 'Bắt đầu' },
+        { key: 'endTime', label: 'Kết thúc' },
+        { key: 'note', label: 'Ghi chú' },
+      ]}
+    />
+  )
 }
