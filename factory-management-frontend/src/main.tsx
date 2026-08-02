@@ -1,12 +1,12 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
-import './index.css'
-import './toast.css'
-import './frontend-next.css'
-import App from './App'
-import ToastViewport from './components/ToastViewport'
-import { AuthProvider } from './context/AuthContext'
+import './styles/index.css'
+import './styles/toast.css'
+import './styles/frontend-next.css'
+import App from './app/App'
+import ToastViewport from './shared/toast/ToastViewport'
+import { AuthProvider } from './features/auth/context/AuthContext'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
