@@ -46,7 +46,12 @@ type FieldSpec = {
   hint?: string
 }
 
-const managerRoles: Role[] = ['ADMIN', 'FACTORY_MANAGER', 'DEPARTMENT_MANAGER', 'PRODUCTION_MANAGER']
+const managerRoles: Role[] = [
+  'ADMIN',
+  'FACTORY_MANAGER',
+  'DEPARTMENT_MANAGER',
+  'PRODUCTION_MANAGER',
+]
 const requestCreatorRoles: Role[] = [...managerRoles, 'TEAM_LEADER']
 const priorities: Option[] = [
   { value: 'LOW', label: 'Thấp' },
@@ -85,7 +90,7 @@ const machineStatuses: Record<string, string> = {
 const optionLabel = (options: Option[], value: unknown) =>
   options.find((option) => option.value === value)?.label ?? String(value ?? '—')
 
-const numberValue = (value: string) => value === '' ? undefined : Number(value)
+const numberValue = (value: string) => (value === '' ? undefined : Number(value))
 const hasFiniteNumber = (value: unknown): value is number =>
   typeof value === 'number' && Number.isFinite(value)
 const currencyFormatter = new Intl.NumberFormat('vi-VN', {
@@ -95,9 +100,14 @@ const currencyFormatter = new Intl.NumberFormat('vi-VN', {
 })
 const currency = (value: unknown) =>
   hasFiniteNumber(value) ? currencyFormatter.format(value) : '—'
-const dateTime = (value: unknown) => value
-  ? new Date(String(value)).toLocaleString('vi-VN')
-  : '—'
+const dateTime = (value: unknown) => (value ? new Date(String(value)).toLocaleString('vi-VN') : '—')
+const downtimeOptionLabel = (downtime: MaintenanceDowntimeOption) =>
+  [
+    dateTime(downtime.startTime),
+    downtime.downtimeReasonName,
+    `${downtime.durationMinutes} phút`,
+    `BC #${downtime.productionReportStagingId} (${downtime.reportStatus})`,
+  ].join(' · ')
 const today = () => new Date().toISOString().slice(0, 10)
 const monthStart = () => `${today().slice(0, 8)}01`
 const nextDateStart = (value: string) => {
@@ -172,11 +182,31 @@ function MaintenanceDashboardView() {
     { key: 'machineCode', label: 'Máy' },
     { key: 'teamName', label: 'Tổ' },
     { key: 'title', label: 'Nội dung' },
-    { key: 'actualEnd', label: 'Hoàn tất', render: (row: MaintenanceWorkOrderItem) => dateTime(row.actualEnd) },
-    { key: 'laborCost', label: 'Nhân công', render: (row: MaintenanceWorkOrderItem) => currency(row.laborCost) },
-    { key: 'partCost', label: 'Vật tư', render: (row: MaintenanceWorkOrderItem) => currency(row.partCost) },
-    { key: 'externalCost', label: 'Thuê ngoài', render: (row: MaintenanceWorkOrderItem) => currency(row.externalCost) },
-    { key: 'totalCost', label: 'Tổng chi phí', render: (row: MaintenanceWorkOrderItem) => currency(row.totalCost) },
+    {
+      key: 'actualEnd',
+      label: 'Hoàn tất',
+      render: (row: MaintenanceWorkOrderItem) => dateTime(row.actualEnd),
+    },
+    {
+      key: 'laborCost',
+      label: 'Nhân công',
+      render: (row: MaintenanceWorkOrderItem) => currency(row.laborCost),
+    },
+    {
+      key: 'partCost',
+      label: 'Vật tư',
+      render: (row: MaintenanceWorkOrderItem) => currency(row.partCost),
+    },
+    {
+      key: 'externalCost',
+      label: 'Thuê ngoài',
+      render: (row: MaintenanceWorkOrderItem) => currency(row.externalCost),
+    },
+    {
+      key: 'totalCost',
+      label: 'Tổng chi phí',
+      render: (row: MaintenanceWorkOrderItem) => currency(row.totalCost),
+    },
   ]
 
   return (
@@ -187,19 +217,66 @@ function MaintenanceDashboardView() {
       />
       <Panel title="Bộ lọc phạm vi và thời gian">
         <div className="filters hr-filters">
-          <FilterInput label="ID tổ" type="number" value={filters.teamId} onChange={(value) => setFilters({ ...filters, teamId: value })} />
-          <FilterInput label="Từ ngày" type="date" value={filters.fromDate} onChange={(value) => setFilters({ ...filters, fromDate: value })} />
-          <FilterInput label="Đến ngày" type="date" value={filters.toDate} onChange={(value) => setFilters({ ...filters, toDate: value })} />
-          <button onClick={() => { setPage(0); setApplied({ ...filters }) }}>Áp dụng</button>
+          <FilterInput
+            label="ID tổ"
+            type="number"
+            value={filters.teamId}
+            onChange={(value) => setFilters({ ...filters, teamId: value })}
+          />
+          <FilterInput
+            label="Từ ngày"
+            type="date"
+            value={filters.fromDate}
+            onChange={(value) => setFilters({ ...filters, fromDate: value })}
+          />
+          <FilterInput
+            label="Đến ngày"
+            type="date"
+            value={filters.toDate}
+            onChange={(value) => setFilters({ ...filters, toDate: value })}
+          />
+          <button
+            onClick={() => {
+              setPage(0)
+              setApplied({ ...filters })
+            }}
+          >
+            Áp dụng
+          </button>
         </div>
       </Panel>
       <LoadingState loading={loading} error={error} />
       <div className="kpi-grid maintenance-kpis">
-        <KpiCard label="Yêu cầu đang mở" value={number(dashboard?.openRequests)} hint="Chưa kết thúc" tone="blue" />
-        <KpiCard label="Yêu cầu khẩn cấp" value={number(dashboard?.criticalRequests)} hint="Cần ưu tiên" tone="orange" />
-        <KpiCard label="Lịch đã quá hạn" value={number(dashboard?.overdueSchedules)} hint="Đang hoạt động" tone="purple" />
-        <KpiCard label="Phiếu đang thực hiện" value={number(dashboard?.activeWorkOrders)} hint="Đã giao hoặc đang làm" tone="green" />
-        <KpiCard label="Chi phí đã hoàn tất" value={currency(dashboard?.completedCost)} hint="Theo khoảng ngày đã chọn" tone="orange" />
+        <KpiCard
+          label="Yêu cầu đang mở"
+          value={number(dashboard?.openRequests)}
+          hint="Chưa kết thúc"
+          tone="blue"
+        />
+        <KpiCard
+          label="Yêu cầu khẩn cấp"
+          value={number(dashboard?.criticalRequests)}
+          hint="Cần ưu tiên"
+          tone="orange"
+        />
+        <KpiCard
+          label="Lịch đã quá hạn"
+          value={number(dashboard?.overdueSchedules)}
+          hint="Đang hoạt động"
+          tone="purple"
+        />
+        <KpiCard
+          label="Phiếu đang thực hiện"
+          value={number(dashboard?.activeWorkOrders)}
+          hint="Đã giao hoặc đang làm"
+          tone="green"
+        />
+        <KpiCard
+          label="Chi phí đã hoàn tất"
+          value={currency(dashboard?.completedCost)}
+          hint="Theo khoảng ngày đã chọn"
+          tone="orange"
+        />
       </div>
       <Panel title={`Chi tiết chi phí phiếu đã hoàn tất (${number(orders?.totalElements)})`}>
         <DataTable rows={orders?.content ?? []} columns={columns} />
@@ -209,8 +286,22 @@ function MaintenanceDashboardView() {
   )
 }
 
-function MaintenanceRequestsView({ canManage, canCreate }: { canManage: boolean; canCreate: boolean }) {
-  const defaults = { machineId: '', teamId: '', status: '', priority: '', keyword: '', fromDate: '', toDate: '' }
+function MaintenanceRequestsView({
+  canManage,
+  canCreate,
+}: {
+  canManage: boolean
+  canCreate: boolean
+}) {
+  const defaults = {
+    machineId: '',
+    teamId: '',
+    status: '',
+    priority: '',
+    keyword: '',
+    fromDate: '',
+    toDate: '',
+  }
   const [filters, setFilters] = useState(defaults)
   const [applied, setApplied] = useState(defaults)
   const [result, setResult] = useState<PageResponse<MaintenanceRequestItem>>()
@@ -264,7 +355,8 @@ function MaintenanceRequestsView({ canManage, canCreate }: { canManage: boolean;
     let cancelled = false
     setMachineOptionsLoading(true)
     setMachineOptionsError('')
-    maintenanceApi.machineOptions()
+    maintenanceApi
+      .machineOptions()
       .then((items) => {
         if (!cancelled) setMachineOptions(items)
       })
@@ -274,7 +366,9 @@ function MaintenanceRequestsView({ canManage, canCreate }: { canManage: boolean;
       .finally(() => {
         if (!cancelled) setMachineOptionsLoading(false)
       })
-    return () => { cancelled = true }
+    return () => {
+      cancelled = true
+    }
   }, [canCreate])
 
   useEffect(() => {
@@ -288,7 +382,8 @@ function MaintenanceRequestsView({ canManage, canCreate }: { canManage: boolean;
 
     let cancelled = false
     setDowntimeOptionsLoading(true)
-    maintenanceApi.downtimesByMachine(machineId)
+    maintenanceApi
+      .downtimesByMachine(machineId)
       .then((items) => {
         if (!cancelled) setDowntimeOptions(items)
       })
@@ -298,7 +393,9 @@ function MaintenanceRequestsView({ canManage, canCreate }: { canManage: boolean;
       .finally(() => {
         if (!cancelled) setDowntimeOptionsLoading(false)
       })
-    return () => { cancelled = true }
+    return () => {
+      cancelled = true
+    }
   }, [createOpen, createForm.machineId])
 
   function openCreate() {
@@ -378,18 +475,38 @@ function MaintenanceRequestsView({ canManage, canCreate }: { canManage: boolean;
 
   const columns = [
     { key: 'requestNo', label: 'Mã yêu cầu' },
-    { key: 'reportedAt', label: 'Thời điểm', render: (row: MaintenanceRequestItem) => dateTime(row.reportedAt) },
+    {
+      key: 'reportedAt',
+      label: 'Thời điểm',
+      render: (row: MaintenanceRequestItem) => dateTime(row.reportedAt),
+    },
     { key: 'machineCode', label: 'Máy' },
     { key: 'teamName', label: 'Tổ' },
     { key: 'title', label: 'Nội dung' },
     { key: 'reportedByName', label: 'Người báo' },
-    { key: 'priority', label: 'Ưu tiên', render: (row: MaintenanceRequestItem) => <StatusText value={row.priority} label={optionLabel(priorities, row.priority)} /> },
-    { key: 'status', label: 'Trạng thái', render: (row: MaintenanceRequestItem) => <StatusText value={row.status} label={optionLabel(requestStatuses, row.status)} /> },
     {
-      key: 'actions', label: 'Thao tác', render: (row: MaintenanceRequestItem) => (
+      key: 'priority',
+      label: 'Ưu tiên',
+      render: (row: MaintenanceRequestItem) => (
+        <StatusText value={row.priority} label={optionLabel(priorities, row.priority)} />
+      ),
+    },
+    {
+      key: 'status',
+      label: 'Trạng thái',
+      render: (row: MaintenanceRequestItem) => (
+        <StatusText value={row.status} label={optionLabel(requestStatuses, row.status)} />
+      ),
+    },
+    {
+      key: 'actions',
+      label: 'Thao tác',
+      render: (row: MaintenanceRequestItem) => (
         <div className="admin-actions">
           <button onClick={() => void openDetail(row)}>Chi tiết</button>
-          {canManage && nextRequestStatuses(row.status).length > 0 && <button onClick={() => openStatus(row)}>Xử lý</button>}
+          {canManage && nextRequestStatuses(row.status).length > 0 && (
+            <button onClick={() => openStatus(row)}>Xử lý</button>
+          )}
         </div>
       ),
     },
@@ -417,7 +534,7 @@ function MaintenanceRequestsView({ canManage, canCreate }: { canManage: boolean;
       type: 'select',
       options: downtimeOptions.map((downtime) => ({
         value: String(downtime.id),
-        label: `${dateTime(downtime.startTime)} · ${downtime.downtimeReasonName} · ${downtime.durationMinutes} phút · BC #${downtime.productionReportStagingId} (${downtime.reportStatus})`,
+        label: downtimeOptionLabel(downtime),
       })),
       hint: !createForm.machineId
         ? 'Chọn máy trước; có thể để trống nếu yêu cầu không phát sinh từ một lần dừng máy.'
@@ -437,19 +554,85 @@ function MaintenanceRequestsView({ canManage, canCreate }: { canManage: boolean;
     <>
       <PageTitle
         title="Yêu cầu bảo trì"
-        description={canManage ? 'Tiếp nhận, phân loại và xử lý yêu cầu trong phạm vi quản lý.' : 'Gửi và theo dõi yêu cầu sửa chữa máy thuộc tổ phụ trách.'}
-        action={canCreate && <button className="admin-add-button" onClick={openCreate}>+ Tạo yêu cầu</button>}
+        description={
+          canManage
+            ? 'Tiếp nhận, phân loại và xử lý yêu cầu trong phạm vi quản lý.'
+            : 'Gửi và theo dõi yêu cầu sửa chữa máy thuộc tổ phụ trách.'
+        }
+        action={
+          canCreate && (
+            <button className="admin-add-button" onClick={openCreate}>
+              + Tạo yêu cầu
+            </button>
+          )
+        }
       />
       <Panel title="Bộ lọc yêu cầu">
         <div className="filters hr-filters">
-          <label>Từ ngày<input type="date" value={filters.fromDate} onChange={(event) => setFilters({ ...filters, fromDate: event.target.value })} /></label>
-          <label>Đến ngày<input type="date" value={filters.toDate} onChange={(event) => setFilters({ ...filters, toDate: event.target.value })} /></label>
-          <FilterSelect label="Máy" value={filters.machineId} options={machineOptions.map((machine) => ({ value: String(machine.id), label: `${machine.code} - ${machine.name} - ${machine.teamName}` }))} onChange={(value) => setFilters({ ...filters, machineId: value })} />
-          <FilterSelect label="Trạng thái" value={filters.status} options={requestStatuses} onChange={(value) => setFilters({ ...filters, status: value })} />
-          <FilterSelect label="Ưu tiên" value={filters.priority} options={priorities} onChange={(value) => setFilters({ ...filters, priority: value })} />
-          <label>Từ khóa<input type="search" placeholder="Mã yêu cầu, máy, nội dung, người báo…" value={filters.keyword} onChange={(event) => setFilters({ ...filters, keyword: event.target.value })} /></label>
-          <button onClick={() => { setPage(0); setApplied({ ...filters }) }}>Áp dụng</button>
-          <button type="button" onClick={() => { setFilters(defaults); setApplied(defaults); setPage(0) }}>Xóa bộ lọc</button>
+          <label>
+            Từ ngày
+            <input
+              type="date"
+              value={filters.fromDate}
+              onChange={(event) => setFilters({ ...filters, fromDate: event.target.value })}
+            />
+          </label>
+          <label>
+            Đến ngày
+            <input
+              type="date"
+              value={filters.toDate}
+              onChange={(event) => setFilters({ ...filters, toDate: event.target.value })}
+            />
+          </label>
+          <FilterSelect
+            label="Máy"
+            value={filters.machineId}
+            options={machineOptions.map((machine) => ({
+              value: String(machine.id),
+              label: `${machine.code} - ${machine.name} - ${machine.teamName}`,
+            }))}
+            onChange={(value) => setFilters({ ...filters, machineId: value })}
+          />
+          <FilterSelect
+            label="Trạng thái"
+            value={filters.status}
+            options={requestStatuses}
+            onChange={(value) => setFilters({ ...filters, status: value })}
+          />
+          <FilterSelect
+            label="Ưu tiên"
+            value={filters.priority}
+            options={priorities}
+            onChange={(value) => setFilters({ ...filters, priority: value })}
+          />
+          <label>
+            Từ khóa
+            <input
+              type="search"
+              placeholder="Mã yêu cầu, máy, nội dung, người báo…"
+              value={filters.keyword}
+              onChange={(event) => setFilters({ ...filters, keyword: event.target.value })}
+            />
+          </label>
+          <button
+            onClick={() => {
+              setPage(0)
+              setApplied({ ...filters })
+            }}
+          >
+            Áp dụng
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setFilters(defaults)
+              setApplied(defaults)
+              setPage(0)
+            }}
+          >
+            Xóa bộ lọc
+          </button>
         </div>
       </Panel>
       <Panel title={`${number(result?.totalElements)} yêu cầu`}>
@@ -459,15 +642,37 @@ function MaintenanceRequestsView({ canManage, canCreate }: { canManage: boolean;
       </Panel>
 
       {createOpen && (
-        <EditorModal title="Tạo yêu cầu bảo trì" subtitle="Yêu cầu mới luôn bắt đầu ở trạng thái Mới tạo." fields={createFields} values={createForm} onChange={changeCreateForm} busy={busy} error={[modalError, machineOptionsError, downtimeOptionsError].filter(Boolean).join(' ')} onClose={() => setCreateOpen(false)} onSubmit={createRequest} />
+        <EditorModal
+          title="Tạo yêu cầu bảo trì"
+          subtitle="Yêu cầu mới luôn bắt đầu ở trạng thái Mới tạo."
+          fields={createFields}
+          values={createForm}
+          onChange={changeCreateForm}
+          busy={busy}
+          error={[modalError, machineOptionsError, downtimeOptionsError].filter(Boolean).join(' ')}
+          onClose={() => setCreateOpen(false)}
+          onSubmit={createRequest}
+        />
       )}
       {statusTarget && (
         <EditorModal
           title={`Xử lý ${statusTarget.requestNo}`}
           subtitle={`Hiện tại: ${optionLabel(requestStatuses, statusTarget.status)}`}
           fields={[
-            { key: 'status', label: 'Chuyển sang', type: 'select', options: nextRequestStatuses(statusTarget.status), required: true },
-            { key: 'resolutionNote', label: statusForm.status === 'RESOLVED' ? 'Kết quả xử lý' : 'Ghi chú xử lý', type: 'textarea', required: statusForm.status === 'RESOLVED', full: true },
+            {
+              key: 'status',
+              label: 'Chuyển sang',
+              type: 'select',
+              options: nextRequestStatuses(statusTarget.status),
+              required: true,
+            },
+            {
+              key: 'resolutionNote',
+              label: statusForm.status === 'RESOLVED' ? 'Kết quả xử lý' : 'Ghi chú xử lý',
+              type: 'textarea',
+              required: statusForm.status === 'RESOLVED',
+              full: true,
+            },
           ]}
           values={statusForm}
           onChange={setStatusForm}
@@ -478,17 +683,23 @@ function MaintenanceRequestsView({ canManage, canCreate }: { canManage: boolean;
         />
       )}
       {detail && (
-        <DetailModal title={detail.requestNo} subtitle={detail.title} onClose={() => setDetail(undefined)}>
-          <DetailGrid values={[
-            ['Máy', `${detail.machineCode} · ${detail.machineName}`],
-            ['Tổ', detail.teamName],
-            ['Người báo', detail.reportedByName],
-            ['Thời điểm báo', dateTime(detail.reportedAt)],
-            ['Ưu tiên', optionLabel(priorities, detail.priority)],
-            ['Trạng thái', optionLabel(requestStatuses, detail.status)],
-            ['Downtime nguồn', detail.sourceDowntimeStagingId ?? '—'],
-            ['Đã giải quyết lúc', dateTime(detail.resolvedAt)],
-          ]} />
+        <DetailModal
+          title={detail.requestNo}
+          subtitle={detail.title}
+          onClose={() => setDetail(undefined)}
+        >
+          <DetailGrid
+            values={[
+              ['Máy', `${detail.machineCode} · ${detail.machineName}`],
+              ['Tổ', detail.teamName],
+              ['Người báo', detail.reportedByName],
+              ['Thời điểm báo', dateTime(detail.reportedAt)],
+              ['Ưu tiên', optionLabel(priorities, detail.priority)],
+              ['Trạng thái', optionLabel(requestStatuses, detail.status)],
+              ['Downtime nguồn', detail.sourceDowntimeStagingId ?? '—'],
+              ['Đã giải quyết lúc', dateTime(detail.resolvedAt)],
+            ]}
+          />
           <DetailText label="Mô tả" value={detail.description} />
           <DetailText label="Ảnh hưởng" value={detail.impactDescription} />
           <DetailText label="Kết quả xử lý" value={detail.resolutionNote} />
@@ -538,7 +749,12 @@ function MaintenanceSchedulesView({ canManage }: { canManage: boolean }) {
 
   function openCreate() {
     setEditing(null)
-    setForm({ maintenanceType: 'PREVENTIVE', intervalDays: '30', nextDueDate: today(), active: 'true' })
+    setForm({
+      maintenanceType: 'PREVENTIVE',
+      intervalDays: '30',
+      nextDueDate: today(),
+      active: 'true',
+    })
     setModalError('')
   }
 
@@ -605,42 +821,125 @@ function MaintenanceSchedulesView({ canManage }: { canManage: boolean }) {
     { key: 'machineCode', label: 'Máy' },
     { key: 'teamName', label: 'Tổ' },
     { key: 'name', label: 'Tên lịch' },
-    { key: 'maintenanceType', label: 'Loại', render: (row: MaintenanceScheduleItem) => optionLabel(maintenanceTypes, row.maintenanceType) },
-    { key: 'intervalDays', label: 'Chu kỳ', render: (row: MaintenanceScheduleItem) => `${row.intervalDays} ngày` },
+    {
+      key: 'maintenanceType',
+      label: 'Loại',
+      render: (row: MaintenanceScheduleItem) => optionLabel(maintenanceTypes, row.maintenanceType),
+    },
+    {
+      key: 'intervalDays',
+      label: 'Chu kỳ',
+      render: (row: MaintenanceScheduleItem) => `${row.intervalDays} ngày`,
+    },
     { key: 'lastCompletedDate', label: 'Lần gần nhất' },
     { key: 'nextDueDate', label: 'Hạn tiếp theo' },
-    { key: 'active', label: 'Trạng thái', render: (row: MaintenanceScheduleItem) => <StatusText value={row.active} label={row.active ? 'Đang dùng' : 'Đã ngừng'} /> },
-    ...(canManage ? [{
-      key: 'actions', label: 'Thao tác', render: (row: MaintenanceScheduleItem) => (
-        <div className="admin-actions">
-          <button onClick={() => void openEdit(row)}>Sửa</button>
-          {row.active && <button className="danger-link" disabled={busy} onClick={() => void deactivate(row)}>Ngừng</button>}
-        </div>
+    {
+      key: 'active',
+      label: 'Trạng thái',
+      render: (row: MaintenanceScheduleItem) => (
+        <StatusText value={row.active} label={row.active ? 'Đang dùng' : 'Đã ngừng'} />
       ),
-    }] : []),
+    },
+    ...(canManage
+      ? [
+          {
+            key: 'actions',
+            label: 'Thao tác',
+            render: (row: MaintenanceScheduleItem) => (
+              <div className="admin-actions">
+                <button onClick={() => void openEdit(row)}>Sửa</button>
+                {row.active && (
+                  <button
+                    className="danger-link"
+                    disabled={busy}
+                    onClick={() => void deactivate(row)}
+                  >
+                    Ngừng
+                  </button>
+                )}
+              </div>
+            ),
+          },
+        ]
+      : []),
   ]
 
   const fields: FieldSpec[] = [
     { key: 'machineId', label: 'ID máy', type: 'number', min: 1, required: true },
-    { key: 'maintenanceType', label: 'Loại bảo trì', type: 'select', options: maintenanceTypes, required: true },
+    {
+      key: 'maintenanceType',
+      label: 'Loại bảo trì',
+      type: 'select',
+      options: maintenanceTypes,
+      required: true,
+    },
     { key: 'name', label: 'Tên lịch', required: true },
     { key: 'intervalDays', label: 'Chu kỳ (ngày)', type: 'number', min: 1, required: true },
     { key: 'lastCompletedDate', label: 'Ngày hoàn thành gần nhất', type: 'date' },
     { key: 'nextDueDate', label: 'Hạn bảo trì tiếp theo', type: 'date', required: true },
-    { key: 'active', label: 'Trạng thái', type: 'select', options: [{ value: 'true', label: 'Đang sử dụng' }, { value: 'false', label: 'Ngừng sử dụng' }], required: true },
+    {
+      key: 'active',
+      label: 'Trạng thái',
+      type: 'select',
+      options: [
+        { value: 'true', label: 'Đang sử dụng' },
+        { value: 'false', label: 'Ngừng sử dụng' },
+      ],
+      required: true,
+    },
     { key: 'description', label: 'Mô tả', type: 'textarea', full: true },
   ]
 
   return (
     <>
-      <PageTitle title="Lịch bảo trì định kỳ" description="Lập và theo dõi lịch bảo trì theo máy trong phạm vi quản lý." action={canManage && <button className="admin-add-button" onClick={openCreate}>+ Tạo lịch</button>} />
+      <PageTitle
+        title="Lịch bảo trì định kỳ"
+        description="Lập và theo dõi lịch bảo trì theo máy trong phạm vi quản lý."
+        action={
+          canManage && (
+            <button className="admin-add-button" onClick={openCreate}>
+              + Tạo lịch
+            </button>
+          )
+        }
+      />
       <Panel title="Bộ lọc lịch">
         <div className="filters hr-filters">
-          <FilterInput label="ID máy" type="number" value={filters.machineId} onChange={(value) => setFilters({ ...filters, machineId: value })} />
-          <FilterInput label="ID tổ" type="number" value={filters.teamId} onChange={(value) => setFilters({ ...filters, teamId: value })} />
-          <FilterSelect label="Trạng thái" value={filters.active} options={[{ value: 'true', label: 'Đang dùng' }, { value: 'false', label: 'Đã ngừng' }]} onChange={(value) => setFilters({ ...filters, active: value })} />
-          <FilterInput label="Đến hạn trước" type="date" value={filters.dueBefore} onChange={(value) => setFilters({ ...filters, dueBefore: value })} />
-          <button onClick={() => { setPage(0); setApplied({ ...filters }) }}>Áp dụng</button>
+          <FilterInput
+            label="ID máy"
+            type="number"
+            value={filters.machineId}
+            onChange={(value) => setFilters({ ...filters, machineId: value })}
+          />
+          <FilterInput
+            label="ID tổ"
+            type="number"
+            value={filters.teamId}
+            onChange={(value) => setFilters({ ...filters, teamId: value })}
+          />
+          <FilterSelect
+            label="Trạng thái"
+            value={filters.active}
+            options={[
+              { value: 'true', label: 'Đang dùng' },
+              { value: 'false', label: 'Đã ngừng' },
+            ]}
+            onChange={(value) => setFilters({ ...filters, active: value })}
+          />
+          <FilterInput
+            label="Đến hạn trước"
+            type="date"
+            value={filters.dueBefore}
+            onChange={(value) => setFilters({ ...filters, dueBefore: value })}
+          />
+          <button
+            onClick={() => {
+              setPage(0)
+              setApplied({ ...filters })
+            }}
+          >
+            Áp dụng
+          </button>
         </div>
       </Panel>
       <Panel title={`${number(result?.totalElements)} lịch bảo trì`}>
@@ -649,7 +948,17 @@ function MaintenanceSchedulesView({ canManage }: { canManage: boolean }) {
         <Pager result={result} page={page} onPage={setPage} />
       </Panel>
       {editing !== undefined && (
-        <EditorModal title={editing ? `Cập nhật lịch #${editing.id}` : 'Tạo lịch bảo trì'} subtitle="Ngày hoàn thành gần nhất không được sau hạn tiếp theo." fields={fields} values={form} onChange={setForm} busy={busy} error={modalError} onClose={() => setEditing(undefined)} onSubmit={save} />
+        <EditorModal
+          title={editing ? `Cập nhật lịch #${editing.id}` : 'Tạo lịch bảo trì'}
+          subtitle="Ngày hoàn thành gần nhất không được sau hạn tiếp theo."
+          fields={fields}
+          values={form}
+          onChange={setForm}
+          busy={busy}
+          error={modalError}
+          onClose={() => setEditing(undefined)}
+          onSubmit={save}
+        />
       )}
     </>
   )
@@ -764,7 +1073,12 @@ function MaintenanceWorkOrdersView({ canManage }: { canManage: boolean }) {
   function openStatus(row: MaintenanceWorkOrderItem) {
     const options = nextWorkOrderStatuses(row.status)
     setStatusTarget(row)
-    setStatusForm({ status: options[0]?.value ?? '', actualStart: '', actualEnd: '', completionNote: '' })
+    setStatusForm({
+      status: options[0]?.value ?? '',
+      actualStart: '',
+      actualEnd: '',
+      completionNote: '',
+    })
     setModalError('')
   }
 
@@ -828,30 +1142,72 @@ function MaintenanceWorkOrdersView({ canManage }: { canManage: boolean }) {
 
   const columns = [
     { key: 'workOrderNo', label: 'Mã phiếu' },
-    { key: 'plannedStart', label: 'Dự kiến bắt đầu', render: (row: MaintenanceWorkOrderItem) => dateTime(row.plannedStart) },
+    {
+      key: 'plannedStart',
+      label: 'Dự kiến bắt đầu',
+      render: (row: MaintenanceWorkOrderItem) => dateTime(row.plannedStart),
+    },
     { key: 'machineCode', label: 'Máy' },
     { key: 'teamName', label: 'Tổ' },
     { key: 'title', label: 'Công việc' },
     { key: 'assignedEmployeeName', label: 'Phụ trách' },
-    { key: 'priority', label: 'Ưu tiên', render: (row: MaintenanceWorkOrderItem) => <StatusText value={row.priority} label={optionLabel(priorities, row.priority)} /> },
-    { key: 'status', label: 'Trạng thái', render: (row: MaintenanceWorkOrderItem) => <StatusText value={row.status} label={optionLabel(workOrderStatuses, row.status)} /> },
-    { key: 'totalCost', label: 'Chi phí', render: (row: MaintenanceWorkOrderItem) => currency(row.totalCost) },
     {
-      key: 'actions', label: 'Thao tác', render: (row: MaintenanceWorkOrderItem) => (
+      key: 'priority',
+      label: 'Ưu tiên',
+      render: (row: MaintenanceWorkOrderItem) => (
+        <StatusText value={row.priority} label={optionLabel(priorities, row.priority)} />
+      ),
+    },
+    {
+      key: 'status',
+      label: 'Trạng thái',
+      render: (row: MaintenanceWorkOrderItem) => (
+        <StatusText value={row.status} label={optionLabel(workOrderStatuses, row.status)} />
+      ),
+    },
+    {
+      key: 'totalCost',
+      label: 'Chi phí',
+      render: (row: MaintenanceWorkOrderItem) => currency(row.totalCost),
+    },
+    {
+      key: 'actions',
+      label: 'Thao tác',
+      render: (row: MaintenanceWorkOrderItem) => (
         <div className="admin-actions">
           <button onClick={() => void openDetail(row)}>Chi tiết</button>
-          {canManage && nextWorkOrderStatuses(row.status).length > 0 && <button onClick={() => openStatus(row)}>Cập nhật</button>}
+          {canManage && nextWorkOrderStatuses(row.status).length > 0 && (
+            <button onClick={() => openStatus(row)}>Cập nhật</button>
+          )}
         </div>
       ),
     },
   ]
 
   const createFields: FieldSpec[] = [
-    { key: 'maintenanceRequestId', label: 'ID yêu cầu nguồn', type: 'number', min: 1, hint: 'Nhập một trong hai nguồn.' },
-    { key: 'maintenanceScheduleId', label: 'ID lịch nguồn', type: 'number', min: 1, hint: 'Phải cùng máy với phiếu.' },
+    {
+      key: 'maintenanceRequestId',
+      label: 'ID yêu cầu nguồn',
+      type: 'number',
+      min: 1,
+      hint: 'Nhập một trong hai nguồn.',
+    },
+    {
+      key: 'maintenanceScheduleId',
+      label: 'ID lịch nguồn',
+      type: 'number',
+      min: 1,
+      hint: 'Phải cùng máy với phiếu.',
+    },
     { key: 'machineId', label: 'ID máy', type: 'number', min: 1, required: true },
     { key: 'assignedEmployeeId', label: 'ID nhân viên phụ trách', type: 'number', min: 1 },
-    { key: 'maintenanceType', label: 'Loại bảo trì', type: 'select', options: maintenanceTypes, required: true },
+    {
+      key: 'maintenanceType',
+      label: 'Loại bảo trì',
+      type: 'select',
+      options: maintenanceTypes,
+      required: true,
+    },
     { key: 'priority', label: 'Mức ưu tiên', type: 'select', options: priorities, required: true },
     { key: 'title', label: 'Tên công việc', required: true },
     { key: 'description', label: 'Mô tả', type: 'textarea', full: true },
@@ -863,16 +1219,63 @@ function MaintenanceWorkOrdersView({ canManage }: { canManage: boolean }) {
 
   return (
     <>
-      <PageTitle title="Phiếu công việc bảo trì" description="Quản lý thực hiện, thời gian, người phụ trách, vật tư và chi phí từng công việc." action={canManage && <button className="admin-add-button" onClick={openCreate}>+ Lập phiếu</button>} />
+      <PageTitle
+        title="Phiếu công việc bảo trì"
+        description="Quản lý thực hiện, thời gian, người phụ trách, vật tư và chi phí từng công việc."
+        action={
+          canManage && (
+            <button className="admin-add-button" onClick={openCreate}>
+              + Lập phiếu
+            </button>
+          )
+        }
+      />
       <Panel title="Bộ lọc phiếu công việc">
         <div className="filters hr-filters">
-          <FilterInput label="ID máy" type="number" value={filters.machineId} onChange={(value) => setFilters({ ...filters, machineId: value })} />
-          <FilterInput label="ID tổ" type="number" value={filters.teamId} onChange={(value) => setFilters({ ...filters, teamId: value })} />
-          <FilterSelect label="Trạng thái" value={filters.status} options={workOrderStatuses} onChange={(value) => setFilters({ ...filters, status: value })} />
-          <FilterSelect label="Ưu tiên" value={filters.priority} options={priorities} onChange={(value) => setFilters({ ...filters, priority: value })} />
-          <FilterInput label="Từ ngày" type="date" value={filters.from} onChange={(value) => setFilters({ ...filters, from: value })} />
-          <FilterInput label="Đến ngày" type="date" value={filters.to} onChange={(value) => setFilters({ ...filters, to: value })} />
-          <button onClick={() => { setPage(0); setApplied({ ...filters }) }}>Áp dụng</button>
+          <FilterInput
+            label="ID máy"
+            type="number"
+            value={filters.machineId}
+            onChange={(value) => setFilters({ ...filters, machineId: value })}
+          />
+          <FilterInput
+            label="ID tổ"
+            type="number"
+            value={filters.teamId}
+            onChange={(value) => setFilters({ ...filters, teamId: value })}
+          />
+          <FilterSelect
+            label="Trạng thái"
+            value={filters.status}
+            options={workOrderStatuses}
+            onChange={(value) => setFilters({ ...filters, status: value })}
+          />
+          <FilterSelect
+            label="Ưu tiên"
+            value={filters.priority}
+            options={priorities}
+            onChange={(value) => setFilters({ ...filters, priority: value })}
+          />
+          <FilterInput
+            label="Từ ngày"
+            type="date"
+            value={filters.from}
+            onChange={(value) => setFilters({ ...filters, from: value })}
+          />
+          <FilterInput
+            label="Đến ngày"
+            type="date"
+            value={filters.to}
+            onChange={(value) => setFilters({ ...filters, to: value })}
+          />
+          <button
+            onClick={() => {
+              setPage(0)
+              setApplied({ ...filters })
+            }}
+          >
+            Áp dụng
+          </button>
         </div>
       </Panel>
       <Panel title={`${number(result?.totalElements)} phiếu công việc`}>
@@ -881,16 +1284,50 @@ function MaintenanceWorkOrdersView({ canManage }: { canManage: boolean }) {
         <Pager result={result} page={page} onPage={setPage} />
       </Panel>
 
-      {createOpen && <EditorModal title="Lập phiếu công việc" subtitle="Phiếu phải liên kết ít nhất một yêu cầu hoặc lịch bảo trì đang hiệu lực." fields={createFields} values={form} onChange={setForm} busy={busy} error={modalError} onClose={() => setCreateOpen(false)} onSubmit={create} />}
+      {createOpen && (
+        <EditorModal
+          title="Lập phiếu công việc"
+          subtitle="Phiếu phải liên kết ít nhất một yêu cầu hoặc lịch bảo trì đang hiệu lực."
+          fields={createFields}
+          values={form}
+          onChange={setForm}
+          busy={busy}
+          error={modalError}
+          onClose={() => setCreateOpen(false)}
+          onSubmit={create}
+        />
+      )}
       {statusTarget && (
         <EditorModal
           title={`Cập nhật ${statusTarget.workOrderNo}`}
           subtitle={`Hiện tại: ${optionLabel(workOrderStatuses, statusTarget.status)}`}
           fields={[
-            { key: 'status', label: 'Chuyển sang', type: 'select', options: nextWorkOrderStatuses(statusTarget.status), required: true },
-            { key: 'actualStart', label: 'Bắt đầu thực tế', type: 'datetime-local', hint: 'Để trống khi bắt đầu để hệ thống lấy thời điểm hiện tại.' },
-            { key: 'actualEnd', label: 'Kết thúc thực tế', type: 'datetime-local', hint: 'Để trống khi hoàn tất để hệ thống lấy thời điểm hiện tại.' },
-            { key: 'completionNote', label: statusForm.status === 'COMPLETED' ? 'Kết quả hoàn thành' : 'Ghi chú', type: 'textarea', required: statusForm.status === 'COMPLETED', full: true },
+            {
+              key: 'status',
+              label: 'Chuyển sang',
+              type: 'select',
+              options: nextWorkOrderStatuses(statusTarget.status),
+              required: true,
+            },
+            {
+              key: 'actualStart',
+              label: 'Bắt đầu thực tế',
+              type: 'datetime-local',
+              hint: 'Để trống khi bắt đầu để hệ thống lấy thời điểm hiện tại.',
+            },
+            {
+              key: 'actualEnd',
+              label: 'Kết thúc thực tế',
+              type: 'datetime-local',
+              hint: 'Để trống khi hoàn tất để hệ thống lấy thời điểm hiện tại.',
+            },
+            {
+              key: 'completionNote',
+              label: statusForm.status === 'COMPLETED' ? 'Kết quả hoàn thành' : 'Ghi chú',
+              type: 'textarea',
+              required: statusForm.status === 'COMPLETED',
+              full: true,
+            },
           ]}
           values={statusForm}
           onChange={setStatusForm}
@@ -901,43 +1338,121 @@ function MaintenanceWorkOrdersView({ canManage }: { canManage: boolean }) {
         />
       )}
       {detail && (
-        <DetailModal title={detail.workOrderNo} subtitle={detail.title} onClose={() => setDetail(undefined)} wide>
-          <DetailGrid values={[
-            ['Máy', `${detail.machineCode} · ${detail.machineName}`],
-            ['Tổ', detail.teamName],
-            ['Loại', optionLabel(maintenanceTypes, detail.maintenanceType)],
-            ['Ưu tiên', optionLabel(priorities, detail.priority)],
-            ['Trạng thái', optionLabel(workOrderStatuses, detail.status)],
-            ['Người phụ trách', detail.assignedEmployeeName ?? 'Chưa phân công'],
-            ['Yêu cầu nguồn', detail.maintenanceRequestId ?? '—'],
-            ['Lịch nguồn', detail.maintenanceScheduleId ?? '—'],
-            ['Dự kiến', `${dateTime(detail.plannedStart)} — ${dateTime(detail.plannedEnd)}`],
-            ['Thực tế', `${dateTime(detail.actualStart)} — ${dateTime(detail.actualEnd)}`],
-          ]} />
+        <DetailModal
+          title={detail.workOrderNo}
+          subtitle={detail.title}
+          onClose={() => setDetail(undefined)}
+          wide
+        >
+          <DetailGrid
+            values={[
+              ['Máy', `${detail.machineCode} · ${detail.machineName}`],
+              ['Tổ', detail.teamName],
+              ['Loại', optionLabel(maintenanceTypes, detail.maintenanceType)],
+              ['Ưu tiên', optionLabel(priorities, detail.priority)],
+              ['Trạng thái', optionLabel(workOrderStatuses, detail.status)],
+              ['Người phụ trách', detail.assignedEmployeeName ?? 'Chưa phân công'],
+              ['Yêu cầu nguồn', detail.maintenanceRequestId ?? '—'],
+              ['Lịch nguồn', detail.maintenanceScheduleId ?? '—'],
+              ['Dự kiến', `${dateTime(detail.plannedStart)} — ${dateTime(detail.plannedEnd)}`],
+              ['Thực tế', `${dateTime(detail.actualStart)} — ${dateTime(detail.actualEnd)}`],
+            ]}
+          />
           <DetailText label="Mô tả" value={detail.description} />
           <DetailText label="Kết quả" value={detail.completionNote} />
           <div className="maintenance-cost-grid">
-            <span>Nhân công<b>{currency(detail.laborCost)}</b></span>
-            <span>Vật tư<b>{currency(detail.partCost)}</b></span>
-            <span>Thuê ngoài<b>{currency(detail.externalCost)}</b></span>
-            <span>Tổng cộng<b>{currency(detail.totalCost)}</b></span>
+            <span>
+              Nhân công<b>{currency(detail.laborCost)}</b>
+            </span>
+            <span>
+              Vật tư<b>{currency(detail.partCost)}</b>
+            </span>
+            <span>
+              Thuê ngoài<b>{currency(detail.externalCost)}</b>
+            </span>
+            <span>
+              Tổng cộng<b>{currency(detail.totalCost)}</b>
+            </span>
           </div>
-          <div className="maintenance-parts-heading"><h3>Vật tư đã sử dụng</h3></div>
-          <DataTable rows={detail.parts ?? []} columns={[
-            { key: 'materialCode', label: 'Mã vật tư' },
-            { key: 'materialName', label: 'Tên vật tư' },
-            { key: 'quantity', label: 'Số lượng' },
-            { key: 'unit', label: 'Đơn vị' },
-            { key: 'unitCost', label: 'Đơn giá', render: (row: MaintenancePartUsageItem) => currency(row.unitCost) },
-            { key: 'totalCost', label: 'Thành tiền', render: (row: MaintenancePartUsageItem) => currency(row.totalCost) },
-            ...(canManage && !isTerminalWorkOrder(detail.status) ? [{ key: 'actions', label: 'Thao tác', render: (row: MaintenancePartUsageItem) => <button className="danger-link" disabled={busy} onClick={() => void deletePart(row)}>Bỏ</button> }] : []),
-          ]} />
+          <div className="maintenance-parts-heading">
+            <h3>Vật tư đã sử dụng</h3>
+          </div>
+          <DataTable
+            rows={detail.parts ?? []}
+            columns={[
+              { key: 'materialCode', label: 'Mã vật tư' },
+              { key: 'materialName', label: 'Tên vật tư' },
+              { key: 'quantity', label: 'Số lượng' },
+              { key: 'unit', label: 'Đơn vị' },
+              {
+                key: 'unitCost',
+                label: 'Đơn giá',
+                render: (row: MaintenancePartUsageItem) => currency(row.unitCost),
+              },
+              {
+                key: 'totalCost',
+                label: 'Thành tiền',
+                render: (row: MaintenancePartUsageItem) => currency(row.totalCost),
+              },
+              ...(canManage && !isTerminalWorkOrder(detail.status)
+                ? [
+                    {
+                      key: 'actions',
+                      label: 'Thao tác',
+                      render: (row: MaintenancePartUsageItem) => (
+                        <button
+                          className="danger-link"
+                          disabled={busy}
+                          onClick={() => void deletePart(row)}
+                        >
+                          Bỏ
+                        </button>
+                      ),
+                    },
+                  ]
+                : []),
+            ]}
+          />
           {canManage && !isTerminalWorkOrder(detail.status) && (
             <form className="maintenance-part-form" onSubmit={addPart}>
-              <Field field={{ key: 'materialId', label: 'ID vật tư', type: 'number', min: 1, required: true }} value={partForm.materialId ?? ''} onChange={(value) => setPartForm({ ...partForm, materialId: value })} />
-              <Field field={{ key: 'quantity', label: 'Số lượng', type: 'number', min: 0.001, step: '0.001', required: true }} value={partForm.quantity ?? ''} onChange={(value) => setPartForm({ ...partForm, quantity: value })} />
-              <Field field={{ key: 'unitCost', label: 'Đơn giá', type: 'number', min: 0, step: '0.01', required: true }} value={partForm.unitCost ?? ''} onChange={(value) => setPartForm({ ...partForm, unitCost: value })} />
-              <button className="admin-add-button" disabled={busy} type="submit">+ Thêm vật tư</button>
+              <Field
+                field={{
+                  key: 'materialId',
+                  label: 'ID vật tư',
+                  type: 'number',
+                  min: 1,
+                  required: true,
+                }}
+                value={partForm.materialId ?? ''}
+                onChange={(value) => setPartForm({ ...partForm, materialId: value })}
+              />
+              <Field
+                field={{
+                  key: 'quantity',
+                  label: 'Số lượng',
+                  type: 'number',
+                  min: 0.001,
+                  step: '0.001',
+                  required: true,
+                }}
+                value={partForm.quantity ?? ''}
+                onChange={(value) => setPartForm({ ...partForm, quantity: value })}
+              />
+              <Field
+                field={{
+                  key: 'unitCost',
+                  label: 'Đơn giá',
+                  type: 'number',
+                  min: 0,
+                  step: '0.01',
+                  required: true,
+                }}
+                value={partForm.unitCost ?? ''}
+                onChange={(value) => setPartForm({ ...partForm, unitCost: value })}
+              />
+              <button className="admin-add-button" disabled={busy} type="submit">
+                + Thêm vật tư
+              </button>
             </form>
           )}
           {modalError && <p className="form-message error">{modalError}</p>}
@@ -973,9 +1488,28 @@ function MaintenanceHistoryView() {
   }, [appliedMachineId, load])
 
   const columns = [
-    { key: 'changedAt', label: 'Thời điểm', render: (row: MaintenanceStatusHistoryItem) => dateTime(row.changedAt) },
-    { key: 'previousStatus', label: 'Trạng thái trước', render: (row: MaintenanceStatusHistoryItem) => <StatusText value={row.previousStatus} label={machineStatuses[row.previousStatus ?? ''] ?? 'Chưa có'} /> },
-    { key: 'newStatus', label: 'Trạng thái mới', render: (row: MaintenanceStatusHistoryItem) => <StatusText value={row.newStatus} label={machineStatuses[row.newStatus] ?? row.newStatus} /> },
+    {
+      key: 'changedAt',
+      label: 'Thời điểm',
+      render: (row: MaintenanceStatusHistoryItem) => dateTime(row.changedAt),
+    },
+    {
+      key: 'previousStatus',
+      label: 'Trạng thái trước',
+      render: (row: MaintenanceStatusHistoryItem) => (
+        <StatusText
+          value={row.previousStatus}
+          label={machineStatuses[row.previousStatus ?? ''] ?? 'Chưa có'}
+        />
+      ),
+    },
+    {
+      key: 'newStatus',
+      label: 'Trạng thái mới',
+      render: (row: MaintenanceStatusHistoryItem) => (
+        <StatusText value={row.newStatus} label={machineStatuses[row.newStatus] ?? row.newStatus} />
+      ),
+    },
     { key: 'sourceType', label: 'Nguồn thay đổi' },
     { key: 'sourceId', label: 'ID nguồn' },
     { key: 'note', label: 'Ghi chú' },
@@ -984,15 +1518,38 @@ function MaintenanceHistoryView() {
 
   return (
     <>
-      <PageTitle title="Lịch sử trạng thái máy" description="Theo dõi các lần máy chuyển sang bảo trì và trở lại trạng thái sẵn sàng." />
+      <PageTitle
+        title="Lịch sử trạng thái máy"
+        description="Theo dõi các lần máy chuyển sang bảo trì và trở lại trạng thái sẵn sàng."
+      />
       <Panel title="Chọn máy trong phạm vi">
-        <form className="filters hr-filters" onSubmit={(event) => { event.preventDefault(); if (Number(machineId) > 0) { setPage(0); setAppliedMachineId(Number(machineId)) } }}>
+        <form
+          className="filters hr-filters"
+          onSubmit={(event) => {
+            event.preventDefault()
+            if (Number(machineId) > 0) {
+              setPage(0)
+              setAppliedMachineId(Number(machineId))
+            }
+          }}
+        >
           <FilterInput label="ID máy" type="number" value={machineId} onChange={setMachineId} />
           <button type="submit">Xem lịch sử</button>
         </form>
       </Panel>
-      <Panel title={appliedMachineId ? `${number(result?.totalElements)} lần thay đổi của máy #${appliedMachineId}` : 'Lịch sử trạng thái'}>
-        {!appliedMachineId && <div className="module-empty"><b>Chưa chọn máy</b><p>Nhập ID máy thuộc phạm vi được cấp để xem lịch sử.</p></div>}
+      <Panel
+        title={
+          appliedMachineId
+            ? `${number(result?.totalElements)} lần thay đổi của máy #${appliedMachineId}`
+            : 'Lịch sử trạng thái'
+        }
+      >
+        {!appliedMachineId && (
+          <div className="module-empty">
+            <b>Chưa chọn máy</b>
+            <p>Nhập ID máy thuộc phạm vi được cấp để xem lịch sử.</p>
+          </div>
+        )}
         <LoadingState loading={loading} error={error} />
         {appliedMachineId && <DataTable rows={result?.content ?? []} columns={columns} />}
         <Pager result={result} page={page} onPage={setPage} />
@@ -1026,34 +1583,121 @@ function nextWorkOrderStatuses(status: MaintenanceWorkOrderStatus): Option[] {
 const isTerminalWorkOrder = (status: MaintenanceWorkOrderStatus) =>
   status === 'COMPLETED' || status === 'CANCELLED'
 
-function PageTitle({ title, description, action }: { title: string; description: string; action?: ReactNode }) {
-  return <div className="page-title"><div><h2>{title}</h2><p>{description}</p></div>{action}</div>
-}
-
-function Pager<T>({ result, page, onPage }: { result?: PageResponse<T>; page: number; onPage: (page: number) => void }) {
-  if (!result || result.totalPages <= 1) return null
+function PageTitle({
+  title,
+  description,
+  action,
+}: {
+  title: string
+  description: string
+  action?: ReactNode
+}) {
   return (
-    <div className="pagination">
-      <button disabled={result.first || page <= 0} onClick={() => onPage(page - 1)}>Trang trước</button>
-      <span>Trang {result.page + 1}/{result.totalPages} · {result.totalElements} bản ghi</span>
-      <button disabled={result.last} onClick={() => onPage(page + 1)}>Trang sau</button>
+    <div className="page-title">
+      <div>
+        <h2>{title}</h2>
+        <p>{description}</p>
+      </div>
+      {action}
     </div>
   )
 }
 
-function FilterInput({ label, type, value, onChange }: { label: string; type: 'number' | 'date'; value: string; onChange: (value: string) => void }) {
-  return <label>{label}<input type={type} min={type === 'number' ? 1 : undefined} value={value} onChange={(event) => onChange(event.target.value)} /></label>
+function Pager<T>({
+  result,
+  page,
+  onPage,
+}: {
+  result?: PageResponse<T>
+  page: number
+  onPage: (page: number) => void
+}) {
+  if (!result || result.totalPages <= 1) return null
+  return (
+    <div className="pagination">
+      <button disabled={result.first || page <= 0} onClick={() => onPage(page - 1)}>
+        Trang trước
+      </button>
+      <span>
+        Trang {result.page + 1}/{result.totalPages} · {result.totalElements} bản ghi
+      </span>
+      <button disabled={result.last} onClick={() => onPage(page + 1)}>
+        Trang sau
+      </button>
+    </div>
+  )
 }
 
-function FilterSelect({ label, value, options, onChange }: { label: string; value: string; options: Option[]; onChange: (value: string) => void }) {
-  return <label>{label}<select value={value} onChange={(event) => onChange(event.target.value)}><option value="">Tất cả</option>{options.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>
+function FilterInput({
+  label,
+  type,
+  value,
+  onChange,
+}: {
+  label: string
+  type: 'number' | 'date'
+  value: string
+  onChange: (value: string) => void
+}) {
+  return (
+    <label>
+      {label}
+      <input
+        type={type}
+        min={type === 'number' ? 1 : undefined}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+      />
+    </label>
+  )
+}
+
+function FilterSelect({
+  label,
+  value,
+  options,
+  onChange,
+}: {
+  label: string
+  value: string
+  options: Option[]
+  onChange: (value: string) => void
+}) {
+  return (
+    <label>
+      {label}
+      <select value={value} onChange={(event) => onChange(event.target.value)}>
+        <option value="">Tất cả</option>
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+    </label>
+  )
 }
 
 function StatusText({ value, label }: { value: unknown; label: string }) {
-  return <span className="maintenance-status"><StatusBadge value={value} /><span>{label}</span></span>
+  return (
+    <span className="maintenance-status">
+      <StatusBadge value={value} />
+      <span>{label}</span>
+    </span>
+  )
 }
 
-function EditorModal({ title, subtitle, fields, values, onChange, busy, error, onClose, onSubmit }: {
+function EditorModal({
+  title,
+  subtitle,
+  fields,
+  values,
+  onChange,
+  busy,
+  error,
+  onClose,
+  onSubmit,
+}: {
   title: string
   subtitle: string
   fields: FieldSpec[]
@@ -1065,43 +1709,123 @@ function EditorModal({ title, subtitle, fields, values, onChange, busy, error, o
   onSubmit: (event: FormEvent) => void
 }) {
   return (
-    <div className="modal-backdrop" onMouseDown={(event) => event.target === event.currentTarget && !busy && onClose()}>
+    <div
+      className="modal-backdrop"
+      onMouseDown={(event) => event.target === event.currentTarget && !busy && onClose()}
+    >
       <form className="modal admin-modal maintenance-modal" onSubmit={onSubmit}>
-        <div className="admin-modal-header"><div><h2>{title}</h2><p>{subtitle}</p></div><button type="button" className="modal-close" disabled={busy} onClick={onClose}>×</button></div>
+        <div className="admin-modal-header">
+          <div>
+            <h2>{title}</h2>
+            <p>{subtitle}</p>
+          </div>
+          <button type="button" className="modal-close" disabled={busy} onClick={onClose}>
+            ×
+          </button>
+        </div>
         <div className="form-grid">
-          {fields.map((field) => <Field key={field.key} field={field} value={values[field.key] ?? ''} onChange={(value) => onChange({ ...values, [field.key]: value })} />)}
+          {fields.map((field) => (
+            <Field
+              key={field.key}
+              field={field}
+              value={values[field.key] ?? ''}
+              onChange={(value) => onChange({ ...values, [field.key]: value })}
+            />
+          ))}
         </div>
         {error && <p className="form-message error">{error}</p>}
-        <div className="form-actions"><button type="button" disabled={busy} onClick={onClose}>Hủy</button><button type="submit" className="primary" disabled={busy}>{busy ? 'Đang xử lý…' : 'Lưu'}</button></div>
+        <div className="form-actions">
+          <button type="button" disabled={busy} onClick={onClose}>
+            Hủy
+          </button>
+          <button type="submit" className="primary" disabled={busy}>
+            {busy ? 'Đang xử lý…' : 'Lưu'}
+          </button>
+        </div>
       </form>
     </div>
   )
 }
 
-function Field({ field, value, onChange }: { field: FieldSpec; value: string; onChange: (value: string) => void }) {
+function Field({
+  field,
+  value,
+  onChange,
+}: {
+  field: FieldSpec
+  value: string
+  onChange: (value: string) => void
+}) {
   return (
     <label className={`field ${field.full ? 'maintenance-field-full' : ''}`}>
-      <span>{field.label}{field.required ? ' *' : ''}</span>
+      <span>
+        {field.label}
+        {field.required ? ' *' : ''}
+      </span>
       {field.type === 'select' ? (
-        <select required={field.required} value={value} onChange={(event) => onChange(event.target.value)}>
+        <select
+          required={field.required}
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+        >
           <option value="">-- Chọn --</option>
-          {field.options?.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+          {field.options?.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
         </select>
       ) : field.type === 'textarea' ? (
-        <textarea required={field.required} placeholder={field.placeholder} value={value} onChange={(event) => onChange(event.target.value)} />
+        <textarea
+          required={field.required}
+          placeholder={field.placeholder}
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+        />
       ) : (
-        <input required={field.required} type={field.type ?? 'text'} min={field.min} step={field.step} placeholder={field.placeholder} value={value} onChange={(event) => onChange(event.target.value)} />
+        <input
+          required={field.required}
+          type={field.type ?? 'text'}
+          min={field.min}
+          step={field.step}
+          placeholder={field.placeholder}
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+        />
       )}
       {field.hint && <small>{field.hint}</small>}
     </label>
   )
 }
 
-function DetailModal({ title, subtitle, children, onClose, wide = false }: { title: string; subtitle: string; children: ReactNode; onClose: () => void; wide?: boolean }) {
+function DetailModal({
+  title,
+  subtitle,
+  children,
+  onClose,
+  wide = false,
+}: {
+  title: string
+  subtitle: string
+  children: ReactNode
+  onClose: () => void
+  wide?: boolean
+}) {
   return (
-    <div className="modal-backdrop" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
+    <div
+      className="modal-backdrop"
+      onMouseDown={(event) => event.target === event.currentTarget && onClose()}
+    >
       <div className={`modal admin-modal maintenance-detail-modal ${wide ? 'wide' : ''}`}>
-        <div className="admin-modal-header"><div><h2>{title}</h2><p>{subtitle}</p></div><button className="modal-close" onClick={onClose}>×</button></div>
+        <div className="admin-modal-header">
+          <div>
+            <h2>{title}</h2>
+            <p>{subtitle}</p>
+          </div>
+          <button className="modal-close" onClick={onClose}>
+            ×
+          </button>
+        </div>
         <div className="maintenance-detail-body">{children}</div>
       </div>
     </div>
@@ -1109,10 +1833,24 @@ function DetailModal({ title, subtitle, children, onClose, wide = false }: { tit
 }
 
 function DetailGrid({ values }: { values: [string, ReactNode][] }) {
-  return <div className="maintenance-detail-grid">{values.map(([label, value]) => <span key={label}><small>{label}</small><b>{value}</b></span>)}</div>
+  return (
+    <div className="maintenance-detail-grid">
+      {values.map(([label, value]) => (
+        <span key={label}>
+          <small>{label}</small>
+          <b>{value}</b>
+        </span>
+      ))}
+    </div>
+  )
 }
 
 function DetailText({ label, value }: { label: string; value?: string }) {
   if (!value) return null
-  return <div className="maintenance-detail-text"><b>{label}</b><p>{value}</p></div>
+  return (
+    <div className="maintenance-detail-text">
+      <b>{label}</b>
+      <p>{value}</p>
+    </div>
+  )
 }
