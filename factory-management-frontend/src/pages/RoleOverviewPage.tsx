@@ -23,6 +23,7 @@ export default function RoleOverviewPage({ role }: { role: Role }) {
 function TeamLeaderOverview() {
   const reports = useApi(dashboardApi.stagingMyScope)
   if (reports.loading) return <LoadingState loading error={reports.error} />
+
   return (
     <>
       <Title role="TEAM_LEADER" />
@@ -37,6 +38,15 @@ function StandardRoleOverview({ role }: { role: Role }) {
   const data = summary.data
   if (summary.loading) return <LoadingState loading error={summary.error} />
 
+  if (summary.error) {
+    return (
+      <>
+        <Title role={role} />
+        <LoadingState loading={false} error={summary.error} />
+      </>
+    )
+  }
+
   if (role === 'DEPARTMENT_MANAGER') {
     return (
       <>
@@ -45,7 +55,7 @@ function StandardRoleOverview({ role }: { role: Role }) {
           <KpiCard label="NHÂN SỰ THỰC TẾ" value="—" hint="Chờ API tổng hợp phòng ban" tone="blue" />
           <KpiCard label="CHẤM CÔNG" value="—" hint="Chờ dữ liệu chấm công" tone="green" />
           <KpiCard label="KPI BỘ PHẬN" value={percent(data?.averageOee)} hint="KPI vận hành hiện có" tone="purple" />
-          <KpiCard label="CẢNH BÁO" value="0" hint="Thông báo cần xử lý" tone="orange" />
+          <KpiCard label="CẢNH BÁO" value="—" hint="Chờ API thông báo cần xử lý" tone="orange" />
         </div>
         <ScopePanel data={data} />
       </>
@@ -58,7 +68,7 @@ function StandardRoleOverview({ role }: { role: Role }) {
       <div className="kpi-grid">
         <KpiCard label="KẾ HOẠCH" value={number(data?.plannedQuantity)} hint={data?.scopeName ?? 'Phạm vi được cấp'} tone="blue" />
         <KpiCard label="SẢN LƯỢNG THỰC TẾ" value={number(data?.actualQuantity)} hint={`${number(data?.goodQuantity)} sản phẩm tốt`} tone="green" />
-        <KpiCard label="OEE TRUNG BÌNH" value={percent(data?.averageOee)} hint={`${data?.reportCount ?? 0} báo cáo chính thức`} tone="purple" />
+        <KpiCard label="OEE TRUNG BÌNH" value={percent(data?.averageOee)} hint={`${number(data?.reportCount)} báo cáo chính thức`} tone="purple" />
         <KpiCard label="DOWNTIME" value={`${number(data?.downtimeMinutes)} phút`} hint={`${number(data?.defectQuantity)} sản phẩm lỗi`} tone="orange" />
       </div>
       <ScopePanel data={data} />
