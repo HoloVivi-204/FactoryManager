@@ -42,7 +42,9 @@ export default function AppRoutes({ role, page }: { role: Role; page: PageKey })
 
   if (
     role === 'DEPARTMENT_MANAGER' &&
-    ['schedule', 'attendance', 'kpi', 'leave', 'overtime', 'assignments', 'notifications'].includes(page)
+    ['schedule', 'attendance', 'kpi', 'leave', 'overtime', 'assignments', 'notifications'].includes(
+      page,
+    )
   ) {
     return <HrManagementPage view={page as HrView} />
   }
@@ -56,14 +58,16 @@ export default function AppRoutes({ role, page }: { role: Role; page: PageKey })
   if (page === 'reports') return <ReportsPage />
   if (page === 'approval') return <ApprovalPage />
 
-  if (['schedule', 'attendance', 'kpi', 'leave', 'overtime', 'assignments', 'notifications'].includes(page)) {
+  if (
+    ['schedule', 'attendance', 'kpi', 'leave', 'overtime', 'assignments', 'notifications'].includes(
+      page,
+    )
+  ) {
     return <RolePlaceholder page={page} />
   }
 
   return (
-    <OperationalPage
-      kind={page as 'machines' | 'downtime' | 'quality' | 'people' | 'materials'}
-    />
+    <OperationalPage kind={page as 'machines' | 'downtime' | 'quality' | 'people' | 'materials'} />
   )
 }
 

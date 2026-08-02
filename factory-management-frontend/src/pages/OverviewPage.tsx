@@ -17,10 +17,8 @@ import { KpiCard, LoadingState, Panel } from '../components/ui'
 import { number, percent } from '../utils/format'
 import { useApi } from '../utils/useApi'
 
-const hasQualityBreakdown = (
-  goodQuantity?: number | null,
-  defectQuantity?: number | null,
-) => goodQuantity != null && defectQuantity != null
+const hasQualityBreakdown = (goodQuantity?: number | null, defectQuantity?: number | null) =>
+  goodQuantity != null && defectQuantity != null
 
 export default function OverviewPage() {
   const summary = useApi(dashboardApi.summary)

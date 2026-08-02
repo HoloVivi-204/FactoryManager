@@ -79,22 +79,39 @@ export default function ApprovalPage() {
       </Panel>
 
       {selected && (
-        <div className="modal-backdrop" onMouseDown={(event) => event.target === event.currentTarget && close()}>
+        <div
+          className="modal-backdrop"
+          onMouseDown={(event) => event.target === event.currentTarget && close()}
+        >
           <div className="modal approval-modal">
             <div className="admin-modal-header">
               <div>
                 <h2>Duyệt báo cáo #{selected.id}</h2>
-                <p>{selected.reportDate} · {selected.shiftName} · {selected.teamName}</p>
+                <p>
+                  {selected.reportDate} · {selected.shiftName} · {selected.teamName}
+                </p>
               </div>
-              <button className="modal-close" disabled={busy} onClick={close}>×</button>
+              <button className="modal-close" disabled={busy} onClick={close}>
+                ×
+              </button>
             </div>
             <div className="approval-body">
               <div className="review-stats">
-                <span>Kế hoạch <b>{selected.plannedQuantity}</b></span>
-                <span>Thực tế <b>{selected.actualQuantity}</b></span>
-                <span>Đạt <b>{selected.goodQuantity}</b></span>
-                <span>Lỗi <b>{selected.defectQuantity}</b></span>
-                <span>Downtime <b>{selected.downtimeMinutes} phút</b></span>
+                <span>
+                  Kế hoạch <b>{selected.plannedQuantity}</b>
+                </span>
+                <span>
+                  Thực tế <b>{selected.actualQuantity}</b>
+                </span>
+                <span>
+                  Đạt <b>{selected.goodQuantity}</b>
+                </span>
+                <span>
+                  Lỗi <b>{selected.defectQuantity}</b>
+                </span>
+                <span>
+                  Downtime <b>{selected.downtimeMinutes} phút</b>
+                </span>
               </div>
               <StagingDetailsPanel data={details} loading={detailLoading} error={detailError} />
               <label className="field">
@@ -104,11 +121,21 @@ export default function ApprovalPage() {
               {message && <p className="form-message error">{message}</p>}
             </div>
             <div className="form-actions">
-              <button disabled={busy} onClick={close}>Đóng</button>
-              <button className="danger" disabled={busy || !comment.trim()} onClick={() => void act('change')}>
+              <button disabled={busy} onClick={close}>
+                Đóng
+              </button>
+              <button
+                className="danger"
+                disabled={busy || !comment.trim()}
+                onClick={() => void act('change')}
+              >
                 Yêu cầu sửa
               </button>
-              <button className="primary" disabled={busy || detailLoading || !!detailError} onClick={() => void act('approve')}>
+              <button
+                className="primary"
+                disabled={busy || detailLoading || !!detailError}
+                onClick={() => void act('approve')}
+              >
                 Phê duyệt
               </button>
             </div>

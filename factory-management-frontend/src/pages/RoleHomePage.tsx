@@ -42,9 +42,8 @@ export default function RoleHomePage() {
 
       <Panel title="Phạm vi sử dụng">
         <div className="role-note">
-          Menu bên trái chỉ hiển thị chức năng được cấp cho vai trò của bạn.
-          Backend tiếp tục kiểm tra phạm vi nhà máy, phòng ban, dây chuyền
-          và team trước mỗi thao tác.
+          Menu bên trái chỉ hiển thị chức năng được cấp cho vai trò của bạn. Backend tiếp tục kiểm
+          tra phạm vi nhà máy, phòng ban, dây chuyền và team trước mỗi thao tác.
         </div>
       </Panel>
     </>

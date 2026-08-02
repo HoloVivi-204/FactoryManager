@@ -1,11 +1,12 @@
 import { useRef, useState } from 'react'
-import {
-  stagingExcelApi,
-  type StagingExcelImportResult,
-} from '../api/stagingExcelApi'
+import { stagingExcelApi, type StagingExcelImportResult } from '../api/stagingExcelApi'
 import { Panel } from './ui'
 
-export default function StagingExcelImporter({ onImported }: { onImported: () => void | Promise<void> }) {
+export default function StagingExcelImporter({
+  onImported,
+}: {
+  onImported: () => void | Promise<void>
+}) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [file, setFile] = useState<File>()
   const [result, setResult] = useState<StagingExcelImportResult>()
@@ -22,9 +23,11 @@ export default function StagingExcelImporter({ onImported }: { onImported: () =>
     try {
       const value = await stagingExcelApi.preview(file)
       setResult(value)
-      setMessage(value.valid
-        ? 'File hợp lệ. Bạn có thể bấm Nhập dữ liệu.'
-        : `File còn ${value.errors.length} lỗi. Chưa có dữ liệu nào được lưu.`)
+      setMessage(
+        value.valid
+          ? 'File hợp lệ. Bạn có thể bấm Nhập dữ liệu.'
+          : `File còn ${value.errors.length} lỗi. Chưa có dữ liệu nào được lưu.`,
+      )
     } catch (error) {
       setResult(undefined)
       setMessage((error as Error).message)
@@ -64,7 +67,10 @@ export default function StagingExcelImporter({ onImported }: { onImported: () =>
       <div className="excel-import-intro">
         <div>
           <b>Một file, 5 nhóm dữ liệu</b>
-          <p>Sản lượng · Nhân sự · Dừng máy · Chất lượng · Vật tư. Bạn có thể chỉ điền sheet cần nhập.</p>
+          <p>
+            Sản lượng · Nhân sự · Dừng máy · Chất lượng · Vật tư. Bạn có thể chỉ điền sheet cần
+            nhập.
+          </p>
         </div>
         <button disabled={busy} onClick={() => void stagingExcelApi.template()}>
           Tải file Excel mẫu
@@ -89,8 +95,11 @@ export default function StagingExcelImporter({ onImported }: { onImported: () =>
         <button disabled={busy || !file} onClick={() => void preview()}>
           {busy ? 'Đang xử lý…' : '1. Kiểm tra file'}
         </button>
-        <button className="primary" disabled={busy || !file || !result?.valid || result.imported}
-          onClick={() => void importData()}>
+        <button
+          className="primary"
+          disabled={busy || !file || !result?.valid || result.imported}
+          onClick={() => void importData()}
+        >
           2. Nhập vào báo cáo DRAFT
         </button>
       </div>
@@ -110,17 +119,28 @@ export default function StagingExcelImporter({ onImported }: { onImported: () =>
           </div>
           {result.imported && (
             <p className="excel-imported-summary">
-              Báo cáo: tạo {result.createdReports}, cập nhật {result.updatedReports}. Chi tiết: tạo {result.createdDetails}, cập nhật {result.updatedDetails}.
+              Báo cáo: tạo {result.createdReports}, cập nhật {result.updatedReports}. Chi tiết: tạo{' '}
+              {result.createdDetails}, cập nhật {result.updatedDetails}.
             </p>
           )}
           {result.errors.length > 0 && (
             <div className="table-wrap excel-errors">
               <table>
-                <thead><tr><th>Sheet</th><th>Dòng</th><th>Cột</th><th>Lỗi cần sửa</th><th>Giá trị</th></tr></thead>
+                <thead>
+                  <tr>
+                    <th>Sheet</th>
+                    <th>Dòng</th>
+                    <th>Cột</th>
+                    <th>Lỗi cần sửa</th>
+                    <th>Giá trị</th>
+                  </tr>
+                </thead>
                 <tbody>
                   {result.errors.map((error, index) => (
                     <tr key={`${error.sheet}-${error.row}-${error.column}-${index}`}>
-                      <td><b>{error.sheet}</b></td>
+                      <td>
+                        <b>{error.sheet}</b>
+                      </td>
                       <td>{error.row || '—'}</td>
                       <td>{error.column || '—'}</td>
                       <td>{error.message}</td>
@@ -134,11 +154,19 @@ export default function StagingExcelImporter({ onImported }: { onImported: () =>
         </>
       )}
       {message && <p className="form-message">{message}</p>}
-      <p className="hint-inline">Hệ thống kiểm tra toàn bộ file trước khi lưu. Nếu có một dòng lỗi thì không dòng nào được nhập.</p>
+      <p className="hint-inline">
+        Hệ thống kiểm tra toàn bộ file trước khi lưu. Nếu có một dòng lỗi thì không dòng nào được
+        nhập.
+      </p>
     </Panel>
   )
 }
 
 function Count({ label, value }: { label: string; value: number }) {
-  return <div><span>{label}</span><b>{value}</b></div>
+  return (
+    <div>
+      <span>{label}</span>
+      <b>{value}</b>
+    </div>
+  )
 }

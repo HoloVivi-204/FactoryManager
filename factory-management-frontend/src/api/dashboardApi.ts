@@ -24,11 +24,9 @@ export const dashboardApi = {
   productionReportDetails: (id: number) =>
     get<ProductionReportDetails>(`/production-reports/${id}/details`),
 
-  stagingMyScope: () =>
-    get<StagingReport[]>('/production-report-staging/my-scope'),
+  stagingMyScope: () => get<StagingReport[]>('/production-report-staging/my-scope'),
 
-  getStaging: (id: number) =>
-    get<StagingReport>(`/production-report-staging/${id}`),
+  getStaging: (id: number) => get<StagingReport>(`/production-report-staging/${id}`),
 
   submitted: async () => {
     const reports = await get<StagingReport[]>('/production-report-staging/my-scope')
@@ -70,25 +68,20 @@ export const dashboardApi = {
   },
 
   master: (path: string) => get<TableRow[]>(`/${path}/all`),
-  departmentsByFactory: (factoryId: number) =>
-    get<TableRow[]>(`/departments/factory/${factoryId}`),
+  departmentsByFactory: (factoryId: number) => get<TableRow[]>(`/departments/factory/${factoryId}`),
   linesByDepartment: (departmentId: number) =>
     get<TableRow[]>(`/production-lines/department/${departmentId}`),
-  teamsByLine: (lineId: number) =>
-    get<TableRow[]>(`/teams/production-line/${lineId}`),
+  teamsByLine: (lineId: number) => get<TableRow[]>(`/teams/production-line/${lineId}`),
   employeesByTeam: (teamId: number) => get<TableRow[]>(`/employees/team/${teamId}`),
   machinesByTeam: (teamId: number) => get<TableRow[]>(`/machines/team/${teamId}`),
 
-  createStaging: (data: unknown) =>
-    send<StagingReport>('/production-report-staging', 'POST', data),
+  createStaging: (data: unknown) => send<StagingReport>('/production-report-staging', 'POST', data),
   updateStaging: (id: number, data: unknown) =>
     send<StagingReport>(`/production-report-staging/${id}`, 'PUT', data),
-  deleteStaging: (id: number) =>
-    send<void>(`/production-report-staging/${id}`, 'DELETE'),
+  deleteStaging: (id: number) => send<void>(`/production-report-staging/${id}`, 'DELETE'),
   returnToDraft: (id: number) =>
     send<StagingReport>(`/production-report-staging/${id}/return-to-draft`, 'PUT'),
-  submit: (id: number) =>
-    send<StagingReport>(`/production-report-staging/${id}/submit`, 'PUT'),
+  submit: (id: number) => send<StagingReport>(`/production-report-staging/${id}/submit`, 'PUT'),
   requestChange: (id: number, comment: string) =>
     send<StagingReport>(`/production-report-staging/${id}/request-change`, 'PUT', { comment }),
   approve: (id: number, remark: string) =>

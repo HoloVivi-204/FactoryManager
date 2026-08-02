@@ -66,8 +66,7 @@ export type MaintenanceDashboardFilters = {
 }
 
 export const maintenanceApi = {
-  machineOptions: () =>
-    get<MaintenanceMachineOption[]>('/maintenance/options/machines'),
+  machineOptions: () => get<MaintenanceMachineOption[]>('/maintenance/options/machines'),
 
   downtimesByMachine: (machineId: number) =>
     get<MaintenanceDowntimeOption[]>(`/machine-downtime-staging/machine/${machineId}`),
@@ -75,8 +74,7 @@ export const maintenanceApi = {
   requests: (filters: MaintenanceRequestFilters = {}) =>
     get<PageResponse<MaintenanceRequestItem>>(`/maintenance/requests${queryString(filters)}`),
 
-  request: (id: number) =>
-    get<MaintenanceRequestItem>(`/maintenance/requests/${id}`),
+  request: (id: number) => get<MaintenanceRequestItem>(`/maintenance/requests/${id}`),
 
   createRequest: (data: unknown) =>
     send<MaintenanceRequestItem>('/maintenance/requests', 'POST', data),
@@ -87,8 +85,7 @@ export const maintenanceApi = {
   schedules: (filters: MaintenanceScheduleFilters = {}) =>
     get<PageResponse<MaintenanceScheduleItem>>(`/maintenance/schedules${queryString(filters)}`),
 
-  schedule: (id: number) =>
-    get<MaintenanceScheduleItem>(`/maintenance/schedules/${id}`),
+  schedule: (id: number) => get<MaintenanceScheduleItem>(`/maintenance/schedules/${id}`),
 
   createSchedule: (data: unknown) =>
     send<MaintenanceScheduleItem>('/maintenance/schedules', 'POST', data),
@@ -96,14 +93,12 @@ export const maintenanceApi = {
   updateSchedule: (id: number, data: unknown) =>
     send<MaintenanceScheduleItem>(`/maintenance/schedules/${id}`, 'PUT', data),
 
-  deleteSchedule: (id: number) =>
-    send<void>(`/maintenance/schedules/${id}`, 'DELETE'),
+  deleteSchedule: (id: number) => send<void>(`/maintenance/schedules/${id}`, 'DELETE'),
 
   workOrders: (filters: MaintenanceWorkOrderFilters = {}) =>
     get<PageResponse<MaintenanceWorkOrderItem>>(`/maintenance/work-orders${queryString(filters)}`),
 
-  workOrder: (id: number) =>
-    get<MaintenanceWorkOrderItem>(`/maintenance/work-orders/${id}`),
+  workOrder: (id: number) => get<MaintenanceWorkOrderItem>(`/maintenance/work-orders/${id}`),
 
   createWorkOrder: (data: unknown) =>
     send<MaintenanceWorkOrderItem>('/maintenance/work-orders', 'POST', data),

@@ -29,7 +29,16 @@ export type AiDashboardWidget = {
   columns?: Array<{
     key: string
     label: string
-    format?: 'text' | 'number' | 'percent' | 'currency' | 'duration' | 'date' | 'datetime' | 'status' | string
+    format?:
+      | 'text'
+      | 'number'
+      | 'percent'
+      | 'currency'
+      | 'duration'
+      | 'date'
+      | 'datetime'
+      | 'status'
+      | string
   }>
   rows?: Array<Record<string, unknown>>
   numerator?: number | null

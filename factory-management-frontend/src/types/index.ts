@@ -430,12 +430,7 @@ export type MaintenanceWorkOrderStatus =
   | 'COMPLETED'
   | 'CANCELLED'
 
-export type MachineOperationalStatus =
-  | 'IDLE'
-  | 'RUNNING'
-  | 'STOPPED'
-  | 'MAINTENANCE'
-  | 'BREAKDOWN'
+export type MachineOperationalStatus = 'IDLE' | 'RUNNING' | 'STOPPED' | 'MAINTENANCE' | 'BREAKDOWN'
 
 export type MaintenanceMachineOption = {
   id: number

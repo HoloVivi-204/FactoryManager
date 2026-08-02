@@ -70,7 +70,15 @@ export default function ReportEntryPage() {
   useEffect(() => {
     Promise.all(
       selectFields.map(async ([, , ,], index) => {
-        const paths = ['shifts', 'factories', 'departments', 'production-lines', 'teams', 'employees', 'machines']
+        const paths = [
+          'shifts',
+          'factories',
+          'departments',
+          'production-lines',
+          'teams',
+          'employees',
+          'machines',
+        ]
         const [key] = selectFields[index]
         return [key, await dashboardApi.master(paths[index])] as const
       }),
@@ -79,7 +87,8 @@ export default function ReportEntryPage() {
       .catch((error) => setMessage((error as Error).message))
   }, [])
 
-  const change = (key: keyof ReportForm, value: string) => setForm((current) => ({ ...current, [key]: value }))
+  const change = (key: keyof ReportForm, value: string) =>
+    setForm((current) => ({ ...current, [key]: value }))
 
   async function save() {
     setBusy(true)
@@ -124,7 +133,11 @@ export default function ReportEntryPage() {
       <Panel title="Thông tin chung">
         <div className="form-grid">
           <Field label="Ngày">
-            <input type="date" value={form.reportDate} onChange={(event) => change('reportDate', event.target.value)} />
+            <input
+              type="date"
+              value={form.reportDate}
+              onChange={(event) => change('reportDate', event.target.value)}
+            />
           </Field>
 
           {selectFields.map(([key, label, codeKey, nameKey]) => (
@@ -157,8 +170,15 @@ export default function ReportEntryPage() {
         </div>
 
         <div className="form-actions">
-          <button className="primary" disabled={busy || !!saved} onClick={() => void save()}>Lưu bản nháp</button>
-          <button disabled={busy || !saved || saved.status !== 'DRAFT'} onClick={() => void submit()}>Gửi duyệt</button>
+          <button className="primary" disabled={busy || !!saved} onClick={() => void save()}>
+            Lưu bản nháp
+          </button>
+          <button
+            disabled={busy || !saved || saved.status !== 'DRAFT'}
+            onClick={() => void submit()}
+          >
+            Gửi duyệt
+          </button>
         </div>
         {message && <p className="form-message">{message}</p>}
       </Panel>
@@ -171,7 +191,9 @@ export default function ReportEntryPage() {
             <span>Sự cố vật tư</span>
             <span>Nhân sự thực tế</span>
           </div>
-          <p className="hint">Tổng lỗi chất lượng chi tiết phải bằng số sản phẩm lỗi trước khi gửi duyệt.</p>
+          <p className="hint">
+            Tổng lỗi chất lượng chi tiết phải bằng số sản phẩm lỗi trước khi gửi duyệt.
+          </p>
         </Panel>
       )}
     </>

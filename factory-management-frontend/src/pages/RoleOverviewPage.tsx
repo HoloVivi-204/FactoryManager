@@ -52,9 +52,19 @@ function StandardRoleOverview({ role }: { role: Role }) {
       <>
         <Title role={role} />
         <div className="kpi-grid">
-          <KpiCard label="NHÂN SỰ THỰC TẾ" value="—" hint="Chờ API tổng hợp phòng ban" tone="blue" />
+          <KpiCard
+            label="NHÂN SỰ THỰC TẾ"
+            value="—"
+            hint="Chờ API tổng hợp phòng ban"
+            tone="blue"
+          />
           <KpiCard label="CHẤM CÔNG" value="—" hint="Chờ dữ liệu chấm công" tone="green" />
-          <KpiCard label="KPI BỘ PHẬN" value={percent(data?.averageOee)} hint="KPI vận hành hiện có" tone="purple" />
+          <KpiCard
+            label="KPI BỘ PHẬN"
+            value={percent(data?.averageOee)}
+            hint="KPI vận hành hiện có"
+            tone="purple"
+          />
           <KpiCard label="CẢNH BÁO" value="—" hint="Chờ API thông báo cần xử lý" tone="orange" />
         </div>
         <ScopePanel data={data} />
@@ -66,10 +76,30 @@ function StandardRoleOverview({ role }: { role: Role }) {
     <>
       <Title role={role} />
       <div className="kpi-grid">
-        <KpiCard label="KẾ HOẠCH" value={number(data?.plannedQuantity)} hint={data?.scopeName ?? 'Phạm vi được cấp'} tone="blue" />
-        <KpiCard label="SẢN LƯỢNG THỰC TẾ" value={number(data?.actualQuantity)} hint={`${number(data?.goodQuantity)} sản phẩm tốt`} tone="green" />
-        <KpiCard label="OEE TRUNG BÌNH" value={percent(data?.averageOee)} hint={`${number(data?.reportCount)} báo cáo chính thức`} tone="purple" />
-        <KpiCard label="DOWNTIME" value={`${number(data?.downtimeMinutes)} phút`} hint={`${number(data?.defectQuantity)} sản phẩm lỗi`} tone="orange" />
+        <KpiCard
+          label="KẾ HOẠCH"
+          value={number(data?.plannedQuantity)}
+          hint={data?.scopeName ?? 'Phạm vi được cấp'}
+          tone="blue"
+        />
+        <KpiCard
+          label="SẢN LƯỢNG THỰC TẾ"
+          value={number(data?.actualQuantity)}
+          hint={`${number(data?.goodQuantity)} sản phẩm tốt`}
+          tone="green"
+        />
+        <KpiCard
+          label="OEE TRUNG BÌNH"
+          value={percent(data?.averageOee)}
+          hint={`${number(data?.reportCount)} báo cáo chính thức`}
+          tone="purple"
+        />
+        <KpiCard
+          label="DOWNTIME"
+          value={`${number(data?.downtimeMinutes)} phút`}
+          hint={`${number(data?.defectQuantity)} sản phẩm lỗi`}
+          tone="orange"
+        />
       </div>
       <ScopePanel data={data} />
     </>
@@ -91,10 +121,18 @@ function ScopePanel({ data }: { data?: DashboardSummary }) {
   return (
     <Panel title="Phạm vi dữ liệu hiện tại">
       <div className="role-facts">
-        <span>Phạm vi<b>{data?.scopeName ?? 'Chưa xác định'}</b></span>
-        <span>Loại phạm vi<b>{data?.scopeType ?? '—'}</b></span>
-        <span>Chất lượng<b>{percent(data?.averageQuality)}</b></span>
-        <span>Hiệu suất<b>{percent(data?.averagePerformance)}</b></span>
+        <span>
+          Phạm vi<b>{data?.scopeName ?? 'Chưa xác định'}</b>
+        </span>
+        <span>
+          Loại phạm vi<b>{data?.scopeType ?? '—'}</b>
+        </span>
+        <span>
+          Chất lượng<b>{percent(data?.averageQuality)}</b>
+        </span>
+        <span>
+          Hiệu suất<b>{percent(data?.averagePerformance)}</b>
+        </span>
       </div>
     </Panel>
   )

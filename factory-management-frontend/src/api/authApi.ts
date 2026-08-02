@@ -7,6 +7,5 @@ export const authApi = {
 
   me: () => get<AuthUser>('/auth/me'),
 
-  logout: (token: string) =>
-    publicPost<void>('/auth/logout', { token }),
+  logout: (token: string) => publicPost<void>('/auth/logout', { token }),
 }

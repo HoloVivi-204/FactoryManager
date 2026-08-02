@@ -121,7 +121,10 @@ export default function FinancePage({ view }: { view: FinanceView }) {
   const select = (key: string, label: string, list: TableRow[]) => (
     <label className="field">
       <span>{label}</span>
-      <select value={form[key] ?? ''} onChange={(event) => setForm({ ...form, [key]: event.target.value })}>
+      <select
+        value={form[key] ?? ''}
+        onChange={(event) => setForm({ ...form, [key]: event.target.value })}
+      >
         <option value="">-- Chọn --</option>
         {list.map((item) => (
           <option key={String(item.id)} value={String(item.id ?? '')}>
@@ -136,17 +139,40 @@ export default function FinancePage({ view }: { view: FinanceView }) {
     <>
       <div className="page-title">
         <div>
-          <h2>{view === 'finance' ? 'Tài chính quản trị' : view === 'warehouses' ? 'Quản lý kho' : 'Nhập - xuất - tồn'}</h2>
+          <h2>
+            {view === 'finance'
+              ? 'Tài chính quản trị'
+              : view === 'warehouses'
+                ? 'Quản lý kho'
+                : 'Nhập - xuất - tồn'}
+          </h2>
           <p>Dữ liệu trong phạm vi nhà máy được phân quyền</p>
         </div>
-        <button className="admin-add-button" onClick={() => setOpen(true)}>+ Nhập dữ liệu</button>
+        <button className="admin-add-button" onClick={() => setOpen(true)}>
+          + Nhập dữ liệu
+        </button>
       </div>
 
       {view === 'finance' && (
         <div className="kpi-grid">
-          <KpiCard label="DOANH THU" value={money(summary.totalRevenue)} hint="Trong kỳ" tone="green" />
-          <KpiCard label="CHI PHÍ" value={money(summary.totalExpense)} hint="Trong kỳ" tone="orange" />
-          <KpiCard label="LỢI NHUẬN" value={money(summary.profit)} hint="Doanh thu - chi phí" tone="blue" />
+          <KpiCard
+            label="DOANH THU"
+            value={money(summary.totalRevenue)}
+            hint="Trong kỳ"
+            tone="green"
+          />
+          <KpiCard
+            label="CHI PHÍ"
+            value={money(summary.totalExpense)}
+            hint="Trong kỳ"
+            tone="orange"
+          />
+          <KpiCard
+            label="LỢI NHUẬN"
+            value={money(summary.profit)}
+            hint="Doanh thu - chi phí"
+            tone="blue"
+          />
           <KpiCard
             label="PHẢI THU / PHẢI TRẢ"
             value={`${money(summary.accountsReceivable)} / ${money(summary.accountsPayable)}`}
@@ -169,14 +195,22 @@ export default function FinancePage({ view }: { view: FinanceView }) {
                   { key: 'categoryName', label: 'Danh mục' },
                   { key: 'counterparty', label: 'Đối tác' },
                   { key: 'amount', label: 'Số tiền', render: (row) => money(row.amount) },
-                  { key: 'paymentStatus', label: 'Thanh toán', render: (row) => <StatusBadge value={row.paymentStatus} /> },
+                  {
+                    key: 'paymentStatus',
+                    label: 'Thanh toán',
+                    render: (row) => <StatusBadge value={row.paymentStatus} />,
+                  },
                 ]
               : view === 'warehouses'
                 ? [
                     { key: 'code', label: 'Mã kho' },
                     { key: 'name', label: 'Tên kho' },
                     { key: 'factoryName', label: 'Nhà máy' },
-                    { key: 'active', label: 'Trạng thái', render: (row) => <StatusBadge value={row.active} /> },
+                    {
+                      key: 'active',
+                      label: 'Trạng thái',
+                      render: (row) => <StatusBadge value={row.active} />,
+                    },
                   ]
                 : [
                     { key: 'transactionNo', label: 'Số phiếu' },
@@ -185,7 +219,11 @@ export default function FinancePage({ view }: { view: FinanceView }) {
                     { key: 'warehouseName', label: 'Kho' },
                     { key: 'materialName', label: 'Vật tư' },
                     { key: 'quantity', label: 'Số lượng' },
-                    { key: 'totalAmount', label: 'Thành tiền', render: (row) => money(row.totalAmount) },
+                    {
+                      key: 'totalAmount',
+                      label: 'Thành tiền',
+                      render: (row) => money(row.totalAmount),
+                    },
                   ]
           }
         />
@@ -195,18 +233,51 @@ export default function FinancePage({ view }: { view: FinanceView }) {
         <div className="modal-backdrop">
           <div className="modal admin-modal">
             <div className="admin-modal-header">
-              <h2>Nhập {view === 'finance' ? 'giao dịch tài chính' : view === 'warehouses' ? 'kho' : 'giao dịch kho'}</h2>
-              <button className="modal-close" onClick={() => setOpen(false)}>×</button>
+              <h2>
+                Nhập{' '}
+                {view === 'finance'
+                  ? 'giao dịch tài chính'
+                  : view === 'warehouses'
+                    ? 'kho'
+                    : 'giao dịch kho'}
+              </h2>
+              <button className="modal-close" onClick={() => setOpen(false)}>
+                ×
+              </button>
             </div>
             <div className="form-grid">
               {view === 'finance' ? (
                 <>
                   {select('categoryId', 'Danh mục', options.categories)}
                   {select('factoryId', 'Nhà máy', options.factories)}
-                  <Input fieldKey="recordDate" label="Ngày" type="date" form={form} setForm={setForm} />
-                  <Input fieldKey="amount" label="Số tiền" type="number" form={form} setForm={setForm} />
-                  <Input fieldKey="paidAmount" label="Đã thanh toán" type="number" form={form} setForm={setForm} />
-                  <Input fieldKey="dueDate" label="Hạn thanh toán" type="date" form={form} setForm={setForm} />
+                  <Input
+                    fieldKey="recordDate"
+                    label="Ngày"
+                    type="date"
+                    form={form}
+                    setForm={setForm}
+                  />
+                  <Input
+                    fieldKey="amount"
+                    label="Số tiền"
+                    type="number"
+                    form={form}
+                    setForm={setForm}
+                  />
+                  <Input
+                    fieldKey="paidAmount"
+                    label="Đã thanh toán"
+                    type="number"
+                    form={form}
+                    setForm={setForm}
+                  />
+                  <Input
+                    fieldKey="dueDate"
+                    label="Hạn thanh toán"
+                    type="date"
+                    form={form}
+                    setForm={setForm}
+                  />
                   <Input fieldKey="counterparty" label="Đối tác" form={form} setForm={setForm} />
                   <Input fieldKey="referenceNo" label="Số chứng từ" form={form} setForm={setForm} />
                 </>
@@ -221,26 +292,50 @@ export default function FinancePage({ view }: { view: FinanceView }) {
                 <>
                   {select('warehouseId', 'Kho', options.warehouses)}
                   {select('materialId', 'Vật tư', options.materials)}
-                  <Input fieldKey="transactionDate" label="Ngày" type="date" form={form} setForm={setForm} />
+                  <Input
+                    fieldKey="transactionDate"
+                    label="Ngày"
+                    type="date"
+                    form={form}
+                    setForm={setForm}
+                  />
                   <label className="field">
                     <span>Loại</span>
                     <select
                       value={form.transactionType ?? ''}
-                      onChange={(event) => setForm({ ...form, transactionType: event.target.value })}
+                      onChange={(event) =>
+                        setForm({ ...form, transactionType: event.target.value })
+                      }
                     >
-                      {['', 'INBOUND', 'OUTBOUND', 'ADJUSTMENT_IN', 'ADJUSTMENT_OUT'].map((value) => (
-                        <option key={value}>{value}</option>
-                      ))}
+                      {['', 'INBOUND', 'OUTBOUND', 'ADJUSTMENT_IN', 'ADJUSTMENT_OUT'].map(
+                        (value) => (
+                          <option key={value}>{value}</option>
+                        ),
+                      )}
                     </select>
                   </label>
-                  <Input fieldKey="quantity" label="Số lượng" type="number" form={form} setForm={setForm} />
-                  <Input fieldKey="unitCost" label="Đơn giá" type="number" form={form} setForm={setForm} />
+                  <Input
+                    fieldKey="quantity"
+                    label="Số lượng"
+                    type="number"
+                    form={form}
+                    setForm={setForm}
+                  />
+                  <Input
+                    fieldKey="unitCost"
+                    label="Đơn giá"
+                    type="number"
+                    form={form}
+                    setForm={setForm}
+                  />
                 </>
               )}
             </div>
             <div className="form-actions">
               <button onClick={() => setOpen(false)}>Hủy</button>
-              <button className="primary" onClick={() => void save()}>Lưu</button>
+              <button className="primary" onClick={() => void save()}>
+                Lưu
+              </button>
             </div>
           </div>
         </div>

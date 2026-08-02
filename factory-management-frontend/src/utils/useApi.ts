@@ -13,7 +13,8 @@ export function useApi<T>(loader: () => Promise<T>, reloadKey?: unknown) {
   const reload = useCallback(() => {
     setLoading(true)
     setError('')
-    loaderRef.current()
+    loaderRef
+      .current()
       .then(setData)
       .catch((loadError: Error) => setError(loadError.message))
       .finally(() => setLoading(false))

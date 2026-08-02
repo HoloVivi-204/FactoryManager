@@ -2,12 +2,7 @@ import type { ReactNode } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import AiChatWidget from '../components/AiChatWidget'
 import { useAuth } from '../context/useAuth'
-import {
-  availableRoles,
-  navigation,
-  roleLabels,
-  workspacePath,
-} from '../routes/roleNavigation'
+import { availableRoles, navigation, roleLabels, workspacePath } from '../routes/roleNavigation'
 import type { Role } from '../types'
 
 export default function DashboardLayout({

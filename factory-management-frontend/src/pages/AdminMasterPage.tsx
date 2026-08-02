@@ -1,5 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { adminApi, type DataScopeType, type DepartmentTypeOption, type UserDataScope } from '../api/adminApi'
+import {
+  adminApi,
+  type DataScopeType,
+  type DepartmentTypeOption,
+  type UserDataScope,
+} from '../api/adminApi'
 import { DataTable, Panel, StatusBadge, type TableColumn } from '../components/ui'
 import type { TableRow } from '../types'
 
@@ -161,10 +166,12 @@ const enumValues: Record<string, string[]> = {
   severity: ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'],
 }
 
-const text = (value: unknown, fallback = '—') => value == null ? fallback : String(value)
+const text = (value: unknown, fallback = '—') => (value == null ? fallback : String(value))
 const idOf = (row: TableRow) => Number(row.id)
 const rolesOf = (row: TableRow | null) =>
-  Array.isArray(row?.roles) ? row.roles.filter((role): role is string => typeof role === 'string') : []
+  Array.isArray(row?.roles)
+    ? row.roles.filter((role): role is string => typeof role === 'string')
+    : []
 
 export default function AdminMasterPage({ section }: { section?: string }) {
   const [path, setPath] = useState(section ?? 'factories')
@@ -193,7 +200,7 @@ export default function AdminMasterPage({ section }: { section?: string }) {
   const config = configs[path]
 
   const sources = useMemo(
-    () => [...new Set(config.fields.flatMap((field) => field.source ? [field.source] : []))],
+    () => [...new Set(config.fields.flatMap((field) => (field.source ? [field.source] : [])))],
     [config],
   )
 
@@ -218,8 +225,11 @@ export default function AdminMasterPage({ section }: { section?: string }) {
     setMessage(null)
     void load()
 
-    const optionRequest = Promise.all(sources.map(async (source) => [source, await adminApi.list(source)] as const))
-    const departmentTypeRequest = path === 'departments' ? adminApi.departmentTypes() : Promise.resolve([])
+    const optionRequest = Promise.all(
+      sources.map(async (source) => [source, await adminApi.list(source)] as const),
+    )
+    const departmentTypeRequest =
+      path === 'departments' ? adminApi.departmentTypes() : Promise.resolve([])
     Promise.all([optionRequest, departmentTypeRequest])
       .then(([optionEntries, typeEntries]) => {
         setOptions(Object.fromEntries(optionEntries))
@@ -261,7 +271,8 @@ export default function AdminMasterPage({ section }: { section?: string }) {
   }
 
   async function save() {
-    const missing = !editingId && config.fields.find((field) => field.required && !form[field.key]?.trim())
+    const missing =
+      !editingId && config.fields.find((field) => field.required && !form[field.key]?.trim())
     if (missing) {
       setMessage({ text: `Vui lòng nhập/chọn ${missing.label}.`, error: true })
       return
@@ -274,7 +285,7 @@ export default function AdminMasterPage({ section }: { section?: string }) {
     const data = Object.fromEntries(
       Object.entries(form)
         .filter(([, value]) => value !== '')
-        .map(([key, value]) => key.endsWith('Id') ? [key, Number(value)] : [key, value.trim()]),
+        .map(([key, value]) => (key.endsWith('Id') ? [key, Number(value)] : [key, value.trim()])),
     )
 
     setBusy(true)
@@ -489,16 +500,19 @@ export default function AdminMasterPage({ section }: { section?: string }) {
     }
   }
 
-  const selectedFactory = (options.factories ?? []).find((item) => String(item.id) === form.factoryId)
+  const selectedFactory = (options.factories ?? []).find(
+    (item) => String(item.id) === form.factoryId,
+  )
   const selectedDepartmentType = departmentTypes.find((item) => item.type === form.departmentType)
-  const visibleFields = config.fields.filter((field) =>
-    !(path === 'users' && editingId && (field.key === 'employeeId' || field.key === 'password')),
+  const visibleFields = config.fields.filter(
+    (field) =>
+      !(path === 'users' && editingId && (field.key === 'employeeId' || field.key === 'password')),
   )
 
   const fields = (
     <>
       <div className="form-grid">
-        {visibleFields.map((field) => (
+        {visibleFields.map((field) =>
           field.type === 'roles' ? (
             <div className="field role-field" key={field.key}>
               <span>Vai trò *</span>
@@ -529,7 +543,10 @@ export default function AdminMasterPage({ section }: { section?: string }) {
             </div>
           ) : (
             <label className="field" key={field.key}>
-              <span>{field.label}{field.required && !editingId ? ' *' : ''}</span>
+              <span>
+                {field.label}
+                {field.required && !editingId ? ' *' : ''}
+              </span>
               {field.source ? (
                 <select
                   disabled={path === 'users' && !!editingId}
@@ -548,7 +565,9 @@ export default function AdminMasterPage({ section }: { section?: string }) {
                 <select
                   value={form[field.key] ?? ''}
                   onChange={(event) => {
-                    const selected = departmentTypes.find((item) => item.type === event.target.value)
+                    const selected = departmentTypes.find(
+                      (item) => item.type === event.target.value,
+                    )
                     setForm({
                       ...form,
                       [field.key]: event.target.value,
@@ -558,7 +577,9 @@ export default function AdminMasterPage({ section }: { section?: string }) {
                 >
                   <option value="">-- Chọn loại phòng ban --</option>
                   {departmentTypes.map((option) => (
-                    <option key={option.type} value={option.type}>{option.name} ({option.codeSuffix})</option>
+                    <option key={option.type} value={option.type}>
+                      {option.name} ({option.codeSuffix})
+                    </option>
                   ))}
                 </select>
               ) : field.type && enumValues[field.type] ? (
@@ -567,7 +588,9 @@ export default function AdminMasterPage({ section }: { section?: string }) {
                   onChange={(event) => setForm({ ...form, [field.key]: event.target.value })}
                 >
                   <option value="">-- Chọn {field.label.toLowerCase()} --</option>
-                  {enumValues[field.type].map((value) => <option key={value}>{value}</option>)}
+                  {enumValues[field.type].map((value) => (
+                    <option key={value}>{value}</option>
+                  ))}
                 </select>
               ) : field.type === 'textarea' ? (
                 <textarea
@@ -583,8 +606,8 @@ export default function AdminMasterPage({ section }: { section?: string }) {
                 />
               )}
             </label>
-          )
-        ))}
+          ),
+        )}
       </div>
       {path === 'departments' && selectedDepartmentType && (
         <p className="hint">
@@ -593,7 +616,8 @@ export default function AdminMasterPage({ section }: { section?: string }) {
             {selectedFactory
               ? `${text(selectedFactory.code)}-${selectedDepartmentType.codeSuffix}`
               : `{MÃ_NHÀ_MÁY}-${selectedDepartmentType.codeSuffix}`}
-          </strong>. Bạn có thể chỉnh lại phần mô tả trước khi lưu.
+          </strong>
+          . Bạn có thể chỉnh lại phần mô tả trước khi lưu.
         </p>
       )}
     </>
@@ -612,15 +636,19 @@ export default function AdminMasterPage({ section }: { section?: string }) {
     },
   }))
 
-  const teamLeaderColumns: TableColumn<TableRow>[] = path === 'teams'
-    ? [{
-        key: 'leaderEmployeeName',
-        label: 'Tổ trưởng',
-        render: (row) => row.leaderEmployeeId
-          ? `${text(row.leaderEmployeeCode)} - ${text(row.leaderEmployeeName)}`
-          : 'Chưa gán',
-      }]
-    : []
+  const teamLeaderColumns: TableColumn<TableRow>[] =
+    path === 'teams'
+      ? [
+          {
+            key: 'leaderEmployeeName',
+            label: 'Tổ trưởng',
+            render: (row) =>
+              row.leaderEmployeeId
+                ? `${text(row.leaderEmployeeCode)} - ${text(row.leaderEmployeeName)}`
+                : 'Chưa gán',
+          },
+        ]
+      : []
 
   const userColumns: TableColumn<TableRow>[] = [
     { key: 'employeeCode', label: 'Mã nhân viên' },
@@ -638,38 +666,72 @@ export default function AdminMasterPage({ section }: { section?: string }) {
   const tableColumns: TableColumn<TableRow>[] = [
     { key: 'id', label: 'ID' },
     ...(path === 'users' ? userColumns : [...normalColumns, ...teamLeaderColumns]),
-    ...(path === 'users' ? [] : [{ key: 'active', label: 'Trạng thái', render: (row: TableRow) => <StatusBadge value={row.active} /> }]),
+    ...(path === 'users'
+      ? []
+      : [
+          {
+            key: 'active',
+            label: 'Trạng thái',
+            render: (row: TableRow) => <StatusBadge value={row.active} />,
+          },
+        ]),
     {
       key: 'action',
       label: 'Thao tác',
       render: (row) => (
         <div className="admin-actions">
-          <button disabled={busy} onClick={() => edit(row)}>{path === 'users' ? 'Phân quyền' : 'Sửa'}</button>
+          <button disabled={busy} onClick={() => edit(row)}>
+            {path === 'users' ? 'Phân quyền' : 'Sửa'}
+          </button>
           {path === 'teams' && (
             <button disabled={busy} onClick={() => void openLeaderModal(row)}>
               {row.leaderEmployeeId ? 'Đổi tổ trưởng' : 'Gán tổ trưởng'}
             </button>
           )}
           {path === 'users' && (
-            <button disabled={busy} onClick={() => { setMessage(null); setResetValue(''); setResetUser(row) }}>
+            <button
+              disabled={busy}
+              onClick={() => {
+                setMessage(null)
+                setResetValue('')
+                setResetUser(row)
+              }}
+            >
               Đặt lại mật khẩu
             </button>
           )}
           {path === 'users' && (
-            <button disabled={busy} onClick={() => void openScopeModal(row)}>Phạm vi dữ liệu</button>
+            <button disabled={busy} onClick={() => void openScopeModal(row)}>
+              Phạm vi dữ liệu
+            </button>
           )}
           {path !== 'users' && (
-            <button disabled={busy} className="danger-link" onClick={() => void remove(idOf(row))}>Xóa</button>
+            <button disabled={busy} className="danger-link" onClick={() => void remove(idOf(row))}>
+              Xóa
+            </button>
           )}
           {resetUser?.id === row.id && (
-            <div className="modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget && !busy) setResetUser(null) }}>
+            <div
+              className="modal-backdrop"
+              onMouseDown={(event) => {
+                if (event.target === event.currentTarget && !busy) setResetUser(null)
+              }}
+            >
               <div className="modal reset-password-modal">
                 <div className="admin-modal-header">
                   <div>
                     <h2>Đặt lại mật khẩu</h2>
-                    <p>{text(row.employeeName)} — {text(row.username)}</p>
+                    <p>
+                      {text(row.employeeName)} — {text(row.username)}
+                    </p>
                   </div>
-                  <button className="modal-close" disabled={busy} onClick={() => setResetUser(null)}>×</button>
+                  <button
+                    className="modal-close"
+                    disabled={busy}
+                    onClick={() => setResetUser(null)}
+                  >
+                    ×
+                  </button>
                 </div>
                 <div className="reset-password-body">
                   <label className="field">
@@ -682,10 +744,14 @@ export default function AdminMasterPage({ section }: { section?: string }) {
                       placeholder="Tối thiểu 8 ký tự"
                     />
                   </label>
-                  {message && <p className={`form-message${message.error ? ' error' : ''}`}>{message.text}</p>}
+                  {message && (
+                    <p className={`form-message${message.error ? ' error' : ''}`}>{message.text}</p>
+                  )}
                 </div>
                 <div className="form-actions">
-                  <button disabled={busy} onClick={() => setResetUser(null)}>Hủy</button>
+                  <button disabled={busy} onClick={() => setResetUser(null)}>
+                    Hủy
+                  </button>
                   <button className="primary" disabled={busy} onClick={() => void resetPassword()}>
                     {busy ? 'Đang xử lý...' : 'Xác nhận đặt lại'}
                   </button>
@@ -699,14 +765,28 @@ export default function AdminMasterPage({ section }: { section?: string }) {
   ]
 
   const leaderModal = leaderTeam && (
-    <div className="modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) closeLeaderModal() }}>
+    <div
+      className="modal-backdrop"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) closeLeaderModal()
+      }}
+    >
       <div className="modal admin-modal">
         <div className="admin-modal-header">
           <div>
             <h2>{leaderTeam.leaderEmployeeId ? 'Đổi tổ trưởng' : 'Gán tổ trưởng'}</h2>
-            <p>{text(leaderTeam.code)} — {text(leaderTeam.name)}</p>
+            <p>
+              {text(leaderTeam.code)} — {text(leaderTeam.name)}
+            </p>
           </div>
-          <button aria-label="Đóng" className="modal-close" disabled={leaderBusy} onClick={closeLeaderModal}>×</button>
+          <button
+            aria-label="Đóng"
+            className="modal-close"
+            disabled={leaderBusy}
+            onClick={closeLeaderModal}
+          >
+            ×
+          </button>
         </div>
         <div className="form-grid">
           <label className="field">
@@ -717,7 +797,9 @@ export default function AdminMasterPage({ section }: { section?: string }) {
               value={leaderEmployeeId}
               onChange={(event) => setLeaderEmployeeId(event.target.value)}
             >
-              <option value="">{leaderBusy ? 'Đang tải nhân viên...' : '-- Chọn nhân viên --'}</option>
+              <option value="">
+                {leaderBusy ? 'Đang tải nhân viên...' : '-- Chọn nhân viên --'}
+              </option>
               {leaderCandidates.map((employee) => (
                 <option key={String(employee.id)} value={String(employee.id ?? '')}>
                   {text(employee.code)} - {text(employee.fullName)}
@@ -728,14 +810,28 @@ export default function AdminMasterPage({ section }: { section?: string }) {
           </label>
         </div>
         {!leaderBusy && leaderCandidates.length === 0 && (
-          <p className="hint">Tổ này chưa có nhân viên hoạt động. Hãy phân nhân viên vào tổ trước khi gán tổ trưởng.</p>
+          <p className="hint">
+            Tổ này chưa có nhân viên hoạt động. Hãy phân nhân viên vào tổ trước khi gán tổ trưởng.
+          </p>
         )}
-        <p className="hint">Danh sách chỉ hiển thị nhân viên đang hoạt động và thuộc đúng tổ này.</p>
+        <p className="hint">
+          Danh sách chỉ hiển thị nhân viên đang hoạt động và thuộc đúng tổ này.
+        </p>
         {leaderError && <p className="form-message error">{leaderError}</p>}
         <div className="form-actions">
-          {Boolean(leaderTeam.leaderEmployeeId) && <button className="danger" disabled={leaderBusy} onClick={() => void removeLeader()}>Gỡ tổ trưởng</button>}
-          <button disabled={leaderBusy} onClick={closeLeaderModal}>Hủy</button>
-          <button className="primary" disabled={leaderBusy || !leaderEmployeeId} onClick={() => void assignLeader()}>
+          {Boolean(leaderTeam.leaderEmployeeId) && (
+            <button className="danger" disabled={leaderBusy} onClick={() => void removeLeader()}>
+              Gỡ tổ trưởng
+            </button>
+          )}
+          <button disabled={leaderBusy} onClick={closeLeaderModal}>
+            Hủy
+          </button>
+          <button
+            className="primary"
+            disabled={leaderBusy || !leaderEmployeeId}
+            onClick={() => void assignLeader()}
+          >
             {leaderBusy ? 'Đang xử lý...' : 'Xác nhận gán'}
           </button>
         </div>
@@ -744,17 +840,33 @@ export default function AdminMasterPage({ section }: { section?: string }) {
   )
 
   const scopeModal = scopeUser && (
-    <div className="modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) closeScopeModal() }}>
+    <div
+      className="modal-backdrop"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) closeScopeModal()
+      }}
+    >
       <div className="modal admin-modal">
         <div className="admin-modal-header">
           <div>
             <h2>Phạm vi dữ liệu</h2>
-            <p>{text(scopeUser.employeeName)} — {text(scopeUser.username)}</p>
+            <p>
+              {text(scopeUser.employeeName)} — {text(scopeUser.username)}
+            </p>
           </div>
-          <button aria-label="Đóng" className="modal-close" disabled={scopeBusy} onClick={closeScopeModal}>×</button>
+          <button
+            aria-label="Đóng"
+            className="modal-close"
+            disabled={scopeBusy}
+            onClick={closeScopeModal}
+          >
+            ×
+          </button>
         </div>
         {rolesOf(scopeUser).some((role) => role === 'ADMIN' || role === 'DIRECTOR') && (
-          <p className="hint">ADMIN và DIRECTOR được xem toàn hệ thống nên không bắt buộc cấp phạm vi.</p>
+          <p className="hint">
+            ADMIN và DIRECTOR được xem toàn hệ thống nên không bắt buộc cấp phạm vi.
+          </p>
         )}
         <div className="form-grid">
           <label className="field">
@@ -765,7 +877,9 @@ export default function AdminMasterPage({ section }: { section?: string }) {
               onChange={(event) => void changeScopeType(event.target.value as DataScopeType)}
             >
               {(Object.keys(scopeDefinitions) as DataScopeType[]).map((type) => (
-                <option key={type} value={type}>{scopeDefinitions[type].label}</option>
+                <option key={type} value={type}>
+                  {scopeDefinitions[type].label}
+                </option>
               ))}
             </select>
           </label>
@@ -776,7 +890,11 @@ export default function AdminMasterPage({ section }: { section?: string }) {
               value={scopeTargetId}
               onChange={(event) => setScopeTargetId(event.target.value)}
             >
-              <option value="">{scopeBusy ? 'Đang tải dữ liệu...' : `-- Chọn ${scopeDefinitions[scopeType].label.toLowerCase()} --`}</option>
+              <option value="">
+                {scopeBusy
+                  ? 'Đang tải dữ liệu...'
+                  : `-- Chọn ${scopeDefinitions[scopeType].label.toLowerCase()} --`}
+              </option>
               {scopeTargets.map((target) => (
                 <option key={String(target.id)} value={String(target.id ?? '')}>
                   {target.code ? `${text(target.code)} - ` : ''}
@@ -787,22 +905,36 @@ export default function AdminMasterPage({ section }: { section?: string }) {
           </label>
         </div>
         <div className="form-actions">
-          <button className="primary" disabled={scopeBusy || !scopeTargetId} onClick={() => void addScope()}>
+          <button
+            className="primary"
+            disabled={scopeBusy || !scopeTargetId}
+            onClick={() => void addScope()}
+          >
             {scopeBusy ? 'Đang xử lý...' : 'Thêm phạm vi'}
           </button>
         </div>
-        <p className="hint"><strong>Phạm vi đã cấp</strong> — một tài khoản có thể được cấp nhiều khu vực.</p>
+        <p className="hint">
+          <strong>Phạm vi đã cấp</strong> — một tài khoản có thể được cấp nhiều khu vực.
+        </p>
         <DataTable
           rows={userScopes}
           columns={[
-            { key: 'scopeType', label: 'Cấp', render: (scope) => scopeDefinitions[scope.scopeType].label },
+            {
+              key: 'scopeType',
+              label: 'Cấp',
+              render: (scope) => scopeDefinitions[scope.scopeType].label,
+            },
             { key: 'scopeCode', label: 'Mã' },
             { key: 'scopeName', label: 'Tên phạm vi' },
             {
               key: 'action',
               label: 'Thao tác',
               render: (scope) => (
-                <button className="danger-link" disabled={scopeBusy} onClick={() => void removeScope(scope.id)}>
+                <button
+                  className="danger-link"
+                  disabled={scopeBusy}
+                  onClick={() => void removeScope(scope.id)}
+                >
                   Thu hồi
                 </button>
               ),
@@ -811,7 +943,9 @@ export default function AdminMasterPage({ section }: { section?: string }) {
         />
         {scopeError && <p className="form-message error">{scopeError}</p>}
         <div className="form-actions">
-          <button disabled={scopeBusy} onClick={closeScopeModal}>Đóng</button>
+          <button disabled={scopeBusy} onClick={closeScopeModal}>
+            Đóng
+          </button>
         </div>
       </div>
     </div>
@@ -824,7 +958,9 @@ export default function AdminMasterPage({ section }: { section?: string }) {
           <h2>Quản trị dữ liệu nhà máy</h2>
           <p>Quản lý đầy đủ danh mục tổ chức, nhân sự, ca làm, máy móc, chất lượng và vật tư</p>
         </div>
-        <button className="admin-add-button" onClick={openCreate}>+ Thêm {config.label}</button>
+        <button className="admin-add-button" onClick={openCreate}>
+          + Thêm {config.label}
+        </button>
       </div>
       <div className="step-tabs">
         {Object.entries(configs).map(([key, value]) => (
@@ -833,24 +969,43 @@ export default function AdminMasterPage({ section }: { section?: string }) {
           </button>
         ))}
       </div>
-      {message && !modalOpen && <p className={`form-message${message.error ? ' error' : ''}`}>{message.text}</p>}
+      {message && !modalOpen && (
+        <p className={`form-message${message.error ? ' error' : ''}`}>{message.text}</p>
+      )}
       <Panel title={`Danh sách ${config.label}`}>
         <DataTable rows={rows} columns={tableColumns} />
       </Panel>
       {modalOpen && (
-        <div className="modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) closeModal() }}>
+        <div
+          className="modal-backdrop"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) closeModal()
+          }}
+        >
           <div className="modal admin-modal">
             <div className="admin-modal-header">
               <div>
-                <h2>{editingId ? 'Sửa' : 'Thêm'} {config.label}</h2>
-                <p>{editingId ? `Cập nhật bản ghi #${editingId}` : 'Nhập đầy đủ thông tin bản ghi mới'}</p>
+                <h2>
+                  {editingId ? 'Sửa' : 'Thêm'} {config.label}
+                </h2>
+                <p>
+                  {editingId
+                    ? `Cập nhật bản ghi #${editingId}`
+                    : 'Nhập đầy đủ thông tin bản ghi mới'}
+                </p>
               </div>
-              <button aria-label="Đóng" className="modal-close" onClick={closeModal}>×</button>
+              <button aria-label="Đóng" className="modal-close" onClick={closeModal}>
+                ×
+              </button>
             </div>
             {fields}
-            {message && <p className={`form-message${message.error ? ' error' : ''}`}>{message.text}</p>}
+            {message && (
+              <p className={`form-message${message.error ? ' error' : ''}`}>{message.text}</p>
+            )}
             <div className="form-actions">
-              <button disabled={busy} onClick={closeModal}>Hủy</button>
+              <button disabled={busy} onClick={closeModal}>
+                Hủy
+              </button>
               <button className="primary" disabled={busy} onClick={() => void save()}>
                 {busy ? 'Đang xử lý...' : editingId ? 'Lưu thay đổi' : 'Thêm mới'}
               </button>

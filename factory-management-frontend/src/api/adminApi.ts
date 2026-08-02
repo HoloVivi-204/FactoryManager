@@ -26,8 +26,10 @@ export const adminApi = {
   create: (path: string, data: unknown) => send(`/${path}`, 'POST', data),
   update: (path: string, id: number, data: unknown) => send(`/${path}/${id}`, 'PUT', data),
   updateRoles: (id: number, roles: string[]) => send(`/users/${id}/roles`, 'PUT', { roles }),
-  register: (data: { employeeId: number; username: string; password: string }) => send<{ userId: number }>(`/auth/register`, 'POST', data),
-  resetPassword: (id: number, newPassword: string) => send(`/users/${id}/reset-password`, 'PUT', { newPassword }),
+  register: (data: { employeeId: number; username: string; password: string }) =>
+    send<{ userId: number }>(`/auth/register`, 'POST', data),
+  resetPassword: (id: number, newPassword: string) =>
+    send(`/users/${id}/reset-password`, 'PUT', { newPassword }),
   dataScopes: (userId: number) => get<UserDataScope[]>(`/users/${userId}/data-scopes`),
   addDataScope: (userId: number, scopeType: DataScopeType, scopeId: number) =>
     send<UserDataScope>(`/users/${userId}/data-scopes`, 'POST', { scopeType, scopeId }),

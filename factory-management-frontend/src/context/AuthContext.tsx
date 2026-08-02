@@ -13,7 +13,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     window.addEventListener('factory:unauthorized', unauthorized)
 
     if (TokenManager.token()) {
-      authApi.me()
+      authApi
+        .me()
         .then((me) => {
           const current = { ...me, token: TokenManager.token()! }
           TokenManager.save(current)

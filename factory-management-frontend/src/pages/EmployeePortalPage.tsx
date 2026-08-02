@@ -6,16 +6,23 @@ import { useApi } from '../utils/useApi'
 import type { HrSchedule, PageKey } from '../types'
 
 const formatHours = (minutes?: number | null) =>
-  typeof minutes === 'number' && Number.isFinite(minutes)
-    ? (minutes / 60).toFixed(1)
-    : '—'
+  typeof minutes === 'number' && Number.isFinite(minutes) ? (minutes / 60).toFixed(1) : '—'
 
 export default function EmployeePortalPage({ view }: { view: PageKey }) {
   const portal = useApi(employeeApi.dashboard)
   const overtime = useApi(employeeApi.overtime)
   const data = portal.data
-  const [leaveForm, setLeaveForm] = useState({ fromDate: '', toDate: '', leaveType: 'ANNUAL', reason: '' })
-  const [overtimeForm, setOvertimeForm] = useState({ workDate: '', requestedMinutes: '60', reason: '' })
+  const [leaveForm, setLeaveForm] = useState({
+    fromDate: '',
+    toDate: '',
+    leaveType: 'ANNUAL',
+    reason: '',
+  })
+  const [overtimeForm, setOvertimeForm] = useState({
+    workDate: '',
+    requestedMinutes: '60',
+    reason: '',
+  })
   const [message, setMessage] = useState('')
   const [busy, setBusy] = useState(false)
   const [notificationFilters, setNotificationFilters] = useState({
@@ -34,8 +41,11 @@ export default function EmployeePortalPage({ view }: { view: PageKey }) {
       if (notificationFilters.readStatus === 'UNREAD' && notification.read) return false
       if (notificationFilters.readStatus === 'READ' && !notification.read) return false
       if (!term) return true
-      return [notification.title, notification.message, notification.severity]
-        .some((value) => String(value ?? '').toLocaleLowerCase('vi').includes(term))
+      return [notification.title, notification.message, notification.severity].some((value) =>
+        String(value ?? '')
+          .toLocaleLowerCase('vi')
+          .includes(term),
+      )
     })
   }, [data?.notifications, notificationFilters])
 
@@ -55,7 +65,11 @@ export default function EmployeePortalPage({ view }: { view: PageKey }) {
   }
 
   async function submitOvertime() {
-    if (!overtimeForm.workDate || !overtimeForm.reason.trim() || Number(overtimeForm.requestedMinutes) <= 0) {
+    if (
+      !overtimeForm.workDate ||
+      !overtimeForm.reason.trim() ||
+      Number(overtimeForm.requestedMinutes) <= 0
+    ) {
       setMessage('Vui lòng nhập ngày, số phút và lý do tăng ca hợp lệ.')
       return
     }
@@ -96,7 +110,9 @@ export default function EmployeePortalPage({ view }: { view: PageKey }) {
       <div className="page-title">
         <div>
           <h2>{titles[view] ?? 'Trang cá nhân'}</h2>
-          <p>{data?.employeeName} · {data?.employeeCode} · {data?.teamName}</p>
+          <p>
+            {data?.employeeName} · {data?.employeeCode} · {data?.teamName}
+          </p>
         </div>
       </div>
 
@@ -124,36 +140,52 @@ export default function EmployeePortalPage({ view }: { view: PageKey }) {
               <small>chưa đọc</small>
             </article>
           </div>
-          <Panel title="Lịch sắp tới"><Schedule rows={data?.schedules ?? []} /></Panel>
+          <Panel title="Lịch sắp tới">
+            <Schedule rows={data?.schedules ?? []} />
+          </Panel>
         </>
       )}
 
-      {view === 'schedule' && <Panel title="Lịch làm việc"><Schedule rows={data?.schedules ?? []} /></Panel>}
+      {view === 'schedule' && (
+        <Panel title="Lịch làm việc">
+          <Schedule rows={data?.schedules ?? []} />
+        </Panel>
+      )}
 
       {view === 'attendance' && (
         <Panel title="Chấm công">
-          <DataTable rows={data?.attendance ?? []} columns={[
-            { key: 'workDate', label: 'Ngày' },
-            { key: 'checkIn', label: 'Vào ca' },
-            { key: 'checkOut', label: 'Ra ca' },
-            { key: 'workingMinutes', label: 'Phút làm' },
-            { key: 'overtimeMinutes', label: 'Tăng ca' },
-            { key: 'attendanceStatus', label: 'Trạng thái', render: (row) => <StatusBadge value={row.attendanceStatus} /> },
-          ]} />
+          <DataTable
+            rows={data?.attendance ?? []}
+            columns={[
+              { key: 'workDate', label: 'Ngày' },
+              { key: 'checkIn', label: 'Vào ca' },
+              { key: 'checkOut', label: 'Ra ca' },
+              { key: 'workingMinutes', label: 'Phút làm' },
+              { key: 'overtimeMinutes', label: 'Tăng ca' },
+              {
+                key: 'attendanceStatus',
+                label: 'Trạng thái',
+                render: (row) => <StatusBadge value={row.attendanceStatus} />,
+              },
+            ]}
+          />
         </Panel>
       )}
 
       {view === 'kpi' && (
         <Panel title="KPI cá nhân">
-          <DataTable rows={data?.kpis ?? []} columns={[
-            { key: 'periodStart', label: 'Từ ngày' },
-            { key: 'periodEnd', label: 'Đến ngày' },
-            { key: 'productivityScore', label: 'Năng suất' },
-            { key: 'qualityScore', label: 'Chất lượng' },
-            { key: 'attendanceScore', label: 'Chấm công' },
-            { key: 'score', label: 'Tổng điểm' },
-            { key: 'note', label: 'Nhận xét' },
-          ]} />
+          <DataTable
+            rows={data?.kpis ?? []}
+            columns={[
+              { key: 'periodStart', label: 'Từ ngày' },
+              { key: 'periodEnd', label: 'Đến ngày' },
+              { key: 'productivityScore', label: 'Năng suất' },
+              { key: 'qualityScore', label: 'Chất lượng' },
+              { key: 'attendanceScore', label: 'Chấm công' },
+              { key: 'score', label: 'Tổng điểm' },
+              { key: 'note', label: 'Nhận xét' },
+            ]}
+          />
         </Panel>
       )}
 
@@ -181,7 +213,9 @@ export default function EmployeePortalPage({ view }: { view: PageKey }) {
                 <span>Loại nghỉ</span>
                 <select
                   value={leaveForm.leaveType}
-                  onChange={(event) => setLeaveForm({ ...leaveForm, leaveType: event.target.value })}
+                  onChange={(event) =>
+                    setLeaveForm({ ...leaveForm, leaveType: event.target.value })
+                  }
                 >
                   <option value="ANNUAL">Nghỉ phép năm</option>
                   <option value="SICK">Nghỉ bệnh</option>
@@ -197,17 +231,28 @@ export default function EmployeePortalPage({ view }: { view: PageKey }) {
                 />
               </label>
             </div>
-            <div className="form-actions"><button className="primary" disabled={busy} onClick={() => void submitLeave()}>Gửi đơn</button></div>
+            <div className="form-actions">
+              <button className="primary" disabled={busy} onClick={() => void submitLeave()}>
+                Gửi đơn
+              </button>
+            </div>
           </Panel>
           <Panel title="Lịch sử đơn">
-            <DataTable rows={data?.leaves ?? []} columns={[
-              { key: 'fromDate', label: 'Từ ngày' },
-              { key: 'toDate', label: 'Đến ngày' },
-              { key: 'leaveType', label: 'Loại nghỉ' },
-              { key: 'reason', label: 'Lý do' },
-              { key: 'status', label: 'Trạng thái', render: (row) => <StatusBadge value={row.status} /> },
-              { key: 'reviewComment', label: 'Phản hồi' },
-            ]} />
+            <DataTable
+              rows={data?.leaves ?? []}
+              columns={[
+                { key: 'fromDate', label: 'Từ ngày' },
+                { key: 'toDate', label: 'Đến ngày' },
+                { key: 'leaveType', label: 'Loại nghỉ' },
+                { key: 'reason', label: 'Lý do' },
+                {
+                  key: 'status',
+                  label: 'Trạng thái',
+                  render: (row) => <StatusBadge value={row.status} />,
+                },
+                { key: 'reviewComment', label: 'Phản hồi' },
+              ]}
+            />
           </Panel>
         </>
       )}
@@ -221,7 +266,9 @@ export default function EmployeePortalPage({ view }: { view: PageKey }) {
                 <input
                   type="date"
                   value={overtimeForm.workDate}
-                  onChange={(event) => setOvertimeForm({ ...overtimeForm, workDate: event.target.value })}
+                  onChange={(event) =>
+                    setOvertimeForm({ ...overtimeForm, workDate: event.target.value })
+                  }
                 />
               </label>
               <label className="field">
@@ -231,29 +278,44 @@ export default function EmployeePortalPage({ view }: { view: PageKey }) {
                   min="1"
                   max="720"
                   value={overtimeForm.requestedMinutes}
-                  onChange={(event) => setOvertimeForm({ ...overtimeForm, requestedMinutes: event.target.value })}
+                  onChange={(event) =>
+                    setOvertimeForm({ ...overtimeForm, requestedMinutes: event.target.value })
+                  }
                 />
               </label>
               <label className="field">
                 <span>Lý do</span>
                 <textarea
                   value={overtimeForm.reason}
-                  onChange={(event) => setOvertimeForm({ ...overtimeForm, reason: event.target.value })}
+                  onChange={(event) =>
+                    setOvertimeForm({ ...overtimeForm, reason: event.target.value })
+                  }
                 />
               </label>
             </div>
-            <div className="form-actions"><button className="primary" disabled={busy} onClick={() => void submitOvertime()}>Gửi đăng ký</button></div>
+            <div className="form-actions">
+              <button className="primary" disabled={busy} onClick={() => void submitOvertime()}>
+                Gửi đăng ký
+              </button>
+            </div>
           </Panel>
           <Panel title="Lịch sử đăng ký tăng ca">
             <LoadingState loading={overtime.loading} error={overtime.error} />
-            <DataTable rows={overtime.data ?? data?.overtimeRequests ?? []} columns={[
-              { key: 'workDate', label: 'Ngày' },
-              { key: 'requestedMinutes', label: 'Số phút' },
-              { key: 'reason', label: 'Lý do' },
-              { key: 'status', label: 'Trạng thái', render: (row) => <StatusBadge value={row.status} /> },
-              { key: 'reviewComment', label: 'Phản hồi' },
-              { key: 'createdAt', label: 'Ngày gửi' },
-            ]} />
+            <DataTable
+              rows={overtime.data ?? data?.overtimeRequests ?? []}
+              columns={[
+                { key: 'workDate', label: 'Ngày' },
+                { key: 'requestedMinutes', label: 'Số phút' },
+                { key: 'reason', label: 'Lý do' },
+                {
+                  key: 'status',
+                  label: 'Trạng thái',
+                  render: (row) => <StatusBadge value={row.status} />,
+                },
+                { key: 'reviewComment', label: 'Phản hồi' },
+                { key: 'createdAt', label: 'Ngày gửi' },
+              ]}
+            />
           </Panel>
         </>
       )}
@@ -267,10 +329,12 @@ export default function EmployeePortalPage({ view }: { view: PageKey }) {
                 <input
                   type="date"
                   value={notificationFilters.fromDate}
-                  onChange={(event) => setNotificationFilters({
-                    ...notificationFilters,
-                    fromDate: event.target.value,
-                  })}
+                  onChange={(event) =>
+                    setNotificationFilters({
+                      ...notificationFilters,
+                      fromDate: event.target.value,
+                    })
+                  }
                 />
               </label>
               <label>
@@ -278,20 +342,24 @@ export default function EmployeePortalPage({ view }: { view: PageKey }) {
                 <input
                   type="date"
                   value={notificationFilters.toDate}
-                  onChange={(event) => setNotificationFilters({
-                    ...notificationFilters,
-                    toDate: event.target.value,
-                  })}
+                  onChange={(event) =>
+                    setNotificationFilters({
+                      ...notificationFilters,
+                      toDate: event.target.value,
+                    })
+                  }
                 />
               </label>
               <label>
                 Trạng thái
                 <select
                   value={notificationFilters.readStatus}
-                  onChange={(event) => setNotificationFilters({
-                    ...notificationFilters,
-                    readStatus: event.target.value,
-                  })}
+                  onChange={(event) =>
+                    setNotificationFilters({
+                      ...notificationFilters,
+                      readStatus: event.target.value,
+                    })
+                  }
                 >
                   <option value="">Tất cả</option>
                   <option value="UNREAD">Chưa đọc</option>
@@ -304,26 +372,32 @@ export default function EmployeePortalPage({ view }: { view: PageKey }) {
                   type="search"
                   placeholder="Tiêu đề hoặc nội dung…"
                   value={notificationFilters.keyword}
-                  onChange={(event) => setNotificationFilters({
-                    ...notificationFilters,
-                    keyword: event.target.value,
-                  })}
+                  onChange={(event) =>
+                    setNotificationFilters({
+                      ...notificationFilters,
+                      keyword: event.target.value,
+                    })
+                  }
                 />
               </label>
               <button
                 type="button"
-                onClick={() => setNotificationFilters({
-                  fromDate: '',
-                  toDate: '',
-                  readStatus: '',
-                  keyword: '',
-                })}
+                onClick={() =>
+                  setNotificationFilters({
+                    fromDate: '',
+                    toDate: '',
+                    readStatus: '',
+                    keyword: '',
+                  })
+                }
               >
                 Xóa bộ lọc
               </button>
             </div>
           </Panel>
-          <Panel title={`Thông báo (${filteredNotifications.length}/${number(data?.notifications?.length)})`}>
+          <Panel
+            title={`Thông báo (${filteredNotifications.length}/${number(data?.notifications?.length)})`}
+          >
             <div className="notice-list">
               {filteredNotifications.map((notification) => (
                 <button

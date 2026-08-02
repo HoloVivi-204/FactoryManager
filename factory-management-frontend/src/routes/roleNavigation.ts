@@ -47,9 +47,7 @@ export const navigation: Record<Role, NavItem[]> = {
     { key: 'maintenance-work-orders', label: 'Phiếu bảo trì', icon: '⚒' },
     { key: 'maintenance-history', label: 'Lịch sử trạng thái máy', icon: '↺' },
   ],
-  DIRECTOR: [
-    { key: 'overview', label: 'Báo cáo điều hành', icon: '◈' },
-  ],
+  DIRECTOR: [{ key: 'overview', label: 'Báo cáo điều hành', icon: '◈' }],
   FACTORY_MANAGER: [
     { key: 'overview', label: 'Tổng quan nhà máy', icon: '◈' },
     { key: 'approval', label: 'Phê duyệt báo cáo', icon: '✓' },

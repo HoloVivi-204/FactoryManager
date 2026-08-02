@@ -52,18 +52,15 @@ export const hrApi = {
 
   overtime: (filters?: HrFilters) =>
     get<PageResponse<HrOvertime>>(`/hr/overtime-requests${query(filters)}`),
-  createOvertime: (data: unknown) =>
-    send<HrOvertime>('/hr/overtime-requests', 'POST', data),
+  createOvertime: (data: unknown) => send<HrOvertime>('/hr/overtime-requests', 'POST', data),
   decideOvertime: (id: number, decision: 'APPROVED' | 'REJECTED', comment: string) =>
     send<HrOvertime>(`/hr/overtime-requests/${id}/decision`, 'PUT', { decision, comment }),
 
   assignments: (filters?: HrFilters) =>
     get<PageResponse<HrAssignment>>(`/hr/assignments${query(filters)}`),
-  createAssignment: (data: unknown) =>
-    send<HrAssignment>('/hr/assignments', 'POST', data),
+  createAssignment: (data: unknown) => send<HrAssignment>('/hr/assignments', 'POST', data),
   endAssignment: (id: number, endDate: string) =>
     send<void>(`/hr/assignments/${id}/end?endDate=${encodeURIComponent(endDate)}`, 'PUT'),
 
-  createNotification: (data: unknown) =>
-    send<HrNotification>('/hr/notifications', 'POST', data),
+  createNotification: (data: unknown) => send<HrNotification>('/hr/notifications', 'POST', data),
 }

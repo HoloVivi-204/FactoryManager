@@ -174,7 +174,9 @@ export default function StagingDetailEditor({
                     label: 'Thao tác',
                     render: (row: TableRow) => (
                       <div className="admin-actions">
-                        <button disabled={busy} onClick={() => edit(row)}>Sửa</button>
+                        <button disabled={busy} onClick={() => edit(row)}>
+                          Sửa
+                        </button>
                         <button
                           className="danger-link"
                           disabled={busy}

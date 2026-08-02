@@ -13,14 +13,14 @@ export default function ToastViewport() {
     const timer = timers.current.get(id)
     if (timer !== undefined) window.clearTimeout(timer)
     timers.current.delete(id)
-    setItems(current => current.filter(item => item.id !== id))
+    setItems((current) => current.filter((item) => item.id !== id))
   }, [])
 
   useEffect(() => {
     const receive = (event: Event) => {
       const detail = (event as CustomEvent<ToastDetail>).detail
       const id = ++nextId.current
-      setItems(current => [...current, { ...detail, id }].slice(-5))
+      setItems((current) => [...current, { ...detail, id }].slice(-5))
       const timer = window.setTimeout(() => remove(id), detail.duration ?? 4200)
       timers.current.set(id, timer)
     }
@@ -29,14 +29,14 @@ export default function ToastViewport() {
     const activeTimers = timers.current
     return () => {
       window.removeEventListener(TOAST_EVENT, receive)
-      activeTimers.forEach(timer => window.clearTimeout(timer))
+      activeTimers.forEach((timer) => window.clearTimeout(timer))
       activeTimers.clear()
     }
   }, [remove])
 
   return (
     <div className="toast-viewport" aria-live="polite" aria-atomic="false">
-      {items.map(item => {
+      {items.map((item) => {
         const Icon = item.type === 'success' ? CheckCircle2 : CircleX
         return (
           <article
