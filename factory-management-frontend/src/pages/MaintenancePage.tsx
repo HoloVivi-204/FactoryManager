@@ -1,4 +1,4 @@
-import { type FormEvent, type ReactNode, useEffect, useState } from 'react'
+import { type FormEvent, type ReactNode, useCallback, useEffect, useState } from 'react'
 import {
   maintenanceApi,
   type MaintenanceDashboardFilters,
@@ -128,11 +128,7 @@ function MaintenanceDashboardView() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  useEffect(() => {
-    void load()
-  }, [applied, page])
-
-  async function load() {
+  const load = useCallback(async () => {
     setLoading(true)
     setError('')
     try {
@@ -160,7 +156,11 @@ function MaintenanceDashboardView() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [applied, page])
+
+  useEffect(() => {
+    void load()
+  }, [load])
 
   const columns = [
     { key: 'workOrderNo', label: 'Mã phiếu' },
@@ -227,9 +227,32 @@ function MaintenanceRequestsView({ canManage, canCreate }: { canManage: boolean;
   const [downtimeOptionsLoading, setDowntimeOptionsLoading] = useState(false)
   const [downtimeOptionsError, setDowntimeOptionsError] = useState('')
 
+  const load = useCallback(async () => {
+    setLoading(true)
+    setError('')
+    try {
+      const request: MaintenanceRequestFilters = {
+        machineId: applied.machineId,
+        teamId: applied.teamId,
+        status: applied.status as MaintenanceRequestStatus | '',
+        priority: applied.priority as MaintenancePriority | '',
+        keyword: applied.keyword,
+        fromDate: applied.fromDate,
+        toDate: applied.toDate,
+        page,
+        size: 25,
+      }
+      setResult(await maintenanceApi.requests(request))
+    } catch (loadError) {
+      setError((loadError as Error).message)
+    } finally {
+      setLoading(false)
+    }
+  }, [applied, page])
+
   useEffect(() => {
     void load()
-  }, [applied, page, reloadKey])
+  }, [load, reloadKey])
 
   useEffect(() => {
     if (!canCreate) return
@@ -272,29 +295,6 @@ function MaintenanceRequestsView({ canManage, canCreate }: { canManage: boolean;
       })
     return () => { cancelled = true }
   }, [createOpen, createForm.machineId])
-
-  async function load() {
-    setLoading(true)
-    setError('')
-    try {
-      const request: MaintenanceRequestFilters = {
-        machineId: applied.machineId,
-        teamId: applied.teamId,
-        status: applied.status as MaintenanceRequestStatus | '',
-        priority: applied.priority as MaintenancePriority | '',
-        keyword: applied.keyword,
-        fromDate: applied.fromDate,
-        toDate: applied.toDate,
-        page,
-        size: 25,
-      }
-      setResult(await maintenanceApi.requests(request))
-    } catch (loadError) {
-      setError((loadError as Error).message)
-    } finally {
-      setLoading(false)
-    }
-  }
 
   function openCreate() {
     setCreateForm({
@@ -507,11 +507,7 @@ function MaintenanceSchedulesView({ canManage }: { canManage: boolean }) {
   const [busy, setBusy] = useState(false)
   const [modalError, setModalError] = useState('')
 
-  useEffect(() => {
-    void load()
-  }, [applied, page, reloadKey])
-
-  async function load() {
+  const load = useCallback(async () => {
     setLoading(true)
     setError('')
     try {
@@ -529,7 +525,11 @@ function MaintenanceSchedulesView({ canManage }: { canManage: boolean }) {
     } finally {
       setLoading(false)
     }
-  }
+  }, [applied, page])
+
+  useEffect(() => {
+    void load()
+  }, [load, reloadKey])
 
   function openCreate() {
     setEditing(null)
@@ -668,11 +668,7 @@ function MaintenanceWorkOrdersView({ canManage }: { canManage: boolean }) {
   const [busy, setBusy] = useState(false)
   const [modalError, setModalError] = useState('')
 
-  useEffect(() => {
-    void load()
-  }, [applied, page, reloadKey])
-
-  async function load() {
+  const load = useCallback(async () => {
     setLoading(true)
     setError('')
     try {
@@ -692,7 +688,11 @@ function MaintenanceWorkOrdersView({ canManage }: { canManage: boolean }) {
     } finally {
       setLoading(false)
     }
-  }
+  }, [applied, page])
+
+  useEffect(() => {
+    void load()
+  }, [load, reloadKey])
 
   function openCreate() {
     const now = new Date()
@@ -950,11 +950,7 @@ function MaintenanceHistoryView() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  useEffect(() => {
-    if (appliedMachineId) void load()
-  }, [appliedMachineId, page])
-
-  async function load() {
+  const load = useCallback(async () => {
     if (!appliedMachineId) return
     setLoading(true)
     setError('')
@@ -965,7 +961,11 @@ function MaintenanceHistoryView() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [appliedMachineId, page])
+
+  useEffect(() => {
+    if (appliedMachineId) void load()
+  }, [appliedMachineId, load])
 
   const columns = [
     { key: 'changedAt', label: 'Thời điểm', render: (row: MaintenanceStatusHistoryItem) => dateTime(row.changedAt) },

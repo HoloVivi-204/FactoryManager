@@ -21,7 +21,7 @@ export default function RoleOverviewPage({ role }: { role: Role }) {
 }
 
 function TeamLeaderOverview() {
-  const reports = useApi(dashboardApi.stagingMyScope, [])
+  const reports = useApi(dashboardApi.stagingMyScope)
   if (reports.loading) return <LoadingState loading error={reports.error} />
   return (
     <>
@@ -33,7 +33,7 @@ function TeamLeaderOverview() {
 }
 
 function StandardRoleOverview({ role }: { role: Role }) {
-  const summary = useApi(dashboardApi.summary, [role])
+  const summary = useApi(dashboardApi.summary, role)
   const data = summary.data
   if (summary.loading) return <LoadingState loading error={summary.error} />
 

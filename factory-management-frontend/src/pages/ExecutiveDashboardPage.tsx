@@ -66,7 +66,7 @@ export default function ExecutiveDashboardPage() {
   const [factoryOptions, setFactoryOptions] = useState<ExecutiveFactoryPerformance[]>([])
   const api = useApi(
     () => executiveDashboardApi.get(applied),
-    [applied.fromDate, applied.toDate, applied.factoryId],
+    `${applied.fromDate}|${applied.toDate}|${applied.factoryId ?? ''}`,
   )
   const data = api.data
 

@@ -228,28 +228,31 @@ export default function HrManagementPage({ view }: { view: HrView }) {
 
   useEffect(() => {
     if (view === 'notifications') return
-    void load()
-  }, [view, page, applied, reloadKey])
-
-  async function load() {
+    let cancelled = false
     setLoading(true)
     setError('')
     const request: HrFilters = { ...applied, page, size: 25 }
-    try {
-      const data =
-        view === 'schedule' ? await hrApi.schedules(request) :
-        view === 'attendance' ? await hrApi.attendance(request) :
-        view === 'kpi' ? await hrApi.kpis(request) :
-        view === 'leave' ? await hrApi.leaveRequests(request) :
-        view === 'overtime' ? await hrApi.overtime(request) :
-        view === 'assignments' ? await hrApi.assignments(request) : undefined
-      setResult(data)
-    } catch (loadError) {
-      setError((loadError as Error).message)
-    } finally {
-      setLoading(false)
+
+    async function load() {
+      try {
+        const data =
+          view === 'schedule' ? await hrApi.schedules(request) :
+          view === 'attendance' ? await hrApi.attendance(request) :
+          view === 'kpi' ? await hrApi.kpis(request) :
+          view === 'leave' ? await hrApi.leaveRequests(request) :
+          view === 'overtime' ? await hrApi.overtime(request) :
+          view === 'assignments' ? await hrApi.assignments(request) : undefined
+        if (!cancelled) setResult(data)
+      } catch (loadError) {
+        if (!cancelled) setError((loadError as Error).message)
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
     }
-  }
+
+    void load()
+    return () => { cancelled = true }
+  }, [view, page, applied, reloadKey])
 
   function openCreate() {
     const defaults: Record<string, string> = {}

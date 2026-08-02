@@ -17,7 +17,7 @@ export default function ReportsPage() {
   const params = new URLSearchParams()
   if (from) params.set('fromDate', from)
   if (to) params.set('toDate', to)
-  const api = useApi(() => dashboardApi.reports(params.toString()), [from, to])
+  const api = useApi(() => dashboardApi.reports(params.toString()), `${from}|${to}`)
 
   const rows = (api.data ?? []).filter(
     (item) =>

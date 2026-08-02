@@ -5,8 +5,8 @@ import { useApi } from '../utils/useApi'
 import type { HrSchedule, PageKey } from '../types'
 
 export default function EmployeePortalPage({ view }: { view: PageKey }) {
-  const portal = useApi(employeeApi.dashboard, [])
-  const overtime = useApi(employeeApi.overtime, [])
+  const portal = useApi(employeeApi.dashboard)
+  const overtime = useApi(employeeApi.overtime)
   const data = portal.data
   const [leaveForm, setLeaveForm] = useState({ fromDate: '', toDate: '', leaveType: 'ANNUAL', reason: '' })
   const [overtimeForm, setOvertimeForm] = useState({ workDate: '', requestedMinutes: '60', reason: '' })

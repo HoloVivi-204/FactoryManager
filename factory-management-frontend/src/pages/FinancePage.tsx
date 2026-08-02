@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { financeApi, type FinanceSummary } from '../api/financeApi'
 import { DataTable, KpiCard, Panel, StatusBadge } from '../components/ui'
 import type { TableRow } from '../types'
@@ -34,7 +34,7 @@ export default function FinancePage({ view }: { view: FinanceView }) {
   const [form, setForm] = useState<FormState>({})
   const [message, setMessage] = useState('')
 
-  async function load() {
+  const load = useCallback(async () => {
     try {
       const [categories, factories, departments, lines, materials, warehouses] = await Promise.all([
         financeApi.categories(),
@@ -57,13 +57,13 @@ export default function FinancePage({ view }: { view: FinanceView }) {
     } catch (error) {
       setMessage((error as Error).message)
     }
-  }
+  }, [view])
 
   useEffect(() => {
     setOpen(false)
     setForm({})
     void load()
-  }, [view])
+  }, [load])
 
   async function save() {
     try {

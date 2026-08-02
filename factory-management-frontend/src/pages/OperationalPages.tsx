@@ -107,7 +107,7 @@ const badgeKeys = new Set([
 
 export default function OperationalPage({ kind }: { kind: Kind }) {
   const config = configs[kind]
-  const api = useApi(config.load, [kind])
+  const api = useApi(config.load, kind)
   const [filters, setFilters] = useState({
     fromDate: '',
     toDate: '',

@@ -8,7 +8,7 @@ import { useApi } from '../utils/useApi'
 import type { StagingDetailBundle, StagingReport } from '../types'
 
 export default function ApprovalPage() {
-  const api = useApi(dashboardApi.submitted, [])
+  const api = useApi(dashboardApi.submitted)
   const [selected, setSelected] = useState<StagingReport>()
   const [details, setDetails] = useState<StagingDetailBundle>()
   const [detailLoading, setDetailLoading] = useState(false)

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { dashboardApi } from '../api/dashboardApi'
 import { emptyDetailBundle, shiftReportApi } from '../api/shiftReportApi'
 import StagingDetailEditor from '../components/StagingDetailEditor'
@@ -103,11 +103,17 @@ export default function TeamLeaderReportPage() {
     })
   }, [drafts, draftFilters])
 
-  useEffect(() => {
-    void bootstrap()
+  const reloadDrafts = useCallback(async () => {
+    const scopedReports = await dashboardApi.stagingMyScope()
+    setScopeReports(scopedReports)
+    setDrafts(
+      scopedReports.filter(
+        (item) => item.status === 'DRAFT' || item.status === 'CHANGE_REQUESTED',
+      ),
+    )
   }, [])
 
-  async function bootstrap() {
+  const bootstrap = useCallback(async () => {
     setBusy(true)
     setMessage('')
     try {
@@ -125,17 +131,11 @@ export default function TeamLeaderReportPage() {
     } finally {
       setBusy(false)
     }
-  }
+  }, [reloadDrafts])
 
-  async function reloadDrafts() {
-    const scopedReports = await dashboardApi.stagingMyScope()
-    setScopeReports(scopedReports)
-    setDrafts(
-      scopedReports.filter(
-        (item) => item.status === 'DRAFT' || item.status === 'CHANGE_REQUESTED',
-      ),
-    )
-  }
+  useEffect(() => {
+    void bootstrap()
+  }, [bootstrap])
 
   async function loadHierarchy(current: StagingReport) {
     const [departments, lines, teams, employees, machines] = await Promise.all([
