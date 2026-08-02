@@ -16,14 +16,22 @@ public class AiRecommendationService {
             String question,
             List<AiToolResult> results
     ) {
-        if (!asksForAdvice(question)) return List.of();
+        if (!asksForAdvice(question)) {
+            return List.of();
+        }
+
         AiToolResult production = results.stream()
                 .filter(result -> "get_production_summary".equals(result.toolName()))
-                .findFirst().orElse(null);
-        if (production == null) return List.of();
+                .findFirst()
+                .orElse(null);
+        if (production == null) {
+            return List.of();
+        }
 
         Map<String, Object> official = map(production.data().get("official"));
-        if (longValue(official.get("reportCount")) <= 0) return List.of();
+        if (longValue(official.get("reportCount")) <= 0) {
+            return List.of();
+        }
         long planned = longValue(official.get("plannedQuantity"));
         long actual = longValue(official.get("actualQuantity"));
         long good = longValue(official.get("goodQuantity"));
@@ -77,7 +85,8 @@ public class AiRecommendationService {
             recommendations.add(new AiRecommendation(
                     "MEDIUM",
                     "Khoanh vùng nguyên nhân trước khi tăng tải",
-                    "Dữ liệu tổng hợp chưa chỉ ra downtime hay lỗi đủ rõ. Hãy đối chiếu nhân sự thực tế, vật tư và tốc độ chu kỳ của ca trước khi tăng công suất máy.",
+                    "Dữ liệu tổng hợp chưa chỉ ra downtime hay lỗi đủ rõ. Hãy đối chiếu nhân sự thực tế, "
+                            + "vật tư và tốc độ chu kỳ của ca trước khi tăng công suất máy.",
                     "Khoảng thiếu kế hoạch đã được xác nhận nhưng chưa có bằng chứng chi tiết về nguyên nhân.",
                     "Tránh tăng tốc đồng loạt khi chưa biết đúng điểm nghẽn.",
                     false));
@@ -96,7 +105,10 @@ public class AiRecommendationService {
                 .max(Comparator.comparingLong(line ->
                         longValue(line.get("plannedQuantity")) - longValue(line.get("actualQuantity"))))
                 .orElse(null);
-        if (worst == null) return;
+        if (worst == null) {
+            return;
+        }
+
         long planned = longValue(worst.get("plannedQuantity"));
         long actual = longValue(worst.get("actualQuantity"));
         long gap = planned - actual;
@@ -104,7 +116,8 @@ public class AiRecommendationService {
         target.add(new AiRecommendation(
                 overallGap > 0 && gap * 2 >= overallGap ? "HIGH" : "MEDIUM",
                 "Ưu tiên " + name,
-                "Kiểm tra downtime, tốc độ chu kỳ, nhân sự và vật tư tại dây chuyền này trước; đây là nơi đang hụt sản lượng nhiều nhất trong dữ liệu hiện có.",
+                "Kiểm tra downtime, tốc độ chu kỳ, nhân sự và vật tư tại dây chuyền này trước; "
+                        + "đây là nơi đang hụt sản lượng nhiều nhất trong dữ liệu hiện có.",
                 name + " đạt " + number(actual) + "/" + number(planned)
                         + " sản phẩm, còn thiếu " + number(gap) + ".",
                 "Tập trung xử lý đúng dây chuyền đang đóng góp khoảng trống lớn nhất.",
@@ -119,7 +132,10 @@ public class AiRecommendationService {
             long downtime
     ) {
         long operating = Math.max(working - downtime, 0);
-        if (downtime <= 0 || operating <= 0 || actual <= 0) return;
+        if (downtime <= 0 || operating <= 0 || actual <= 0) {
+            return;
+        }
+
         BigDecimal unitsPerMinute = BigDecimal.valueOf(actual)
                 .divide(BigDecimal.valueOf(operating), 4, RoundingMode.HALF_UP);
         long minutesNeeded = gap <= 0 ? Math.max(1, Math.round(downtime * 0.2))
@@ -152,14 +168,18 @@ public class AiRecommendationService {
             long defect,
             BigDecimal defectRate
     ) {
-        if (defect <= 0 || actual <= 0) return;
+        if (defect <= 0 || actual <= 0) {
+            return;
+        }
+
         BigDecimal retainedPerPoint = BigDecimal.valueOf(actual)
                 .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
         BigDecimal goodPlanRate = planned <= 0 ? null : percent(good, planned);
         target.add(new AiRecommendation(
                 "MEDIUM",
                 "Giảm hàng lỗi để tăng sản lượng đạt",
-                "Khoanh vùng loại lỗi có số lượng cao nhất và công đoạn phát sinh trước khi tăng tốc máy. Giảm lỗi giúp tăng hàng đạt, nhưng không được tính là đã tăng tổng actualQuantity.",
+                "Khoanh vùng loại lỗi có số lượng cao nhất và công đoạn phát sinh trước khi tăng tốc máy. "
+                        + "Giảm lỗi giúp tăng hàng đạt, nhưng không được tính là đã tăng tổng actualQuantity.",
                 number(defect) + " sản phẩm lỗi, " + number(good) + " sản phẩm đạt; tỷ lệ lỗi "
                         + number(defectRate) + "%"
                         + (goodPlanRate == null ? "." : ", hàng đạt tương đương "
@@ -178,18 +198,26 @@ public class AiRecommendationService {
     }
 
     private boolean containsAny(String value, String... phrases) {
-        for (String phrase : phrases) if (value.contains(phrase)) return true;
+        for (String phrase : phrases) {
+            if (value.contains(phrase)) {
+                return true;
+            }
+        }
         return false;
     }
 
     private BigDecimal percent(long numerator, long denominator) {
-        if (denominator <= 0) return BigDecimal.ZERO;
+        if (denominator <= 0) {
+            return BigDecimal.ZERO;
+        }
         return BigDecimal.valueOf(numerator).multiply(BigDecimal.valueOf(100))
                 .divide(BigDecimal.valueOf(denominator), 2, RoundingMode.HALF_UP);
     }
 
     private long longValue(Object value) {
-        if (value instanceof Number number) return number.longValue();
+        if (value instanceof Number number) {
+            return number.longValue();
+        }
         try {
             return value == null ? 0 : new BigDecimal(String.valueOf(value)).longValue();
         } catch (NumberFormatException exception) {
@@ -198,8 +226,12 @@ public class AiRecommendationService {
     }
 
     private BigDecimal decimal(Object value) {
-        if (value instanceof BigDecimal decimal) return decimal;
-        if (value instanceof Number number) return new BigDecimal(number.toString());
+        if (value instanceof BigDecimal decimal) {
+            return decimal;
+        }
+        if (value instanceof Number number) {
+            return new BigDecimal(number.toString());
+        }
         try {
             return value == null ? BigDecimal.ZERO : new BigDecimal(String.valueOf(value));
         } catch (NumberFormatException exception) {
@@ -213,19 +245,24 @@ public class AiRecommendationService {
     }
 
     private String text(Object value, String fallback) {
-        if (value == null || String.valueOf(value).isBlank()) return fallback;
+        if (value == null || String.valueOf(value).isBlank()) {
+            return fallback;
+        }
         return String.valueOf(value);
     }
 
     @SuppressWarnings("unchecked")
     private Map<String, Object> map(Object value) {
         return value instanceof Map<?, ?> map
-                ? new LinkedHashMap<>((Map<String, Object>) map) : Map.of();
+                ? new LinkedHashMap<>((Map<String, Object>) map)
+                : Map.of();
     }
 
     @SuppressWarnings("unchecked")
     private List<Map<String, Object>> rows(Object value) {
-        if (!(value instanceof List<?> values)) return List.of();
+        if (!(value instanceof List<?> values)) {
+            return List.of();
+        }
         return values.stream().filter(Map.class::isInstance)
                 .<Map<String, Object>>map(item -> new LinkedHashMap<>((Map<String, Object>) item))
                 .toList();

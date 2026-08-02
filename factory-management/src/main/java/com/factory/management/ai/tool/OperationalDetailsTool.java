@@ -249,22 +249,30 @@ public class OperationalDetailsTool implements AiDataTool {
             warnings.add("Dữ liệu tạm/chưa xác nhận được hiển thị riêng, không được xem là số liệu chính thức.");
         }
         if (detailType == DetailType.MACHINE_DOWNTIME) {
-            warnings.add("Máy dừng/hỏng được đối chiếu từ machine_downtime và maintenance_request; yêu cầu bảo trì không có thời lượng dừng máy sẽ không được cộng vào tổng số phút dừng.");
+            warnings.add("Máy dừng/hỏng được đối chiếu từ machine_downtime và maintenance_request; "
+                    + "yêu cầu bảo trì không có thời lượng dừng máy sẽ không được cộng vào tổng số phút dừng.");
         }
         if (detailType == DetailType.ATTENDANCE_EXCEPTIONS) {
-            warnings.add("Nhân sự được đối chiếu theo thứ tự ưu tiên: work_schedule làm mẫu số; attendance_record, leave_request APPROVED, employee_actual chính thức rồi employee_actual_staging làm trạng thái thực tế.");
+            warnings.add("Nhân sự được đối chiếu theo thứ tự ưu tiên: work_schedule làm mẫu số; "
+                    + "attendance_record, leave_request APPROVED, employee_actual chính thức "
+                    + "rồi employee_actual_staging làm trạng thái thực tế.");
             if (dashboardPopulation == null || dashboardPopulation.isEmpty()) {
-                warnings.add("Chưa có lịch làm phù hợp ngày/ca/phạm vi nên hệ thống không tạo tỷ lệ nhân sự trên tổng; các bản ghi thực tế chỉ dùng để tra cứu chi tiết.");
+                warnings.add("Chưa có lịch làm phù hợp ngày/ca/phạm vi nên hệ thống không tạo tỷ lệ "
+                        + "nhân sự trên tổng; các bản ghi thực tế chỉ dùng để tra cứu chi tiết.");
             } else {
                 long unconfirmed = dashboardPopulation.stream()
                         .filter(row -> "NO_ATTENDANCE_RECORD".equals(row.get("attendanceStatus")))
                         .count();
                 if (unconfirmed > 0) {
-                    warnings.add("Có " + unconfirmed + " lượt người-ca đã được xếp lịch nhưng chưa có dữ liệu chấm công; hệ thống không tự coi họ là vắng mặt.");
+                    warnings.add("Có " + unconfirmed
+                            + " lượt người-ca đã được xếp lịch nhưng chưa có dữ liệu chấm công; "
+                            + "hệ thống không tự coi họ là vắng mặt.");
                 }
             }
             if (conflictCount > 0) {
-                warnings.add("Có " + conflictCount + " bản ghi nhân sự khác nhau cho cùng nhân viên/ngày; hệ thống đã giữ nguồn có độ ưu tiên cao hơn.");
+                warnings.add("Có " + conflictCount
+                        + " bản ghi nhân sự khác nhau cho cùng nhân viên/ngày; "
+                        + "hệ thống đã giữ nguồn có độ ưu tiên cao hơn.");
             }
         }
         if (officialRows.isEmpty() && temporaryRows.isEmpty()) {
