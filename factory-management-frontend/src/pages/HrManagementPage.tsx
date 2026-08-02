@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { hrApi, type HrFilters } from '../api/hrApi'
 import { DataTable, LoadingState, Panel, StatusBadge } from '../components/ui'
 import type { HrNotification, PageResponse, TableRow } from '../types'
+import { number } from '../utils/format'
 
 export type HrView =
   | 'schedule'
@@ -402,7 +403,7 @@ export default function HrManagementPage({ view }: { view: HrView }) {
       )}
 
       {message && <p className="form-message">{message}</p>}
-      <Panel title={view === 'notifications' ? 'Thông báo vừa gửi trong phiên' : `${result?.totalElements ?? 0} bản ghi`}>
+      <Panel title={view === 'notifications' ? 'Thông báo vừa gửi trong phiên' : `${number(result?.totalElements)} bản ghi`}>
         <LoadingState loading={loading} error={error} />
         <DataTable rows={rows} columns={columns} />
         {view !== 'notifications' && result && result.totalPages > 1 && (

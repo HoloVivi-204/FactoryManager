@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { dashboardApi } from '../api/dashboardApi'
 import { DataTable, LoadingState, Panel, StatusBadge } from '../components/ui'
+import { number } from '../utils/format'
 import { useApi } from '../utils/useApi'
 import type { TableRow } from '../types'
 
@@ -166,7 +167,7 @@ export default function OperationalPage({ kind }: { kind: Kind }) {
           <button type="button" onClick={() => setFilters({ fromDate: '', toDate: '', category: '', reportStatus: '', keyword: '' })}>Xóa bộ lọc</button>
         </div>
       </Panel>
-      <Panel title={`Dữ liệu theo phạm vi JWT (${filteredRows.length}/${api.data?.length ?? 0})`}>
+      <Panel title={`Dữ liệu theo phạm vi JWT (${filteredRows.length}/${number(api.data?.length)})`}>
         <LoadingState loading={api.loading} error={api.error} />
         <DataTable rows={filteredRows} columns={columns} />
       </Panel>

@@ -23,8 +23,23 @@ const emptyOptions: OptionGroups = {
   warehouses: [],
 }
 
-const money = (value: unknown) =>
-  new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(value ?? 0))
+const currencyFormatter = new Intl.NumberFormat('vi-VN', {
+  style: 'currency',
+  currency: 'VND',
+})
+
+const toFiniteNumber = (value: unknown) => {
+  if (typeof value === 'number') return Number.isFinite(value) ? value : undefined
+  if (typeof value !== 'string' || value.trim() === '') return undefined
+
+  const numericValue = Number(value)
+  return Number.isFinite(numericValue) ? numericValue : undefined
+}
+
+const money = (value: unknown) => {
+  const numericValue = toFiniteNumber(value)
+  return numericValue === undefined ? '—' : currencyFormatter.format(numericValue)
+}
 
 export default function FinancePage({ view }: { view: FinanceView }) {
   const [rows, setRows] = useState<TableRow[]>([])

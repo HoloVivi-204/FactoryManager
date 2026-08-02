@@ -4,6 +4,7 @@ import { shiftReportApi } from '../api/shiftReportApi'
 import StagingDetailsPanel from '../components/StagingDetailsPanel'
 import StagingReportList from '../components/StagingReportList'
 import { LoadingState, Panel } from '../components/ui'
+import { number } from '../utils/format'
 import { useApi } from '../utils/useApi'
 import type { StagingDetailBundle, StagingReport } from '../types'
 
@@ -69,7 +70,7 @@ export default function ApprovalPage() {
           <p>Chỉ hiển thị báo cáo SUBMITTED thuộc phạm vi dữ liệu của tài khoản.</p>
         </div>
       </div>
-      <Panel title={`${api.data?.length ?? 0} báo cáo đang chờ`}>
+      <Panel title={`${number(api.data?.length)} báo cáo đang chờ`}>
         <LoadingState loading={api.loading} error={api.error} />
         <StagingReportList
           rows={api.data ?? []}
