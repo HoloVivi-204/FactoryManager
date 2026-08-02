@@ -145,7 +145,7 @@ public class EmployeeActualStagingServiceImpl implements EmployeeActualStagingSe
     }
 
     private Employee activeEmployee(Long id) {
-        return employeeRepository.findByIdAndActiveTrueAndTeam_ActiveTrueAndTeam_ProductionLine_ActiveTrueAndTeam_ProductionLine_Department_ActiveTrueAndTeam_ProductionLine_Department_Factory_ActiveTrue(id)
+        return employeeRepository.findActiveByIdInActiveHierarchy(id)
                 .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_ID_NOT_FOUND));
     }
 

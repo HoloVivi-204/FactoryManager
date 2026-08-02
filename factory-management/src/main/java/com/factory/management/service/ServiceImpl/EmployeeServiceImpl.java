@@ -70,7 +70,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     public List<EmployeeResponse> getAllByTeamId(Long teamId) {
         findActiveTeam(teamId);
         return employeeRepository
-                .findAllByTeam_IdAndActiveTrueAndTeam_ActiveTrueAndTeam_ProductionLine_ActiveTrueAndTeam_ProductionLine_Department_ActiveTrueAndTeam_ProductionLine_Department_Factory_ActiveTrue(teamId)
+                .findAllActiveByTeamIdInActiveHierarchy(teamId)
                 .stream()
                 .map(employeeMapper::mapToEmployeeResponse)
                 .toList();

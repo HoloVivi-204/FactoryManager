@@ -142,7 +142,7 @@ public class MachineDowntimeStagingServiceImpl implements MachineDowntimeStaging
     }
 
     private Machine activeMachine(Long id) {
-        return machineRepository.findByIdAndActiveTrueAndMachineType_ActiveTrueAndTeam_ActiveTrueAndTeam_ProductionLine_ActiveTrueAndTeam_ProductionLine_Department_ActiveTrueAndTeam_ProductionLine_Department_Factory_ActiveTrue(id)
+        return machineRepository.findActiveByIdInActiveHierarchy(id)
                 .orElseThrow(() -> new AppException(ErrorCode.MACHINE_ID_NOT_FOUND));
     }
 

@@ -77,7 +77,7 @@ public class MaintenanceService {
     public List<MaintenanceResponse.MachineOption> machineOptions() {
         Set<Long> visibleTeamIds = authorizationScope.accessibleTeamIds();
         return machineRepository
-                .findAllByActiveTrueAndMachineType_ActiveTrueAndTeam_ActiveTrueAndTeam_ProductionLine_ActiveTrueAndTeam_ProductionLine_Department_ActiveTrueAndTeam_ProductionLine_Department_Factory_ActiveTrue()
+                .findAllActiveInActiveHierarchy()
                 .stream()
                 .filter(machine -> visibleTeamIds.contains(machine.getTeam().getId()))
                 .sorted(java.util.Comparator.comparing(Machine::getCode, String.CASE_INSENSITIVE_ORDER))
@@ -504,7 +504,7 @@ public class MaintenanceService {
 
     private Machine activeMachine(Long id) {
         return machineRepository
-                .findByIdAndActiveTrueAndMachineType_ActiveTrueAndTeam_ActiveTrueAndTeam_ProductionLine_ActiveTrueAndTeam_ProductionLine_Department_ActiveTrueAndTeam_ProductionLine_Department_Factory_ActiveTrue(id)
+                .findActiveByIdInActiveHierarchy(id)
                 .orElseThrow(() -> new AppException(ErrorCode.MACHINE_ID_NOT_FOUND));
     }
 

@@ -68,7 +68,7 @@ public class MachineServiceImpl implements MachineService {
     @Transactional(readOnly = true)
     public List<MachineResponse> getAll() {
         return machineRepository
-                .findAllByActiveTrueAndMachineType_ActiveTrueAndTeam_ActiveTrueAndTeam_ProductionLine_ActiveTrueAndTeam_ProductionLine_Department_ActiveTrueAndTeam_ProductionLine_Department_Factory_ActiveTrue()
+                .findAllActiveInActiveHierarchy()
                 .stream()
                 .map(machineMapper::mapToMachineResponse)
                 .toList();
@@ -79,7 +79,7 @@ public class MachineServiceImpl implements MachineService {
     public List<MachineResponse> getAllByTeamId(Long teamId) {
         findActiveTeam(teamId);
         return machineRepository
-                .findAllByTeam_IdAndActiveTrueAndMachineType_ActiveTrueAndTeam_ActiveTrueAndTeam_ProductionLine_ActiveTrueAndTeam_ProductionLine_Department_ActiveTrueAndTeam_ProductionLine_Department_Factory_ActiveTrue(teamId)
+                .findAllActiveByTeamIdInActiveHierarchy(teamId)
                 .stream()
                 .map(machineMapper::mapToMachineResponse)
                 .toList();
@@ -90,7 +90,7 @@ public class MachineServiceImpl implements MachineService {
     public List<MachineResponse> getAllByMachineTypeId(Long machineTypeId) {
         findActiveMachineType(machineTypeId);
         return machineRepository
-                .findAllByMachineType_IdAndActiveTrueAndMachineType_ActiveTrueAndTeam_ActiveTrueAndTeam_ProductionLine_ActiveTrueAndTeam_ProductionLine_Department_ActiveTrueAndTeam_ProductionLine_Department_Factory_ActiveTrue(machineTypeId)
+                .findAllActiveByMachineTypeIdInActiveHierarchy(machineTypeId)
                 .stream()
                 .map(machineMapper::mapToMachineResponse)
                 .toList();
@@ -100,7 +100,7 @@ public class MachineServiceImpl implements MachineService {
     @Transactional(readOnly = true)
     public List<MachineResponse> getAllByOperationalStatus(MachineOperationalStatus operationalStatus) {
         return machineRepository
-                .findAllByOperationalStatusAndActiveTrueAndMachineType_ActiveTrueAndTeam_ActiveTrueAndTeam_ProductionLine_ActiveTrueAndTeam_ProductionLine_Department_ActiveTrueAndTeam_ProductionLine_Department_Factory_ActiveTrue(operationalStatus)
+                .findAllActiveByOperationalStatusInActiveHierarchy(operationalStatus)
                 .stream()
                 .map(machineMapper::mapToMachineResponse)
                 .toList();
@@ -171,7 +171,7 @@ public class MachineServiceImpl implements MachineService {
 
     private Machine findActiveMachine(Long id) {
         return machineRepository
-                .findByIdAndActiveTrueAndMachineType_ActiveTrueAndTeam_ActiveTrueAndTeam_ProductionLine_ActiveTrueAndTeam_ProductionLine_Department_ActiveTrueAndTeam_ProductionLine_Department_Factory_ActiveTrue(id)
+                .findActiveByIdInActiveHierarchy(id)
                 .orElseThrow(() -> new AppException(ErrorCode.MACHINE_ID_NOT_FOUND));
     }
 

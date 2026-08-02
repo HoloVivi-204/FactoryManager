@@ -118,7 +118,7 @@ public class TeamServiceImpl implements TeamService {
     public TeamResponse assignLeader(Long id, Long employeeId) {
         Team team = findActiveTeam(id);
         Employee employee = employeeRepository
-                .findByIdAndActiveTrueAndTeam_ActiveTrueAndTeam_ProductionLine_ActiveTrueAndTeam_ProductionLine_Department_ActiveTrueAndTeam_ProductionLine_Department_Factory_ActiveTrue(employeeId)
+                .findActiveByIdInActiveHierarchy(employeeId)
                 .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_ID_NOT_FOUND));
 
         if (!employee.getTeam().getId().equals(team.getId())) {
