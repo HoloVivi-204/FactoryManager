@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
+import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
 
 @Service
@@ -800,7 +801,7 @@ public class OllamaChatClient {
         }
         try {
             return objectMapper.readValue(String.valueOf(value), Map.class);
-        } catch (Exception exception) {
+        } catch (JacksonException exception) {
             throw new AppException(ErrorCode.AI_TOOL_ARGUMENT_INVALID);
         }
     }
@@ -842,7 +843,7 @@ public class OllamaChatClient {
     private String toJson(Object value) {
         try {
             return objectMapper.writeValueAsString(value);
-        } catch (Exception exception) {
+        } catch (JacksonException exception) {
             throw new AppException(ErrorCode.AI_PROVIDER_INVALID_RESPONSE);
         }
     }

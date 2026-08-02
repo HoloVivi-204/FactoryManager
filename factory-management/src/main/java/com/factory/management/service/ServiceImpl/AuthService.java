@@ -17,14 +17,14 @@ import com.factory.management.exception.ErrorCode;
 import com.factory.management.repository.EmployeeRepository;
 import com.factory.management.repository.InvalidTokenRepository;
 import com.factory.management.repository.UserRepository;
-import com.nimbusds.jose.crypto.MACSigner;
-import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.JWSObject;
 import com.nimbusds.jose.JWSVerifier;
 import com.nimbusds.jose.Payload;
+import com.nimbusds.jose.crypto.MACSigner;
+import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import java.nio.charset.StandardCharsets;
@@ -38,8 +38,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.UUID;
-import lombok.extern.slf4j.Slf4j;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -65,10 +65,12 @@ public class AuthService {
 
     @Transactional
     public AuthResponse register(RegisterRequest request) {
-        if (userRepository.existsByUsernameIgnoreCase(request.getUsername()))
+        if (userRepository.existsByUsernameIgnoreCase(request.getUsername())) {
             throw new AppException(ErrorCode.USERNAME_EXISTS);
-        if (userRepository.existsByEmployee_Id(request.getEmployeeId()))
+        }
+        if (userRepository.existsByEmployee_Id(request.getEmployeeId())) {
             throw new AppException(ErrorCode.EMPLOYEE_ACCOUNT_EXISTS);
+        }
 
         Employee employee = employeeRepository
                 .findByIdAndActiveTrue(request.getEmployeeId())
@@ -88,8 +90,9 @@ public class AuthService {
                 .orElseThrow(() -> new AppException(ErrorCode.INVALID_CREDENTIALS));
         if (!user.getEnabled() || !user.getAccountNonLocked()
                 || !Boolean.TRUE.equals(user.getEmployee().getActive())
-                || !passwordEncoder.matches(request.getPassword(), user.getPasswordHash()))
+                || !passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
             throw new AppException(ErrorCode.INVALID_CREDENTIALS);
+        }
         user.setLastLoginAt(LocalDateTime.now());
         return response(user, generateToken(user));
     }
@@ -100,7 +103,7 @@ public class AuthService {
         try {
             verifyToken(request.getToken(), false);
             valid = true;
-        } catch (Exception exception) {
+        } catch (AppException exception) {
             valid = false;
         }
         return IntrospectResponse.builder().valid(valid).build();
@@ -149,13 +152,15 @@ public class AuthService {
                     ? Date.from(claims.getIssueTime().toInstant().plusMillis(refreshDuration))
                     : claims.getExpirationTime();
             if (!signedJWT.verify(verifier) || expiry == null || !expiry.after(new Date())
-                    || invalidTokenRepository.existsById(claims.getJWTID()))
+                    || invalidTokenRepository.existsById(claims.getJWTID())) {
                 throw new AppException(ErrorCode.INVALID_TOKEN);
+            }
 
             User user = findActiveUser(claims.getSubject());
             Long tokenVersion = claims.getLongClaim("tokenVersion");
-            if (!Objects.equals(tokenVersion, user.getTokenVersion()))
+            if (!Objects.equals(tokenVersion, user.getTokenVersion())) {
                 throw new AppException(ErrorCode.INVALID_TOKEN);
+            }
             return signedJWT;
         } catch (ParseException | JOSEException exception) {
             throw new AppException(ErrorCode.INVALID_TOKEN);
@@ -202,8 +207,9 @@ public class AuthService {
         User user = userRepository.findByUsernameIgnoreCase(username)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         if (!user.getEnabled() || !user.getAccountNonLocked()
-                || !Boolean.TRUE.equals(user.getEmployee().getActive()))
+                || !Boolean.TRUE.equals(user.getEmployee().getActive())) {
             throw new AppException(ErrorCode.UNAUTHENTICATED);
+        }
         return user;
     }
 

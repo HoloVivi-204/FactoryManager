@@ -107,9 +107,11 @@ public class ReportExcelService {
                     continue;
                 }
                 compareSheet(entry.getKey(), entry.getValue(), actual, errors);
-                if (errors.size() >= MAX_VALIDATION_ERRORS) break;
+                if (errors.size() >= MAX_VALIDATION_ERRORS) {
+                    break;
+                }
             }
-        } catch (Exception exception) {
+        } catch (IOException | RuntimeException exception) {
             errors.add(new ValidationError("WORKBOOK", null, null, "INVALID_XLSX_FILE",
                     "File không phải XLSX hợp lệ hoặc đã bị hỏng", safeMessage(exception)));
         }
@@ -290,22 +292,30 @@ public class ReportExcelService {
 
     private int lastNonBlankRow(Sheet sheet, DataFormatter formatter) {
         for (int index = sheet.getLastRowNum(); index >= 0; index--) {
-            if (lastNonBlankColumn(sheet.getRow(index), formatter) >= 0) return index;
+            if (lastNonBlankColumn(sheet.getRow(index), formatter) >= 0) {
+                return index;
+            }
         }
         return -1;
     }
 
     private int lastNonBlankColumn(Row row, DataFormatter formatter) {
-        if (row == null || row.getLastCellNum() < 0) return -1;
+        if (row == null || row.getLastCellNum() < 0) {
+            return -1;
+        }
         for (int index = row.getLastCellNum() - 1; index >= 0; index--) {
             Cell cell = row.getCell(index, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
-            if (cell != null && !normalize(formatter.formatCellValue(cell)).isEmpty()) return index;
+            if (cell != null && !normalize(formatter.formatCellValue(cell)).isEmpty()) {
+                return index;
+            }
         }
         return -1;
     }
 
     private String columnName(List<List<String>> expected, int columnIndex) {
-        if (!expected.isEmpty() && columnIndex < expected.get(0).size()) return expected.get(0).get(columnIndex);
+        if (!expected.isEmpty() && columnIndex < expected.get(0).size()) {
+            return expected.get(0).get(columnIndex);
+        }
         return "COLUMN_" + (columnIndex + 1);
     }
 
@@ -314,9 +324,15 @@ public class ReportExcelService {
     }
 
     private String text(Object value) {
-        if (value == null) return "";
-        if (value instanceof java.time.LocalDate date) return date.toString();
-        if (value instanceof java.time.LocalDateTime dateTime) return dateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        if (value == null) {
+            return "";
+        }
+        if (value instanceof java.time.LocalDate date) {
+            return date.toString();
+        }
+        if (value instanceof java.time.LocalDateTime dateTime) {
+            return dateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        }
         return String.valueOf(value);
     }
 

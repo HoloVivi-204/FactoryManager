@@ -2,6 +2,7 @@ package com.factory.management.tool;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -22,7 +23,7 @@ public final class StagingExcelDateRangeGenerator {
 
     private StagingExcelDateRangeGenerator() {}
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws IOException {
         if (args.length != 4) {
             throw new IllegalArgumentException("Usage: <input.xlsx> <output.xlsx> <fromDate> <toDate>");
         }
@@ -30,7 +31,9 @@ public final class StagingExcelDateRangeGenerator {
         Path output = Path.of(args[1]).toAbsolutePath();
         LocalDate fromDate = LocalDate.parse(args[2]);
         LocalDate toDate = LocalDate.parse(args[3]);
-        if (toDate.isBefore(fromDate)) throw new IllegalArgumentException("toDate must not be before fromDate");
+        if (toDate.isBefore(fromDate)) {
+            throw new IllegalArgumentException("toDate must not be before fromDate");
+        }
 
         try (FileInputStream source = new FileInputStream(input.toFile());
              XSSFWorkbook workbook = new XSSFWorkbook(source)) {
@@ -55,12 +58,16 @@ public final class StagingExcelDateRangeGenerator {
     private static void duplicateForDates(XSSFWorkbook workbook, String sheetName,
                                           LocalDate fromDate, LocalDate toDate) {
         Sheet sheet = workbook.getSheet(sheetName);
-        if (sheet == null) throw new IllegalArgumentException("Missing sheet: " + sheetName);
+        if (sheet == null) {
+            throw new IllegalArgumentException("Missing sheet: " + sheetName);
+        }
 
         List<List<CellData>> templates = new ArrayList<>();
         for (int rowIndex = 1; rowIndex <= sheet.getLastRowNum(); rowIndex++) {
             Row row = sheet.getRow(rowIndex);
-            if (row == null || row.getLastCellNum() <= 0) continue;
+            if (row == null || row.getLastCellNum() <= 0) {
+                continue;
+            }
             List<CellData> values = new ArrayList<>();
             for (int column = 0; column < row.getLastCellNum(); column++) {
                 Cell cell = row.getCell(column);
@@ -68,11 +75,15 @@ public final class StagingExcelDateRangeGenerator {
             }
             templates.add(values);
         }
-        if (templates.isEmpty()) throw new IllegalArgumentException("Sheet has no sample row: " + sheetName);
+        if (templates.isEmpty()) {
+            throw new IllegalArgumentException("Sheet has no sample row: " + sheetName);
+        }
 
         for (int rowIndex = sheet.getLastRowNum(); rowIndex >= 1; rowIndex--) {
             Row row = sheet.getRow(rowIndex);
-            if (row != null) sheet.removeRow(row);
+            if (row != null) {
+                sheet.removeRow(row);
+            }
         }
 
         int targetRow = 1;
@@ -83,7 +94,9 @@ public final class StagingExcelDateRangeGenerator {
                     CellData value = template.get(column);
                     Cell cell = row.createCell(column);
                     value.write(cell, workbook);
-                    if (column == 0) cell.setCellValue(date.toString());
+                    if (column == 0) {
+                        cell.setCellValue(date.toString());
+                    }
                     if (sheetName.equals("DUNG_MAY") && (column == 5 || column == 6)) {
                         String original = value.textValue();
                         String time = original.length() >= 16 ? original.substring(original.length() - 5) : "08:15";
@@ -96,7 +109,9 @@ public final class StagingExcelDateRangeGenerator {
 
     private record CellData(CellType type, String text, double number, short styleIndex) {
         private static CellData from(Cell cell) {
-            if (cell == null) return new CellData(CellType.BLANK, "", 0, (short) 0);
+            if (cell == null) {
+                return new CellData(CellType.BLANK, "", 0, (short) 0);
+            }
             if (cell.getCellType() == CellType.NUMERIC) {
                 return new CellData(CellType.NUMERIC, "", cell.getNumericCellValue(), cell.getCellStyle().getIndex());
             }
@@ -108,8 +123,11 @@ public final class StagingExcelDateRangeGenerator {
                 CellStyle style = workbook.getCellStyleAt(styleIndex);
                 cell.setCellStyle(style);
             }
-            if (type == CellType.NUMERIC) cell.setCellValue(number);
-            else cell.setCellValue(text);
+            if (type == CellType.NUMERIC) {
+                cell.setCellValue(number);
+            } else {
+                cell.setCellValue(text);
+            }
         }
 
         private String textValue() {
