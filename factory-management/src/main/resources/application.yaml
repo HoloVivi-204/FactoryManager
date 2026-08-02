@@ -41,15 +41,15 @@ api:
   prefix: /api/v1
 
 jwt:
-  signer-key: ${JWT_SIGNER_KEY:factory-management-hs512-secret-key-change-this-value-2026-very-long-key}
+  signer-key: ${JWT_SIGNER_KEY:}
   valid-duration: ${JWT_VALID_DURATION:900000}
   refresh-duration: ${JWT_REFRESH_DURATION:604800000}
 
 app:
   bootstrap-admin:
-    enabled: ${ADMIN_BOOTSTRAP_ENABLED:true}
+    enabled: ${ADMIN_BOOTSTRAP_ENABLED:false}
     username: ${ADMIN_USERNAME:admin}
-    password: ${ADMIN_PASSWORD:Admin@123456}
+    password: ${ADMIN_PASSWORD:}
     employee-code: ${ADMIN_EMPLOYEE_CODE:SYSTEM-ADMIN}
 
 # Chatbot is disabled by default. Ollama runs locally and receives only

@@ -26,13 +26,13 @@ public class AdminBootstrapConfig implements ApplicationRunner {
     private final EmployeeRepository employeeRepository;
     private final PasswordEncoder passwordEncoder;
 
-    @Value("${app.bootstrap-admin.enabled:true}")
+    @Value("${app.bootstrap-admin.enabled:false}")
     private boolean enabled;
 
     @Value("${app.bootstrap-admin.username:admin}")
     private String username;
 
-    @Value("${app.bootstrap-admin.password:Admin@123456}")
+    @Value("${app.bootstrap-admin.password:}")
     private String password;
 
     @Value("${app.bootstrap-admin.employee-code:SYSTEM-ADMIN}")
@@ -47,8 +47,13 @@ public class AdminBootstrapConfig implements ApplicationRunner {
 
         String normalizedUsername = username.trim();
         String normalizedEmployeeCode = employeeCode.trim();
-        if (normalizedUsername.isEmpty() || password.isBlank() || normalizedEmployeeCode.isEmpty()) {
-            throw new IllegalStateException("Thong tin bootstrap Admin khong duoc de trong");
+        if (normalizedUsername.isEmpty() || normalizedEmployeeCode.isEmpty()) {
+            log.warn("Bo qua bootstrap ADMIN vi username hoac employee code bi trong");
+            return;
+        }
+        if (password.isBlank()) {
+            log.warn("Bo qua bootstrap ADMIN vi ADMIN_PASSWORD chua duoc cau hinh");
+            return;
         }
 
         User existingUsername = userRepository.findByUsernameIgnoreCase(normalizedUsername).orElse(null);

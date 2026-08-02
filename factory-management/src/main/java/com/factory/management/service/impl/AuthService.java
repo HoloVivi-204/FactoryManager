@@ -27,6 +27,7 @@ import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import jakarta.annotation.PostConstruct;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.time.Instant;
@@ -49,6 +50,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Slf4j
 public class AuthService {
+    private static final int MIN_HS512_SECRET_BYTES = 64;
+
     private final UserRepository userRepository;
     private final EmployeeRepository employeeRepository;
     private final InvalidTokenRepository invalidTokenRepository;
@@ -62,6 +65,14 @@ public class AuthService {
 
     @Value("${jwt.refresh-duration}")
     private long refreshDuration;
+
+    @PostConstruct
+    void validateSignerKey() {
+        byte[] keyBytes = signerKey == null ? new byte[0] : signerKey.getBytes(StandardCharsets.UTF_8);
+        if (keyBytes.length < MIN_HS512_SECRET_BYTES) {
+            throw new IllegalStateException("JWT_SIGNER_KEY phai duoc cau hinh toi thieu 64 bytes cho HS512");
+        }
+    }
 
     @Transactional
     public AuthResponse register(RegisterRequest request) {

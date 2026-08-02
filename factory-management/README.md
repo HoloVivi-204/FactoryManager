@@ -43,12 +43,12 @@ Base URL:
 http://localhost:8080/factory-management/api/v1
 ```
 
-Cấu hình hiện tại còn fallback local cho signer key và bootstrap admin. Không dùng fallback khi chạy môi
-trường shared, staging hoặc production.
+Ứng dụng không có fallback cho `JWT_SIGNER_KEY` hoặc `ADMIN_PASSWORD`. Nếu thiếu `JWT_SIGNER_KEY` đủ dài,
+backend dừng khởi động để tránh phát token bằng secret mặc định.
 
 Nếu database local chưa có tài khoản, bật `ADMIN_BOOTSTRAP_ENABLED=true` đúng lần khởi tạo đầu tiên và cung
 cấp `ADMIN_USERNAME`, `ADMIN_PASSWORD`, `ADMIN_EMPLOYEE_CODE` bằng biến môi trường riêng. Sau đó đổi mật khẩu
-và tắt bootstrap. Không sử dụng username/password fallback trong source.
+và tắt bootstrap.
 
 ## Kiểm tra
 
@@ -57,9 +57,8 @@ và tắt bootstrap. Không sử dụng username/password fallback trong source.
 .\mvnw.cmd -DskipTests package
 ```
 
-Test hiện tại cố kết nối PostgreSQL theo cấu hình ứng dụng. Repository chưa có Testcontainers hoặc test
-profile tự cô lập, vì vậy cần database local để `contextLoads` khởi động. Xem
-[Final status](../docs/release/FINAL_STATUS.md) cho kết quả kiểm tra gần nhất.
+Test profile hiện dùng H2 in-memory và JWT signer key synthetic riêng trong `src/test/resources`.
+Không cần PostgreSQL local cho `contextLoads`.
 
 ## Cấu trúc nghiệp vụ hiện tại
 

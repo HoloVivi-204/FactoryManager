@@ -21,5 +21,10 @@ app:
   bootstrap-admin:
     enabled: false
 
+jwt:
+  signer-key: test-jwt-signer-key-for-hs512-at-least-sixty-four-bytes-long-2026
+  valid-duration: 900000
+  refresh-duration: 604800000
+
 ai:
   enabled: false

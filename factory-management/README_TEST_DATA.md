@@ -32,10 +32,19 @@ Content-Type: application/json
 Các danh sách JSON trong tài liệu chỉ là cách gom dữ liệu cho dễ đọc. API hiện tại không hỗ trợ
 tạo hàng loạt, vì vậy hãy gửi **từng object một**, theo đúng thứ tự từ trên xuống.
 
-Sau khi tạo mới database và khởi động backend:
+Sau khi tạo mới database, cấu hình bootstrap admin một lần rồi khởi động backend:
 
-- backend tự tạo Employee hệ thống `SYSTEM-ADMIN` với `employeeId = 1`;
-- backend tự tạo User `admin` với `userId = 1`;
+```env
+ADMIN_BOOTSTRAP_ENABLED=true
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD=<local-admin-password>
+ADMIN_EMPLOYEE_CODE=SYSTEM-ADMIN
+```
+
+Khi bootstrap thành công:
+
+- backend tạo Employee hệ thống `SYSTEM-ADMIN` với `employeeId = 1`;
+- backend tạo User `admin` với `userId = 1`;
 - các Employee tự tạo trong tài liệu này bắt đầu từ ID 2;
 - ID của Factory, Department, Line, Team và các bảng khác bắt đầu từ 1.
 
@@ -50,7 +59,7 @@ POST /auth/login
 ```json
 {
   "username": "admin",
-  "password": "Admin@123456"
+  "password": "<local-admin-password>"
 }
 ```
 

@@ -29,7 +29,8 @@ JWT_REFRESH_DURATION=604800000
 
 ## Tài khoản Admin tự động
 
-Khi ứng dụng khởi động, nếu cơ sở dữ liệu chưa có tài khoản mang role `ADMIN`, backend tự tạo:
+Bootstrap admin mặc định tắt. Khi `ADMIN_BOOTSTRAP_ENABLED=true` và cơ sở dữ liệu chưa có tài khoản mang
+role `ADMIN`, backend tự tạo:
 
 - một Employee hệ thống không bắt buộc `teamId`;
 - một tài khoản có role `ADMIN` liên kết với Employee hệ thống đó.
@@ -43,7 +44,8 @@ ADMIN_PASSWORD=change_this_admin_password
 ADMIN_EMPLOYEE_CODE=SYSTEM-ADMIN
 ```
 
-Nếu không khai báo các biến trên, tài khoản mặc định cho môi trường phát triển là `admin` / `Admin@123456`. Hãy đổi mật khẩu ngay sau lần đăng nhập đầu tiên. Những lần khởi động sau không tạo trùng nếu hệ thống đã có một tài khoản `ADMIN`.
+Nếu thiếu `ADMIN_PASSWORD`, backend bỏ qua bootstrap và ghi warning; không có mật khẩu mặc định trong source.
+Sau lần khởi tạo đầu tiên, đổi mật khẩu và tắt `ADMIN_BOOTSTRAP_ENABLED`.
 
 ## Đăng ký
 
