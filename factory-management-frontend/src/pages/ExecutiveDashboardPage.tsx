@@ -19,6 +19,10 @@ const compactCurrencyFormatter = new Intl.NumberFormat('vi-VN', {
   maximumFractionDigits: 1,
 })
 const numberFormatter = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 2 })
+const missingValue = '—'
+
+const hasNumber = (value?: number | null): value is number =>
+  typeof value === 'number' && Number.isFinite(value)
 
 const localDate = (date: Date) => {
   const year = date.getFullYear()
@@ -35,13 +39,24 @@ const defaultFilters = (): ExecutiveDashboardFilters => {
   }
 }
 
-const money = (value: number | undefined) => currencyFormatter.format(Number(value ?? 0))
-const compactMoney = (value: number | undefined) => `${compactCurrencyFormatter.format(Number(value ?? 0))} ₫`
-const number = (value: number | undefined) => numberFormatter.format(Number(value ?? 0))
-const percent = (value: number | undefined) => `${number(value)}%`
+const money = (value?: number | null) =>
+  hasNumber(value) ? currencyFormatter.format(value) : missingValue
+
+const compactMoney = (value?: number | null) =>
+  hasNumber(value) ? `${compactCurrencyFormatter.format(value)} ₫` : missingValue
+
+const formatNumber = (value?: number | null) =>
+  hasNumber(value) ? numberFormatter.format(value) : missingValue
+
+const percent = (value?: number | null) =>
+  hasNumber(value) ? `${formatNumber(value)}%` : missingValue
+
+const clampPercent = (value?: number | null) =>
+  hasNumber(value) ? Math.min(Math.max(value, 0), 100) : 0
+
 const dateTime = (value: string | undefined) => value
   ? new Date(value).toLocaleString('vi-VN')
-  : '—'
+  : missingValue
 
 const domainLabels: Record<string, string> = {
   FINANCE: 'Tài chính',
@@ -175,13 +190,38 @@ export default function ExecutiveDashboardPage() {
           </div>
 
           <section className="executive-kpis" aria-label="Chỉ số điều hành">
-            <ExecutiveKpi label="Doanh thu" value={compactMoney(financial?.revenue)} detail={`${financial?.postedRecordCount ?? 0} bút toán đã ghi nhận`} tone="blue" />
+            <ExecutiveKpi
+              label="Doanh thu"
+              value={compactMoney(financial?.revenue)}
+              detail={`${formatNumber(financial?.postedRecordCount)} bút toán đã ghi nhận`}
+              tone="blue"
+            />
             <ExecutiveKpi label="Chi phí" value={compactMoney(financial?.expense)} detail={`Phải trả quá hạn ${compactMoney(financial?.overduePayable)}`} tone="orange" />
-            <ExecutiveKpi label="Lợi nhuận" value={compactMoney(financial?.profit)} detail={`Biên lợi nhuận ${percent(financial?.profitMarginPercent)}`} tone={(financial?.profit ?? 0) < 0 ? 'red' : 'green'} />
-            <ExecutiveKpi label="Sản lượng" value={number(production?.actualQuantity)} detail={`Đạt ${percent(production?.planAttainmentPercent)} kế hoạch`} tone="indigo" />
-            <ExecutiveKpi label="Năng suất" value={number(production?.productivityPerHour)} detail="Sản phẩm / giờ vận hành" tone="purple" />
+            <ExecutiveKpi
+              label="Lợi nhuận"
+              value={compactMoney(financial?.profit)}
+              detail={`Biên lợi nhuận ${percent(financial?.profitMarginPercent)}`}
+              tone={hasNumber(financial?.profit) && financial.profit < 0 ? 'red' : 'green'}
+            />
+            <ExecutiveKpi
+              label="Sản lượng"
+              value={formatNumber(production?.actualQuantity)}
+              detail={`Đạt ${percent(production?.planAttainmentPercent)} kế hoạch`}
+              tone="indigo"
+            />
+            <ExecutiveKpi
+              label="Năng suất"
+              value={formatNumber(production?.productivityPerHour)}
+              detail="Sản phẩm / giờ vận hành"
+              tone="purple"
+            />
             <ExecutiveKpi label="Chất lượng" value={percent(production?.qualityPercent)} detail={`Tỷ lệ lỗi ${percent(production?.defectRatePercent)}`} tone="teal" />
-            <ExecutiveKpi label="Rủi ro trọng yếu" value={number(materialRisks)} detail={`${data.risks.length} cảnh báo đang được theo dõi`} tone={materialRisks > 0 ? 'red' : 'green'} />
+            <ExecutiveKpi
+              label="Rủi ro trọng yếu"
+              value={formatNumber(materialRisks)}
+              detail={`${formatNumber(data.risks.length)} cảnh báo đang được theo dõi`}
+              tone={materialRisks > 0 ? 'red' : 'green'}
+            />
           </section>
 
           {!hasData ? (
@@ -197,10 +237,10 @@ export default function ExecutiveDashboardPage() {
                 </Panel>
                 <Panel title="Sức khỏe vận hành">
                   <OperationalScorecard
-                    plan={production?.planAttainmentPercent ?? 0}
-                    quality={production?.qualityPercent ?? 0}
-                    oee={production?.oeePercent ?? 0}
-                    productivity={production?.productivityPerHour ?? 0}
+                    plan={production?.planAttainmentPercent}
+                    quality={production?.qualityPercent}
+                    oee={production?.oeePercent}
+                    productivity={production?.productivityPerHour}
                   />
                 </Panel>
               </div>
@@ -213,8 +253,8 @@ export default function ExecutiveDashboardPage() {
                     { key: 'revenue', label: 'Doanh thu', render: (row: ExecutiveTrendPoint) => money(row.revenue) },
                     { key: 'expense', label: 'Chi phí', render: (row: ExecutiveTrendPoint) => money(row.expense) },
                     { key: 'profit', label: 'Lợi nhuận', render: (row: ExecutiveTrendPoint) => <b className={row.profit < 0 ? 'executive-negative' : ''}>{money(row.profit)}</b> },
-                    { key: 'actualQuantity', label: 'Sản lượng', render: (row: ExecutiveTrendPoint) => number(row.actualQuantity) },
-                    { key: 'productivityPerHour', label: 'Năng suất/giờ', render: (row: ExecutiveTrendPoint) => number(row.productivityPerHour) },
+                    { key: 'actualQuantity', label: 'Sản lượng', render: (row: ExecutiveTrendPoint) => formatNumber(row.actualQuantity) },
+                    { key: 'productivityPerHour', label: 'Năng suất/giờ', render: (row: ExecutiveTrendPoint) => formatNumber(row.productivityPerHour) },
                     { key: 'qualityPercent', label: 'Chất lượng', render: (row: ExecutiveTrendPoint) => percent(row.qualityPercent) },
                     { key: 'oeePercent', label: 'OEE', render: (row: ExecutiveTrendPoint) => percent(row.oeePercent) },
                   ]}
@@ -310,10 +350,10 @@ function FinancialTrendChart({ points }: { points: ExecutiveTrendPoint[] }) {
 }
 
 function OperationalScorecard({ plan, quality, oee, productivity }: {
-  plan: number
-  quality: number
-  oee: number
-  productivity: number
+  plan?: number
+  quality?: number
+  oee?: number
+  productivity?: number
 }) {
   const rows = [
     { label: 'Hoàn thành kế hoạch', value: plan, target: 100 },
@@ -326,7 +366,7 @@ function OperationalScorecard({ plan, quality, oee, productivity }: {
         <div className="executive-score" key={row.label}>
           <div><span>{row.label}</span><b>{percent(row.value)}</b></div>
           <div className="executive-score-track">
-            <span style={{ width: `${Math.min(Math.max(row.value, 0), 100)}%` }} />
+            <span style={{ width: `${clampPercent(row.value)}%` }} />
             <i style={{ left: `${Math.min(row.target, 100)}%` }} title={`Mục tiêu ${row.target}%`} />
           </div>
           <small>Mục tiêu tham chiếu: {row.target}%</small>
@@ -334,7 +374,7 @@ function OperationalScorecard({ plan, quality, oee, productivity }: {
       ))}
       <div className="executive-productivity">
         <span>Năng suất bình quân</span>
-        <strong>{number(productivity)}</strong>
+        <strong>{formatNumber(productivity)}</strong>
         <small>sản phẩm / giờ vận hành</small>
       </div>
     </div>
@@ -356,8 +396,8 @@ function RiskList({ risks }: { risks: ExecutiveRisk[] }) {
           <em>{severityLabels[risk.severity] ?? risk.severity}</em>
           <p>{risk.description}</p>
           <small>
-            Chỉ số: {number(risk.metricValue)}{risk.unit ? ` ${risk.unit}` : ''}
-            {risk.threshold !== undefined ? ` · Ngưỡng: ${number(risk.threshold)}${risk.unit ? ` ${risk.unit}` : ''}` : ''}
+            Chỉ số: {formatNumber(risk.metricValue)}{risk.unit ? ` ${risk.unit}` : ''}
+            {risk.threshold !== undefined ? ` · Ngưỡng: ${formatNumber(risk.threshold)}${risk.unit ? ` ${risk.unit}` : ''}` : ''}
             {risk.affectedCount > 0 ? ` · Ảnh hưởng: ${risk.affectedCount}` : ''}
           </small>
         </article>
@@ -396,9 +436,9 @@ function FactoryPerformanceTable({ rows }: { rows: ExecutiveFactoryPerformance[]
         { key: 'revenue', label: 'Doanh thu', render: (row: ExecutiveFactoryPerformance) => money(row.revenue) },
         { key: 'expense', label: 'Chi phí', render: (row: ExecutiveFactoryPerformance) => money(row.expense) },
         { key: 'profit', label: 'Lợi nhuận', render: (row: ExecutiveFactoryPerformance) => <b className={row.profit < 0 ? 'executive-negative' : ''}>{money(row.profit)}</b> },
-        { key: 'actualQuantity', label: 'Sản lượng', render: (row: ExecutiveFactoryPerformance) => number(row.actualQuantity) },
+        { key: 'actualQuantity', label: 'Sản lượng', render: (row: ExecutiveFactoryPerformance) => formatNumber(row.actualQuantity) },
         { key: 'planAttainmentPercent', label: 'Đạt kế hoạch', render: (row: ExecutiveFactoryPerformance) => percent(row.planAttainmentPercent) },
-        { key: 'productivityPerHour', label: 'Năng suất/giờ', render: (row: ExecutiveFactoryPerformance) => number(row.productivityPerHour) },
+        { key: 'productivityPerHour', label: 'Năng suất/giờ', render: (row: ExecutiveFactoryPerformance) => formatNumber(row.productivityPerHour) },
         { key: 'qualityPercent', label: 'Chất lượng', render: (row: ExecutiveFactoryPerformance) => percent(row.qualityPercent) },
         { key: 'oeePercent', label: 'OEE', render: (row: ExecutiveFactoryPerformance) => percent(row.oeePercent) },
       ]}
