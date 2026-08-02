@@ -6,11 +6,7 @@ import StagingExcelImporter from '../components/StagingExcelImporter'
 import TeamLeaderDashboard from '../components/TeamLeaderDashboard'
 import StagingReportList from '../components/StagingReportList'
 import { Panel, StatusBadge } from '../components/ui'
-import type {
-  StagingDetailBundle,
-  StagingReport,
-  TableRow,
-} from '../types'
+import type { StagingDetailBundle, StagingReport, TableRow } from '../types'
 
 type FormState = Record<string, string>
 
@@ -99,7 +95,11 @@ export default function TeamLeaderReportPage() {
         item.machineName,
         item.status,
         item.note,
-      ].some((value) => String(value ?? '').toLocaleLowerCase('vi').includes(term))
+      ].some((value) =>
+        String(value ?? '')
+          .toLocaleLowerCase('vi')
+          .includes(term),
+      )
     })
   }, [drafts, draftFilters])
 
@@ -107,9 +107,7 @@ export default function TeamLeaderReportPage() {
     const scopedReports = await dashboardApi.stagingMyScope()
     setScopeReports(scopedReports)
     setDrafts(
-      scopedReports.filter(
-        (item) => item.status === 'DRAFT' || item.status === 'CHANGE_REQUESTED',
-      ),
+      scopedReports.filter((item) => item.status === 'DRAFT' || item.status === 'CHANGE_REQUESTED'),
     )
   }, [])
 
@@ -190,7 +188,12 @@ export default function TeamLeaderReportPage() {
 
   async function deleteDraft(selected: StagingReport) {
     if (selected.status !== 'DRAFT') return
-    if (!confirm(`Xóa báo cáo nháp #${selected.id}? Toàn bộ dữ liệu nhân sự, dừng máy, chất lượng và vật tư trong báo cáo cũng sẽ bị xóa.`)) return
+    if (
+      !confirm(
+        `Xóa báo cáo nháp #${selected.id}? Toàn bộ dữ liệu nhân sự, dừng máy, chất lượng và vật tư trong báo cáo cũng sẽ bị xóa.`,
+      )
+    )
+      return
     setBusy(true)
     setMessage('')
     try {
@@ -371,7 +374,9 @@ export default function TeamLeaderReportPage() {
           <p>Tạo mới hoặc tiếp tục báo cáo DRAFT / CHANGE_REQUESTED trong phạm vi của bạn.</p>
         </div>
         {!editorOpen && (
-          <button className="admin-add-button" onClick={openNew}>+ Báo cáo mới</button>
+          <button className="admin-add-button" onClick={openNew}>
+            + Báo cáo mới
+          </button>
         )}
       </div>
 
@@ -381,11 +386,58 @@ export default function TeamLeaderReportPage() {
           <StagingExcelImporter onImported={reloadDrafts} />
           <Panel title="Tìm báo cáo cần hoàn thiện">
             <div className="filters hr-filters">
-              <label>Từ ngày<input type="date" value={draftFilters.fromDate} onChange={(event) => setDraftFilters({ ...draftFilters, fromDate: event.target.value })} /></label>
-              <label>Đến ngày<input type="date" value={draftFilters.toDate} onChange={(event) => setDraftFilters({ ...draftFilters, toDate: event.target.value })} /></label>
-              <label>Trạng thái<select value={draftFilters.status} onChange={(event) => setDraftFilters({ ...draftFilters, status: event.target.value })}><option value="">Tất cả</option><option value="DRAFT">Đang nhập</option><option value="CHANGE_REQUESTED">Cần chỉnh sửa</option></select></label>
-              <label>Từ khóa<input type="search" placeholder="ID, máy, ca, tổ, ghi chú…" value={draftFilters.keyword} onChange={(event) => setDraftFilters({ ...draftFilters, keyword: event.target.value })} /></label>
-              <button type="button" onClick={() => setDraftFilters({ fromDate: '', toDate: '', status: '', keyword: '' })}>Xóa bộ lọc</button>
+              <label>
+                Từ ngày
+                <input
+                  type="date"
+                  value={draftFilters.fromDate}
+                  onChange={(event) =>
+                    setDraftFilters({ ...draftFilters, fromDate: event.target.value })
+                  }
+                />
+              </label>
+              <label>
+                Đến ngày
+                <input
+                  type="date"
+                  value={draftFilters.toDate}
+                  onChange={(event) =>
+                    setDraftFilters({ ...draftFilters, toDate: event.target.value })
+                  }
+                />
+              </label>
+              <label>
+                Trạng thái
+                <select
+                  value={draftFilters.status}
+                  onChange={(event) =>
+                    setDraftFilters({ ...draftFilters, status: event.target.value })
+                  }
+                >
+                  <option value="">Tất cả</option>
+                  <option value="DRAFT">Đang nhập</option>
+                  <option value="CHANGE_REQUESTED">Cần chỉnh sửa</option>
+                </select>
+              </label>
+              <label>
+                Từ khóa
+                <input
+                  type="search"
+                  placeholder="ID, máy, ca, tổ, ghi chú…"
+                  value={draftFilters.keyword}
+                  onChange={(event) =>
+                    setDraftFilters({ ...draftFilters, keyword: event.target.value })
+                  }
+                />
+              </label>
+              <button
+                type="button"
+                onClick={() =>
+                  setDraftFilters({ fromDate: '', toDate: '', status: '', keyword: '' })
+                }
+              >
+                Xóa bộ lọc
+              </button>
             </div>
           </Panel>
           <Panel title={`Báo cáo cần hoàn thiện (${filteredDrafts.length}/${drafts.length})`}>
@@ -397,7 +449,13 @@ export default function TeamLeaderReportPage() {
                     {item.status === 'CHANGE_REQUESTED' ? 'Nhận lại & sửa' : 'Tiếp tục nhập'}
                   </button>
                   {item.status === 'DRAFT' && (
-                    <button className="danger-link" disabled={busy} onClick={() => void deleteDraft(item)}>Xóa nháp</button>
+                    <button
+                      className="danger-link"
+                      disabled={busy}
+                      onClick={() => void deleteDraft(item)}
+                    >
+                      Xóa nháp
+                    </button>
                   )}
                 </div>
               )}
@@ -413,10 +471,14 @@ export default function TeamLeaderReportPage() {
               <b>{report ? `Báo cáo #${report.id}` : 'Báo cáo mới'}</b>
               {report && <StatusBadge value={report.status} />}
             </div>
-            <button disabled={busy} onClick={() => void closeEditor()}>Đóng trình nhập</button>
+            <button disabled={busy} onClick={() => void closeEditor()}>
+              Đóng trình nhập
+            </button>
           </div>
           {report?.reviewComment && (
-            <p className="review-comment"><b>Yêu cầu chỉnh sửa:</b> {report.reviewComment}</p>
+            <p className="review-comment">
+              <b>Yêu cầu chỉnh sửa:</b> {report.reviewComment}
+            </p>
           )}
           <div className="step-tabs">
             {tabs.map(([key, label]) => (
@@ -435,15 +497,55 @@ export default function TeamLeaderReportPage() {
             <Panel title="Thông tin ca và sản lượng">
               <div className="form-grid">
                 <Field label="Ngày">
-                  <input type="date" value={form.reportDate} onChange={(e) => change('reportDate', e.target.value)} />
+                  <input
+                    type="date"
+                    value={form.reportDate}
+                    onChange={(e) => change('reportDate', e.target.value)}
+                  />
                 </Field>
-                <Select label="Ca" value={form.shiftId} rows={lists.shifts ?? []} onChange={(v) => change('shiftId', v)} />
-                <Select label="Nhà máy" value={form.factoryId} rows={lists.factories ?? []} onChange={(v) => void selectFactory(v)} />
-                <Select label="Phòng ban" value={form.departmentId} rows={lists.departments ?? []} onChange={(v) => void selectDepartment(v)} />
-                <Select label="Dây chuyền" value={form.productionLineId} rows={lists.lines ?? []} onChange={(v) => void selectLine(v)} />
-                <Select label="Tổ" value={form.teamId} rows={lists.teams ?? []} onChange={(v) => void selectTeam(v)} />
-                <Select label="Tổ trưởng" value={form.leaderEmployeeId} rows={lists.employees ?? []} name="fullName" onChange={(v) => change('leaderEmployeeId', v)} />
-                <Select label="Máy" value={form.machineId} rows={lists.machines ?? []} onChange={(v) => change('machineId', v)} />
+                <Select
+                  label="Ca"
+                  value={form.shiftId}
+                  rows={lists.shifts ?? []}
+                  onChange={(v) => change('shiftId', v)}
+                />
+                <Select
+                  label="Nhà máy"
+                  value={form.factoryId}
+                  rows={lists.factories ?? []}
+                  onChange={(v) => void selectFactory(v)}
+                />
+                <Select
+                  label="Phòng ban"
+                  value={form.departmentId}
+                  rows={lists.departments ?? []}
+                  onChange={(v) => void selectDepartment(v)}
+                />
+                <Select
+                  label="Dây chuyền"
+                  value={form.productionLineId}
+                  rows={lists.lines ?? []}
+                  onChange={(v) => void selectLine(v)}
+                />
+                <Select
+                  label="Tổ"
+                  value={form.teamId}
+                  rows={lists.teams ?? []}
+                  onChange={(v) => void selectTeam(v)}
+                />
+                <Select
+                  label="Tổ trưởng"
+                  value={form.leaderEmployeeId}
+                  rows={lists.employees ?? []}
+                  name="fullName"
+                  onChange={(v) => change('leaderEmployeeId', v)}
+                />
+                <Select
+                  label="Máy"
+                  value={form.machineId}
+                  rows={lists.machines ?? []}
+                  onChange={(v) => change('machineId', v)}
+                />
                 {[
                   ['plannedQuantity', 'Kế hoạch'],
                   ['actualQuantity', 'Thực tế'],
@@ -452,7 +554,12 @@ export default function TeamLeaderReportPage() {
                   ['downtimeMinutes', 'Phút dừng'],
                 ].map(([key, label]) => (
                   <Field key={key} label={label}>
-                    <input type="number" min="0" value={form[key]} onChange={(e) => change(key, e.target.value)} />
+                    <input
+                      type="number"
+                      min="0"
+                      value={form[key]}
+                      onChange={(e) => change(key, e.target.value)}
+                    />
                   </Field>
                 ))}
                 <Field label="Ghi chú">
@@ -460,7 +567,11 @@ export default function TeamLeaderReportPage() {
                 </Field>
               </div>
               <div className="form-actions">
-                <button className="primary" disabled={busy || report?.status === 'SUBMITTED'} onClick={() => void saveHeader()}>
+                <button
+                  className="primary"
+                  disabled={busy || report?.status === 'SUBMITTED'}
+                  onClick={() => void saveHeader()}
+                >
                   {busy ? 'Đang xử lý…' : report ? 'Lưu thông tin chung' : 'Lưu nháp và tiếp tục'}
                 </button>
               </div>
@@ -602,15 +713,29 @@ export default function TeamLeaderReportPage() {
           {tab === 'review' && (
             <Panel title="Kiểm tra và gửi báo cáo">
               <div className="review-summary">
-                <p>Báo cáo: <b>#{report?.id ?? 'Chưa lưu'}</b></p>
-                <p>Thực tế: <b>{form.actualQuantity}</b> · Lỗi: <b>{form.defectQuantity}</b> · Downtime: <b>{form.downtimeMinutes} phút</b></p>
                 <p>
-                  Downtime: {details['machine-downtime-staging'].length} · Loại lỗi: {details['quality-report-staging'].length} · Vật tư: {details['material-issue-staging'].length} · Nhân sự: {details['employee-actual-staging'].length}
+                  Báo cáo: <b>#{report?.id ?? 'Chưa lưu'}</b>
                 </p>
-                <p className="hint-inline">Hãy lưu lại thông tin chung sau khi điều chỉnh tổng lỗi hoặc tổng phút dừng.</p>
+                <p>
+                  Thực tế: <b>{form.actualQuantity}</b> · Lỗi: <b>{form.defectQuantity}</b> ·
+                  Downtime: <b>{form.downtimeMinutes} phút</b>
+                </p>
+                <p>
+                  Downtime: {details['machine-downtime-staging'].length} · Loại lỗi:{' '}
+                  {details['quality-report-staging'].length} · Vật tư:{' '}
+                  {details['material-issue-staging'].length} · Nhân sự:{' '}
+                  {details['employee-actual-staging'].length}
+                </p>
+                <p className="hint-inline">
+                  Hãy lưu lại thông tin chung sau khi điều chỉnh tổng lỗi hoặc tổng phút dừng.
+                </p>
               </div>
               <div className="form-actions">
-                <button className="primary" disabled={busy || dirty || !report || report.status !== 'DRAFT'} onClick={() => void submit()}>
+                <button
+                  className="primary"
+                  disabled={busy || dirty || !report || report.status !== 'DRAFT'}
+                  onClick={() => void submit()}
+                >
                   Xác nhận và gửi duyệt
                 </button>
               </div>
@@ -625,7 +750,12 @@ export default function TeamLeaderReportPage() {
 }
 
 function Field({ label, children }: { label: string; children: ReactNode }) {
-  return <label className="field"><span>{label}</span>{children}</label>
+  return (
+    <label className="field">
+      <span>{label}</span>
+      {children}
+    </label>
+  )
 }
 
 function Select({
@@ -647,7 +777,8 @@ function Select({
         <option value="">-- Chọn --</option>
         {rows.map((row) => (
           <option key={String(row.id)} value={String(row.id ?? '')}>
-            {row.code ? `${String(row.code)} - ` : ''}{String(row[name] ?? row.id ?? '')}
+            {row.code ? `${String(row.code)} - ` : ''}
+            {String(row[name] ?? row.id ?? '')}
           </option>
         ))}
       </select>
