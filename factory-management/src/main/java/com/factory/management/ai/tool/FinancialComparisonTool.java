@@ -53,7 +53,10 @@ public class FinancialComparisonTool implements AiDataTool {
     @Override
     public Map<String, Object> parametersSchema() {
         Map<String, Object> properties = new LinkedHashMap<>();
-        properties.put("currentFrom", AiToolArguments.nullableString("Ngày bắt đầu kỳ hiện tại ISO yyyy-MM-dd; null là đầu tháng hiện tại."));
+        properties.put(
+                "currentFrom",
+                AiToolArguments.nullableString("Ngày bắt đầu kỳ hiện tại ISO yyyy-MM-dd; null là đầu tháng hiện tại.")
+        );
         properties.put("currentTo", AiToolArguments.nullableString("Ngày kết thúc kỳ hiện tại; null là hôm nay."));
         properties.put("previousFrom", AiToolArguments.nullableString("Ngày bắt đầu kỳ so sánh; null là đầu tháng trước."));
         properties.put("previousTo", AiToolArguments.nullableString("Ngày kết thúc kỳ so sánh; null lấy cùng số ngày của kỳ hiện tại."));

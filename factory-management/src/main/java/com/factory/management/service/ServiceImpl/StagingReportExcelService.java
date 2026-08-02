@@ -276,8 +276,24 @@ public class StagingReportExcelService {
                     "FUTURE_DATE", "Không được nhập báo cáo cho ngày tương lai", row.reportDate.toString());
             validateHeaderNumbers(row, inspection);
 
-            Shift shift = lookup(context.shifts, row.shiftCode, inspection, SAN_LUONG, row.row, "shiftCode", "Không tìm thấy ca đang hoạt động");
-            Factory factory = lookup(context.factories, row.factoryCode, inspection, SAN_LUONG, row.row, "factoryCode", "Không tìm thấy nhà máy đang hoạt động");
+            Shift shift = lookup(
+                    context.shifts,
+                    row.shiftCode,
+                    inspection,
+                    SAN_LUONG,
+                    row.row,
+                    "shiftCode",
+                    "Không tìm thấy ca đang hoạt động"
+            );
+            Factory factory = lookup(
+                    context.factories,
+                    row.factoryCode,
+                    inspection,
+                    SAN_LUONG,
+                    row.row,
+                    "factoryCode",
+                    "Không tìm thấy nhà máy đang hoạt động"
+            );
             Department department = factory == null ? null : lookup(context.departments,
                     path(row.factoryCode, row.departmentCode), inspection, SAN_LUONG, row.row, "departmentCode",
                     "Không tìm thấy phòng ban trong nhà máy đã chọn");
